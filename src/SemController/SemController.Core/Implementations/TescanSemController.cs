@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Sockets;
 using System.Text;
 using SemController.Core.Interfaces;
@@ -10,10 +11,13 @@ public class TescanSemController : ISemController
     private readonly string _host;
     private readonly int _port;
     private readonly double _timeoutSeconds;
+    private readonly TimeSpan _stageMovementTimeout = TimeSpan.FromMinutes(5);
     
     private TcpClient? _client;
     private NetworkStream? _stream;
     private bool _disposed;
+    
+    private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
     
     public bool IsConnected => _client?.Connected ?? false;
     
@@ -126,7 +130,7 @@ public class TescanSemController : ISemController
     public async Task<double> GetVacuumPressureAsync(VacuumGauge gauge = VacuumGauge.Chamber, CancellationToken cancellationToken = default)
     {
         var response = await SendCommandAsync($"VacGetPressure {(int)gauge}", cancellationToken);
-        if (double.TryParse(response, out var pressure))
+        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var pressure))
             return pressure;
         return double.NaN;
     }
@@ -170,7 +174,7 @@ public class TescanSemController : ISemController
     public async Task<double> GetHighVoltageAsync(CancellationToken cancellationToken = default)
     {
         var response = await SendCommandAsync("HVGetVoltage", cancellationToken);
-        if (double.TryParse(response, out var voltage))
+        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var voltage))
             return voltage;
         return double.NaN;
     }
@@ -178,13 +182,13 @@ public class TescanSemController : ISemController
     public async Task SetHighVoltageAsync(double voltage, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
         var asyncFlag = waitForCompletion ? 0 : 1;
-        await SendCommandNoResponseAsync($"HVSetVoltage {voltage} {asyncFlag}", cancellationToken);
+        await SendCommandNoResponseAsync(string.Format(InvariantCulture, "HVSetVoltage {0} {1}", voltage, asyncFlag), cancellationToken);
     }
     
     public async Task<double> GetEmissionCurrentAsync(CancellationToken cancellationToken = default)
     {
         var response = await SendCommandAsync("HVGetEmission", cancellationToken);
-        if (double.TryParse(response, out var emission))
+        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var emission))
             return emission;
         return double.NaN;
     }
@@ -195,12 +199,12 @@ public class TescanSemController : ISemController
         var parts = response.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         
         var position = new StagePosition();
-        if (parts.Length >= 1 && double.TryParse(parts[0], out var x)) position.X = x;
-        if (parts.Length >= 2 && double.TryParse(parts[1], out var y)) position.Y = y;
-        if (parts.Length >= 3 && double.TryParse(parts[2], out var z)) position.Z = z;
-        if (parts.Length >= 4 && double.TryParse(parts[3], out var rot)) position.Rotation = rot;
-        if (parts.Length >= 5 && double.TryParse(parts[4], out var tiltX)) position.TiltX = tiltX;
-        if (parts.Length >= 6 && double.TryParse(parts[5], out var tiltY)) position.TiltY = tiltY;
+        if (parts.Length >= 1 && double.TryParse(parts[0], NumberStyles.Float, InvariantCulture, out var x)) position.X = x;
+        if (parts.Length >= 2 && double.TryParse(parts[1], NumberStyles.Float, InvariantCulture, out var y)) position.Y = y;
+        if (parts.Length >= 3 && double.TryParse(parts[2], NumberStyles.Float, InvariantCulture, out var z)) position.Z = z;
+        if (parts.Length >= 4 && double.TryParse(parts[3], NumberStyles.Float, InvariantCulture, out var rot)) position.Rotation = rot;
+        if (parts.Length >= 5 && double.TryParse(parts[4], NumberStyles.Float, InvariantCulture, out var tiltX)) position.TiltX = tiltX;
+        if (parts.Length >= 6 && double.TryParse(parts[5], NumberStyles.Float, InvariantCulture, out var tiltY)) position.TiltY = tiltY;
         
         return position;
     }
@@ -208,34 +212,41 @@ public class TescanSemController : ISemController
     public async Task MoveStageAsync(StagePosition position, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
         var command = position.TiltY.HasValue
-            ? $"StgMoveTo {position.X} {position.Y} {position.Z} {position.Rotation} {position.TiltX} {position.TiltY}"
-            : $"StgMoveTo {position.X} {position.Y} {position.Z} {position.Rotation} {position.TiltX}";
+            ? string.Format(InvariantCulture, "StgMoveTo {0} {1} {2} {3} {4} {5}", position.X, position.Y, position.Z, position.Rotation, position.TiltX, position.TiltY)
+            : string.Format(InvariantCulture, "StgMoveTo {0} {1} {2} {3} {4}", position.X, position.Y, position.Z, position.Rotation, position.TiltX);
         
         await SendCommandNoResponseAsync(command, cancellationToken);
         
         if (waitForCompletion)
         {
-            while (await IsStageMovingAsync(cancellationToken))
-            {
-                await Task.Delay(100, cancellationToken);
-            }
+            await WaitForStageMovementAsync(cancellationToken);
         }
     }
     
     public async Task MoveStageRelativeAsync(StagePosition delta, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
         var command = delta.TiltY.HasValue
-            ? $"StgMove {delta.X} {delta.Y} {delta.Z} {delta.Rotation} {delta.TiltX} {delta.TiltY}"
-            : $"StgMove {delta.X} {delta.Y} {delta.Z} {delta.Rotation} {delta.TiltX}";
+            ? string.Format(InvariantCulture, "StgMove {0} {1} {2} {3} {4} {5}", delta.X, delta.Y, delta.Z, delta.Rotation, delta.TiltX, delta.TiltY)
+            : string.Format(InvariantCulture, "StgMove {0} {1} {2} {3} {4}", delta.X, delta.Y, delta.Z, delta.Rotation, delta.TiltX);
         
         await SendCommandNoResponseAsync(command, cancellationToken);
         
         if (waitForCompletion)
         {
-            while (await IsStageMovingAsync(cancellationToken))
+            await WaitForStageMovementAsync(cancellationToken);
+        }
+    }
+    
+    private async Task WaitForStageMovementAsync(CancellationToken cancellationToken)
+    {
+        var startTime = DateTime.UtcNow;
+        while (await IsStageMovingAsync(cancellationToken))
+        {
+            if (DateTime.UtcNow - startTime > _stageMovementTimeout)
             {
-                await Task.Delay(100, cancellationToken);
+                throw new TimeoutException($"Stage movement timed out after {_stageMovementTimeout.TotalMinutes} minutes");
             }
+            await Task.Delay(100, cancellationToken);
         }
     }
     
@@ -258,43 +269,43 @@ public class TescanSemController : ISemController
         var limits = new StageLimits();
         if (parts.Length >= 2)
         {
-            double.TryParse(parts[0], out var minX);
-            double.TryParse(parts[1], out var maxX);
+            double.TryParse(parts[0], NumberStyles.Float, InvariantCulture, out var minX);
+            double.TryParse(parts[1], NumberStyles.Float, InvariantCulture, out var maxX);
             limits.MinX = minX;
             limits.MaxX = maxX;
         }
         if (parts.Length >= 4)
         {
-            double.TryParse(parts[2], out var minY);
-            double.TryParse(parts[3], out var maxY);
+            double.TryParse(parts[2], NumberStyles.Float, InvariantCulture, out var minY);
+            double.TryParse(parts[3], NumberStyles.Float, InvariantCulture, out var maxY);
             limits.MinY = minY;
             limits.MaxY = maxY;
         }
         if (parts.Length >= 6)
         {
-            double.TryParse(parts[4], out var minZ);
-            double.TryParse(parts[5], out var maxZ);
+            double.TryParse(parts[4], NumberStyles.Float, InvariantCulture, out var minZ);
+            double.TryParse(parts[5], NumberStyles.Float, InvariantCulture, out var maxZ);
             limits.MinZ = minZ;
             limits.MaxZ = maxZ;
         }
         if (parts.Length >= 8)
         {
-            double.TryParse(parts[6], out var minRot);
-            double.TryParse(parts[7], out var maxRot);
+            double.TryParse(parts[6], NumberStyles.Float, InvariantCulture, out var minRot);
+            double.TryParse(parts[7], NumberStyles.Float, InvariantCulture, out var maxRot);
             limits.MinRotation = minRot;
             limits.MaxRotation = maxRot;
         }
         if (parts.Length >= 10)
         {
-            double.TryParse(parts[8], out var minTiltX);
-            double.TryParse(parts[9], out var maxTiltX);
+            double.TryParse(parts[8], NumberStyles.Float, InvariantCulture, out var minTiltX);
+            double.TryParse(parts[9], NumberStyles.Float, InvariantCulture, out var maxTiltX);
             limits.MinTiltX = minTiltX;
             limits.MaxTiltX = maxTiltX;
         }
         if (parts.Length >= 12)
         {
-            double.TryParse(parts[10], out var minTiltY);
-            double.TryParse(parts[11], out var maxTiltY);
+            double.TryParse(parts[10], NumberStyles.Float, InvariantCulture, out var minTiltY);
+            double.TryParse(parts[11], NumberStyles.Float, InvariantCulture, out var maxTiltY);
             limits.MinTiltY = minTiltY;
             limits.MaxTiltY = maxTiltY;
         }
@@ -316,7 +327,7 @@ public class TescanSemController : ISemController
     public async Task<double> GetMagnificationAsync(CancellationToken cancellationToken = default)
     {
         var response = await SendCommandAsync("OpGetViewField", cancellationToken);
-        if (double.TryParse(response, out var viewField))
+        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var viewField))
             return 1.0 / viewField;
         return double.NaN;
     }
@@ -324,20 +335,20 @@ public class TescanSemController : ISemController
     public async Task SetMagnificationAsync(double magnification, CancellationToken cancellationToken = default)
     {
         var viewField = 1.0 / magnification;
-        await SendCommandNoResponseAsync($"OpSetViewField {viewField}", cancellationToken);
+        await SendCommandNoResponseAsync(string.Format(InvariantCulture, "OpSetViewField {0}", viewField), cancellationToken);
     }
     
     public async Task<double> GetWorkingDistanceAsync(CancellationToken cancellationToken = default)
     {
         var response = await SendCommandAsync("OpGetWD", cancellationToken);
-        if (double.TryParse(response, out var wd))
+        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var wd))
             return wd;
         return double.NaN;
     }
     
     public async Task SetWorkingDistanceAsync(double workingDistance, CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync($"OpSetWD {workingDistance}", cancellationToken);
+        await SendCommandNoResponseAsync(string.Format(InvariantCulture, "OpSetWD {0}", workingDistance), cancellationToken);
     }
     
     public async Task<double> GetFocusAsync(CancellationToken cancellationToken = default)
@@ -389,7 +400,8 @@ public class TescanSemController : ISemController
         var bottom = settings.Bottom > 0 ? settings.Bottom : settings.Height;
         
         await SendCommandAsync(
-            $"ScScanXY 0 {settings.Width} {settings.Height} {settings.Left} {settings.Top} {right} {bottom} 1 {(uint)(settings.DwellTimeUs * 1000)}",
+            string.Format(InvariantCulture, "ScScanXY 0 {0} {1} {2} {3} {4} {5} 1 {6}",
+                settings.Width, settings.Height, settings.Left, settings.Top, right, bottom, (uint)(settings.DwellTimeUs * 1000)),
             cancellationToken);
         
         var response = await SendCommandAsync(
@@ -435,14 +447,14 @@ public class TescanSemController : ISemController
     public async Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default)
     {
         var response = await SendCommandAsync("OpGetSpotSize", cancellationToken);
-        if (double.TryParse(response, out var spotSize))
+        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var spotSize))
             return spotSize;
         return double.NaN;
     }
     
     public async Task SetSpotSizeAsync(double spotSize, CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync($"OpSetSpotSize {spotSize}", cancellationToken);
+        await SendCommandNoResponseAsync(string.Format(InvariantCulture, "OpSetSpotSize {0}", spotSize), cancellationToken);
     }
     
     public void Dispose()
