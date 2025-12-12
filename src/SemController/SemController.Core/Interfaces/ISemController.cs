@@ -35,8 +35,8 @@ public interface ISemController : IDisposable
     Task CalibrateStageAsync(CancellationToken cancellationToken = default);
     Task<bool> IsStageCallibratedAsync(CancellationToken cancellationToken = default);
     
-    Task<double> GetMagnificationAsync(CancellationToken cancellationToken = default);
-    Task SetMagnificationAsync(double magnification, CancellationToken cancellationToken = default);
+    Task<double> GetViewFieldAsync(CancellationToken cancellationToken = default);
+    Task SetViewFieldAsync(double viewFieldMicrons, CancellationToken cancellationToken = default);
     
     Task<double> GetWorkingDistanceAsync(CancellationToken cancellationToken = default);
     Task SetWorkingDistanceAsync(double workingDistance, CancellationToken cancellationToken = default);

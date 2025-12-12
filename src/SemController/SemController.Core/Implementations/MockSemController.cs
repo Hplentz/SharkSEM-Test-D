@@ -11,7 +11,7 @@ public class MockSemController : ISemController
     private BeamState _beamState = BeamState.Off;
     private double _highVoltage = 15000;
     private double _workingDistance = 0.010;
-    private double _magnification = 1000;
+    private double _viewFieldMicrons = 100;
     private int _scanSpeed = 5;
     private BlankerMode _blankerMode = BlankerMode.Off;
     private double _spotSize = 3.0;
@@ -164,12 +164,12 @@ public class MockSemController : ISemController
     public Task<bool> IsStageCallibratedAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(true);
     
-    public Task<double> GetMagnificationAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(_magnification);
+    public Task<double> GetViewFieldAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(_viewFieldMicrons);
     
-    public Task SetMagnificationAsync(double magnification, CancellationToken cancellationToken = default)
+    public Task SetViewFieldAsync(double viewFieldMicrons, CancellationToken cancellationToken = default)
     {
-        _magnification = Math.Clamp(magnification, 10, 1000000);
+        _viewFieldMicrons = Math.Clamp(viewFieldMicrons, 1, 100000);
         return Task.CompletedTask;
     }
     

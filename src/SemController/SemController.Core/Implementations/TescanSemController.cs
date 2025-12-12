@@ -343,9 +343,9 @@ public class TescanSemController : ISemController
         if (response.Length > 0)
         {
             int offset = 0;
-            if (offset < response.Length) position.X = DecodeFloat(response, ref offset);
-            if (offset < response.Length) position.Y = DecodeFloat(response, ref offset);
-            if (offset < response.Length) position.Z = DecodeFloat(response, ref offset);
+            if (offset < response.Length) position.X = DecodeFloat(response, ref offset) / 1000.0;
+            if (offset < response.Length) position.Y = DecodeFloat(response, ref offset) / 1000.0;
+            if (offset < response.Length) position.Z = DecodeFloat(response, ref offset) / 1000.0;
             if (offset < response.Length) position.Rotation = DecodeFloat(response, ref offset);
             if (offset < response.Length) position.TiltX = DecodeFloat(response, ref offset);
             if (offset < response.Length) position.TiltY = DecodeFloat(response, ref offset);
@@ -357,9 +357,9 @@ public class TescanSemController : ISemController
     public async Task MoveStageAsync(StagePosition position, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
         var body = new List<byte>();
-        body.AddRange(EncodeFloat(position.X));
-        body.AddRange(EncodeFloat(position.Y));
-        body.AddRange(EncodeFloat(position.Z));
+        body.AddRange(EncodeFloat(position.X * 1000.0));
+        body.AddRange(EncodeFloat(position.Y * 1000.0));
+        body.AddRange(EncodeFloat(position.Z * 1000.0));
         body.AddRange(EncodeFloat(position.Rotation));
         body.AddRange(EncodeFloat(position.TiltX));
         if (position.TiltY.HasValue)
@@ -378,9 +378,9 @@ public class TescanSemController : ISemController
     public async Task MoveStageRelativeAsync(StagePosition delta, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
         var body = new List<byte>();
-        body.AddRange(EncodeFloat(delta.X));
-        body.AddRange(EncodeFloat(delta.Y));
-        body.AddRange(EncodeFloat(delta.Z));
+        body.AddRange(EncodeFloat(delta.X * 1000.0));
+        body.AddRange(EncodeFloat(delta.Y * 1000.0));
+        body.AddRange(EncodeFloat(delta.Z * 1000.0));
         body.AddRange(EncodeFloat(delta.Rotation));
         body.AddRange(EncodeFloat(delta.TiltX));
         if (delta.TiltY.HasValue)
@@ -433,12 +433,12 @@ public class TescanSemController : ISemController
         if (response.Length > 0)
         {
             int offset = 0;
-            if (offset < response.Length) limits.MinX = DecodeFloat(response, ref offset);
-            if (offset < response.Length) limits.MaxX = DecodeFloat(response, ref offset);
-            if (offset < response.Length) limits.MinY = DecodeFloat(response, ref offset);
-            if (offset < response.Length) limits.MaxY = DecodeFloat(response, ref offset);
-            if (offset < response.Length) limits.MinZ = DecodeFloat(response, ref offset);
-            if (offset < response.Length) limits.MaxZ = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MinX = DecodeFloat(response, ref offset) / 1000.0;
+            if (offset < response.Length) limits.MaxX = DecodeFloat(response, ref offset) / 1000.0;
+            if (offset < response.Length) limits.MinY = DecodeFloat(response, ref offset) / 1000.0;
+            if (offset < response.Length) limits.MaxY = DecodeFloat(response, ref offset) / 1000.0;
+            if (offset < response.Length) limits.MinZ = DecodeFloat(response, ref offset) / 1000.0;
+            if (offset < response.Length) limits.MaxZ = DecodeFloat(response, ref offset) / 1000.0;
             if (offset < response.Length) limits.MinRotation = DecodeFloat(response, ref offset);
             if (offset < response.Length) limits.MaxRotation = DecodeFloat(response, ref offset);
             if (offset < response.Length) limits.MinTiltX = DecodeFloat(response, ref offset);
@@ -465,22 +465,22 @@ public class TescanSemController : ISemController
         return false;
     }
     
-    public async Task<double> GetMagnificationAsync(CancellationToken cancellationToken = default)
+    public async Task<double> GetViewFieldAsync(CancellationToken cancellationToken = default)
     {
         var response = await SendCommandAsync("GetViewField", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
-            var viewField = DecodeFloat(response, ref offset);
-            return 1.0 / viewField;
+            var viewFieldMm = DecodeFloat(response, ref offset);
+            return viewFieldMm * 1000.0;
         }
         return double.NaN;
     }
     
-    public async Task SetMagnificationAsync(double magnification, CancellationToken cancellationToken = default)
+    public async Task SetViewFieldAsync(double viewFieldMicrons, CancellationToken cancellationToken = default)
     {
-        var viewField = 1.0 / magnification;
-        var body = EncodeFloat(viewField);
+        var viewFieldMm = viewFieldMicrons / 1000.0;
+        var body = EncodeFloat(viewFieldMm);
         await SendCommandNoResponseAsync("SetViewField", body, cancellationToken);
     }
     
@@ -490,14 +490,16 @@ public class TescanSemController : ISemController
         if (response.Length > 0)
         {
             int offset = 0;
-            return DecodeFloat(response, ref offset);
+            var wdMicrons = DecodeFloat(response, ref offset);
+            return wdMicrons / 1000.0;
         }
         return double.NaN;
     }
     
-    public async Task SetWorkingDistanceAsync(double workingDistance, CancellationToken cancellationToken = default)
+    public async Task SetWorkingDistanceAsync(double workingDistanceMm, CancellationToken cancellationToken = default)
     {
-        var body = EncodeFloat(workingDistance);
+        var wdMicrons = workingDistanceMm * 1000.0;
+        var body = EncodeFloat(wdMicrons);
         await SendCommandNoResponseAsync("SetWD", body, cancellationToken);
     }
     

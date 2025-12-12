@@ -54,6 +54,12 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-12: Fixed unit conversions for TESCAN API
+  - Stage positions/limits: API returns µm, converted to mm (÷1000)
+  - Working Distance: API returns µm, converted to mm (÷1000)
+  - Replaced magnification with View Field (API returns mm, displayed as µm)
+  - Updated interface: GetViewFieldAsync/SetViewFieldAsync replace Get/SetMagnificationAsync
+
 - 2024-12-12: Fixed SharkSEM binary protocol implementation
   - Rewrote TescanSemController to use correct 32-byte binary header format
   - Implemented proper encoding for integers, floats (as strings), and arrays
@@ -93,4 +99,11 @@ The SharkSEM protocol uses a binary message format over TCP:
 - .NET 8.0
 - No external dependencies (pure BCL implementation)
 - SharkSEM uses TCP port 8300 by default
-- All measurements in SI units (meters, volts, amperes, pascals)
+
+## Unit Conventions
+- **Stage positions/limits**: Returned in **mm** (API returns µm, converted ÷1000)
+- **Working Distance**: Returned in **mm** (API returns µm, converted ÷1000)
+- **View Field**: Returned in **µm** (API returns mm, converted ×1000)
+- **High Voltage**: Volts
+- **Emission Current**: Amperes (API returns µA, converted)
+- **Tilt/Rotation**: Degrees (no conversion)

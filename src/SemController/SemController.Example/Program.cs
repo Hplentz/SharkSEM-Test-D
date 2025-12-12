@@ -55,30 +55,30 @@ using (ISemController sem = SemControllerFactory.CreateMock())
     Console.WriteLine($"\nStage Position: {stagePos}");
     
     var limits = await sem.GetStageLimitsAsync();
-    Console.WriteLine($"Stage X Range: {limits.MinX * 1000:F1} to {limits.MaxX * 1000:F1} mm");
-    Console.WriteLine($"Stage Y Range: {limits.MinY * 1000:F1} to {limits.MaxY * 1000:F1} mm");
-    Console.WriteLine($"Stage Z Range: {limits.MinZ * 1000:F1} to {limits.MaxZ * 1000:F1} mm");
+    Console.WriteLine($"Stage X Range: {limits.MinX:F1} to {limits.MaxX:F1} mm");
+    Console.WriteLine($"Stage Y Range: {limits.MinY:F1} to {limits.MaxY:F1} mm");
+    Console.WriteLine($"Stage Z Range: {limits.MinZ:F1} to {limits.MaxZ:F1} mm");
     
     Console.WriteLine("\nMoving stage to X=10mm, Y=5mm...");
     await sem.MoveStageAsync(new StagePosition(0.010, 0.005));
     stagePos = await sem.GetStagePositionAsync();
     Console.WriteLine($"New Position: {stagePos}");
     
-    var mag = await sem.GetMagnificationAsync();
-    Console.WriteLine($"\nMagnification: {mag}x");
+    var viewField = await sem.GetViewFieldAsync();
+    Console.WriteLine($"\nView Field: {viewField:F1} um");
     
-    Console.WriteLine("Setting magnification to 5000x...");
-    await sem.SetMagnificationAsync(5000);
-    mag = await sem.GetMagnificationAsync();
-    Console.WriteLine($"Magnification: {mag}x");
+    Console.WriteLine("Setting view field to 50 um...");
+    await sem.SetViewFieldAsync(50);
+    viewField = await sem.GetViewFieldAsync();
+    Console.WriteLine($"View Field: {viewField:F1} um");
     
     var wd = await sem.GetWorkingDistanceAsync();
-    Console.WriteLine($"\nWorking Distance: {wd * 1000:F2} mm");
+    Console.WriteLine($"\nWorking Distance: {wd:F2} mm");
     
     Console.WriteLine("\nRunning AutoFocus...");
     await sem.AutoFocusAsync();
     wd = await sem.GetWorkingDistanceAsync();
-    Console.WriteLine($"Working Distance: {wd * 1000:F2} mm");
+    Console.WriteLine($"Working Distance: {wd:F2} mm");
     
     Console.WriteLine("\nAcquiring sample image (256x256)...");
     var image = await sem.AcquireSingleImageAsync(0, 256, 256);
