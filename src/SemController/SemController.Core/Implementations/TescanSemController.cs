@@ -15,8 +15,11 @@ public class TescanSemController : ISemController
     
     private TcpClient? _client;
     private NetworkStream? _stream;
+    private TcpClient? _dataClient;
+    private NetworkStream? _dataStream;
     private bool _disposed;
     private uint _messageId;
+    private bool _dataChannelRegistered;
     
     private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
     
@@ -48,10 +51,38 @@ public class TescanSemController : ISemController
         
         await _client.ConnectAsync(_host, _port, cancellationToken);
         _stream = _client.GetStream();
+        
+        _dataChannelRegistered = false;
+    }
+    
+    private async Task EnsureDataChannelAsync(CancellationToken cancellationToken)
+    {
+        if (_dataClient?.Connected == true && _dataChannelRegistered)
+            return;
+            
+        _dataClient = new TcpClient();
+        _dataClient.ReceiveTimeout = (int)(_timeoutSeconds * 1000);
+        _dataClient.SendTimeout = (int)(_timeoutSeconds * 1000);
+        
+        _dataClient.Client.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0));
+        var localPort = ((System.Net.IPEndPoint)_dataClient.Client.LocalEndPoint!).Port;
+        
+        var regBody = EncodeInt(localPort);
+        await SendCommandAsync("TcpRegDataPort", regBody, cancellationToken);
+        
+        await _dataClient.ConnectAsync(_host, _port + 1, cancellationToken);
+        _dataStream = _dataClient.GetStream();
+        _dataChannelRegistered = true;
     }
     
     public Task DisconnectAsync(CancellationToken cancellationToken = default)
     {
+        _dataStream?.Close();
+        _dataClient?.Close();
+        _dataStream = null;
+        _dataClient = null;
+        _dataChannelRegistered = false;
+        
         _stream?.Close();
         _client?.Close();
         _stream = null;
@@ -433,12 +464,12 @@ public class TescanSemController : ISemController
         if (response.Length > 0)
         {
             int offset = 0;
-            if (offset < response.Length) limits.MinX = DecodeFloat(response, ref offset) / 1000.0;
-            if (offset < response.Length) limits.MaxX = DecodeFloat(response, ref offset) / 1000.0;
-            if (offset < response.Length) limits.MinY = DecodeFloat(response, ref offset) / 1000.0;
-            if (offset < response.Length) limits.MaxY = DecodeFloat(response, ref offset) / 1000.0;
-            if (offset < response.Length) limits.MinZ = DecodeFloat(response, ref offset) / 1000.0;
-            if (offset < response.Length) limits.MaxZ = DecodeFloat(response, ref offset) / 1000.0;
+            if (offset < response.Length) limits.MinX = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxX = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MinY = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxY = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MinZ = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxZ = DecodeFloat(response, ref offset);
             if (offset < response.Length) limits.MinRotation = DecodeFloat(response, ref offset);
             if (offset < response.Length) limits.MaxRotation = DecodeFloat(response, ref offset);
             if (offset < response.Length) limits.MinTiltX = DecodeFloat(response, ref offset);
@@ -551,6 +582,8 @@ public class TescanSemController : ISemController
     
     public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
     {
+        await EnsureDataChannelAsync(cancellationToken);
+        
         var right = settings.Right > 0 ? settings.Right : settings.Width;
         var bottom = settings.Bottom > 0 ? settings.Bottom : settings.Height;
         
@@ -576,23 +609,76 @@ public class TescanSemController : ISemController
         fetchBody.AddRange(EncodeInt(settings.Width));
         fetchBody.AddRange(EncodeInt(settings.Height));
         
-        var response = await SendCommandAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
+        var fetchResponse = await SendCommandAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
         
         var images = new List<SemImage>();
-        var imageSize = settings.Width * settings.Height;
+        var channelCount = settings.Channels.Length;
         
-        for (int i = 0; i < settings.Channels.Length; i++)
+        var imageSizes = ParseFetchImageResponse(fetchResponse, channelCount, settings.Width, settings.Height);
+        
+        for (int i = 0; i < channelCount; i++)
         {
-            var start = i * imageSize;
-            if (start + imageSize <= response.Length)
+            var imageSize = imageSizes.Length > i ? imageSizes[i] : settings.Width * settings.Height;
+            var imageData = await ReadImageFromDataChannelAsync(imageSize, cancellationToken);
+            if (imageData.Length > 0)
             {
-                var imageData = new byte[imageSize];
-                Array.Copy(response, start, imageData, 0, imageSize);
                 images.Add(new SemImage(settings.Width, settings.Height, imageData, settings.Channels[i]));
             }
         }
         
         return images.ToArray();
+    }
+    
+    private static int[] ParseFetchImageResponse(byte[] response, int channelCount, int width, int height)
+    {
+        var sizes = new int[channelCount];
+        var defaultSize = width * height;
+        
+        if (response.Length >= channelCount * 4)
+        {
+            for (int i = 0; i < channelCount; i++)
+            {
+                var size = BitConverter.ToInt32(response, i * 4);
+                sizes[i] = size > 0 ? size : defaultSize;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < channelCount; i++)
+                sizes[i] = defaultSize;
+        }
+        
+        return sizes;
+    }
+    
+    private async Task<byte[]> ReadImageFromDataChannelAsync(int expectedSize, CancellationToken cancellationToken)
+    {
+        if (_dataStream == null)
+            return Array.Empty<byte>();
+        
+        try
+        {
+            var imageData = new byte[expectedSize];
+            var bytesRead = 0;
+            var timeout = TimeSpan.FromSeconds(_timeoutSeconds);
+            var startTime = DateTime.UtcNow;
+            
+            while (bytesRead < expectedSize)
+            {
+                if (DateTime.UtcNow - startTime > timeout)
+                    break;
+                    
+                var read = await _dataStream.ReadAsync(imageData.AsMemory(bytesRead, expectedSize - bytesRead), cancellationToken);
+                if (read == 0) break;
+                bytesRead += read;
+            }
+            
+            return bytesRead == expectedSize ? imageData : Array.Empty<byte>();
+        }
+        catch
+        {
+            return Array.Empty<byte>();
+        }
     }
     
     public async Task<SemImage> AcquireSingleImageAsync(int channel, int width, int height, CancellationToken cancellationToken = default)
@@ -642,6 +728,8 @@ public class TescanSemController : ISemController
         
         if (disposing)
         {
+            _dataStream?.Dispose();
+            _dataClient?.Dispose();
             _stream?.Dispose();
             _client?.Dispose();
         }

@@ -102,9 +102,19 @@ The SharkSEM protocol uses a binary message format over TCP:
 
 ## Unit Conventions
 - **Stage positions**: Returned in **mm** (no conversion - API returns mm)
-- **Stage limits X/Y/Z**: Returned in **mm** (API returns µm, converted ÷1000)
+- **Stage limits X/Y/Z**: Returned in **mm** (no conversion - API returns mm)
 - **Working Distance**: Returned in **mm** (no conversion - API returns mm)
 - **View Field**: Returned in **µm** (API returns mm, converted ×1000)
 - **High Voltage**: Volts
 - **Emission Current**: Amperes (API returns µA, converted)
 - **Tilt/Rotation**: Degrees (no conversion)
+
+## Image Acquisition
+The FetchImage command requires a separate data channel connection:
+- **Control port**: 8300 (commands and responses)
+- **Data port**: 8301 (image data transfer)
+
+The library automatically establishes the data channel when acquiring images:
+1. Binds to a local port
+2. Registers the data port with TcpRegDataPort
+3. Connects to port 8301 for image data transfer
