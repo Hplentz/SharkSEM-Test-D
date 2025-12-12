@@ -101,8 +101,9 @@ The SharkSEM protocol uses a binary message format over TCP:
 - SharkSEM uses TCP port 8300 by default
 
 ## Unit Conventions
-- **Stage positions/limits**: Returned in **mm** (API returns µm, converted ÷1000)
-- **Working Distance**: Returned in **mm** (API returns µm, converted ÷1000)
+- **Stage positions**: Returned in **mm** (no conversion - API returns mm)
+- **Stage limits X/Y/Z**: Returned in **mm** (API returns µm, converted ÷1000)
+- **Working Distance**: Returned in **mm** (no conversion - API returns mm)
 - **View Field**: Returned in **µm** (API returns mm, converted ×1000)
 - **High Voltage**: Volts
 - **Emission Current**: Amperes (API returns µA, converted)

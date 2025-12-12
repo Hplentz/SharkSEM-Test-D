@@ -1,6 +1,8 @@
 using SemController.Core.Factory;
 using SemController.Core.Models;
 using SemController.Core.Interfaces;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 Console.WriteLine("=== SEM Controller Library Demo ===\n");
 
@@ -83,6 +85,35 @@ using (ISemController sem = SemControllerFactory.CreateMock())
     Console.WriteLine("\nAcquiring sample image (256x256)...");
     var image = await sem.AcquireSingleImageAsync(0, 256, 256);
     Console.WriteLine($"Image acquired: {image.Width}x{image.Height}, {image.Data.Length} bytes, Channel {image.Channel}");
+    
+    var outputPath = Path.Combine(@"C:\Temp", $"SEM_Image_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+    try
+    {
+        Directory.CreateDirectory(@"C:\Temp");
+        using var bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format8bppIndexed);
+        var palette = bitmap.Palette;
+        for (int i = 0; i < 256; i++)
+        {
+            palette.Entries[i] = Color.FromArgb(i, i, i);
+        }
+        bitmap.Palette = palette;
+        
+        var bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), 
+            ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
+        for (int y = 0; y < image.Height; y++)
+        {
+            System.Runtime.InteropServices.Marshal.Copy(image.Data, y * image.Width, 
+                bitmapData.Scan0 + y * bitmapData.Stride, image.Width);
+        }
+        bitmap.UnlockBits(bitmapData);
+        
+        bitmap.Save(outputPath, ImageFormat.Png);
+        Console.WriteLine($"Image saved to: {outputPath}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Could not save image: {ex.Message}");
+    }
     
     await sem.BeamOffAsync();
     Console.WriteLine("\nBeam turned OFF");
