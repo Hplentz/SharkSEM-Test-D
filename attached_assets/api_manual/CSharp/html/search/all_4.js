@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['callbacks_0',['Callbacks',['../rca_desc.html#rcaCallbacks',1,'']]],
+  ['camera_1',['Chamber Camera',['../group__camera.html',1,'']]],
+  ['cameradisable_2',['CameraDisable',['../group__camera.html#gad65f8b54e9f14829b3c875164b180905',1,'SharkSEM::Commands']]],
+  ['cameraenable_3',['CameraEnable',['../group__camera.html#ga45ae86d9af694b38b3417a3a59ee1ef6',1,'SharkSEM::Commands']]],
+  ['cameraenum_4',['CameraEnum',['../group__camera.html#gaec8511b2c77208ca62385bb477c2658c',1,'SharkSEM::Commands']]],
+  ['cameragetstatus_5',['cameragetstatus',['../group__camera.html#ga4baaeca94cbb10efeddde8b455f320fa',1,'SharkSEM.Commands.CameraGetStatus(this Connection Conn, int Index, out int IsEnabled, out double Zoom, out double Fps, out int Compression)'],['../group__camera.html#ga1783af56128e579b0be6e3a4103d3b79',1,'SharkSEM.Commands.CameraGetStatus(this Connection Conn, out int IsEnabled, out double Zoom, out double Fps, out int Compression)']]],
+  ['centering_6',['centering',['../group__fib_centering.html',1,'FIB Centering'],['../group__sem_centering.html',1,'SEM Centering']]],
+  ['chamber_7',['Chamber',['../group__chamber.html',1,'']]],
+  ['chamber_20camera_8',['Chamber Camera',['../group__camera.html',1,'']]],
+  ['chamberled_9',['ChamberLed',['../group__misc.html#ga92d740d250d8637cf6a1f7a8f49d65df',1,'SharkSEM::Commands']]],
+  ['channels_20and_20detectors_10',['channels and detectors',['../group__fib_detectors.html',1,'FIB Input Channels and Detectors'],['../group__sem_detector.html',1,'SEM Input Channels And Detectors']]],
+  ['chord_20algorithm_11',['chord algorithm',['../group__rca.html',1,'RCA - Rotating Chord Algorithm'],['../rca_desc.html',1,'Rotating Chord Algorithm']]],
+  ['clients_12',['Concurrent Clients',['../overview.html#concurrentClients',1,'']]],
+  ['codes_13',['codes',['../draw_beam_desc.html#drwErrorCodes',1,'DrawBeam Error Codes'],['../stream_files_desc.html#streamFilesErrCodes',1,'Stream Files Error Codes']]],
+  ['command_14',['Single Command',['../command_processing.html#singleCommand',1,'']]],
+  ['command_20processing_15',['command processing',['../command_processing.html',1,'Command Processing'],['../command_processing.html#internalCommandProcessing',1,'Internal Command Processing']]],
+  ['commands_2ecs_16',['Commands.cs',['../_commands_8cs.html',1,'']]],
+  ['communication_17',['Communication',['../group__communication.html',1,'']]],
+  ['compound_20types_18',['Compound Types',['../message_structure.html#compoundTypes',1,'']]],
+  ['concurrent_20clients_19',['Concurrent Clients',['../overview.html#concurrentClients',1,'']]],
+  ['connection_20',['Connection',['../class_shark_s_e_m_1_1_connection.html',1,'SharkSEM']]],
+  ['control_21',['control',['../group__fib.html',1,'FIB Control'],['../group__fib_gui.html',1,'FIB GUI Control'],['../group__sem.html',1,'SEM Control'],['../group__sem_gui.html',1,'SEM GUI Control'],['../group__shutter.html',1,'Shutter Control'],['../group__stage.html',1,'Stage Control']]]
+];

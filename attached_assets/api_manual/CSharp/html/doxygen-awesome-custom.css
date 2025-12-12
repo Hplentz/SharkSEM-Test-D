@@ -1,0 +1,23 @@
+h1 {
+    /*h1 right color according theme */
+    color: var(--page-foreground-color);
+}
+
+#projectlogo img {
+    /*Bigger space between logo and name*/
+    margin-right: var(--spacing-medium);
+}
+
+#side-nav {
+    /*wider to accommodate headline*/
+    width: 270px;
+}
+
+.memItemLeft, .memTemplItemLeft {
+    /*Return types of function wrap */
+    white-space: initial
+}
+
+.directory .levels span {
+    color: var(--page-foreground-color);
+}
