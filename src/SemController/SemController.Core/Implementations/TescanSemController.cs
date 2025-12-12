@@ -16,8 +16,13 @@ public class TescanSemController : ISemController
     private TcpClient? _client;
     private NetworkStream? _stream;
     private bool _disposed;
+    private uint _messageId;
     
     private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
+    
+    private const int HeaderSize = 32;
+    private const int CommandNameSize = 16;
+    private const ushort FlagSendResponse = 0x0001;
     
     public bool IsConnected => _client?.Connected ?? false;
     
@@ -54,34 +59,132 @@ public class TescanSemController : ISemController
         return Task.CompletedTask;
     }
     
-    private async Task<string> SendCommandAsync(string command, CancellationToken cancellationToken)
+    private byte[] BuildHeader(string command, uint bodySize, ushort flags = FlagSendResponse, ushort queue = 0)
     {
-        if (_stream == null)
-            throw new InvalidOperationException("Not connected to microscope");
+        var header = new byte[HeaderSize];
         
-        var request = Encoding.ASCII.GetBytes(command + "\r\n");
-        await _stream.WriteAsync(request, cancellationToken);
+        var cmdBytes = Encoding.ASCII.GetBytes(command);
+        var cmdLen = Math.Min(cmdBytes.Length, CommandNameSize - 1);
+        Array.Copy(cmdBytes, 0, header, 0, cmdLen);
         
-        var buffer = new byte[8192];
-        var response = new StringBuilder();
+        BitConverter.GetBytes(bodySize).CopyTo(header, 16);
+        BitConverter.GetBytes(++_messageId).CopyTo(header, 20);
+        BitConverter.GetBytes(flags).CopyTo(header, 24);
+        BitConverter.GetBytes(queue).CopyTo(header, 26);
         
-        do
-        {
-            var bytesRead = await _stream.ReadAsync(buffer, cancellationToken);
-            if (bytesRead == 0) break;
-            response.Append(Encoding.ASCII.GetString(buffer, 0, bytesRead));
-        } while (_stream.DataAvailable);
-        
-        return response.ToString().Trim();
+        return header;
     }
     
-    private async Task SendCommandNoResponseAsync(string command, CancellationToken cancellationToken)
+    private static int Pad4(int size) => (size + 3) & ~3;
+    
+    private static byte[] EncodeInt(int value)
+    {
+        return BitConverter.GetBytes(value);
+    }
+    
+    private static byte[] EncodeUInt(uint value)
+    {
+        return BitConverter.GetBytes(value);
+    }
+    
+    private static byte[] EncodeFloat(double value)
+    {
+        var str = value.ToString("G", InvariantCulture) + '\0';
+        var strBytes = Encoding.ASCII.GetBytes(str);
+        var paddedSize = Pad4(4 + strBytes.Length);
+        var result = new byte[paddedSize];
+        BitConverter.GetBytes((uint)strBytes.Length).CopyTo(result, 0);
+        Array.Copy(strBytes, 0, result, 4, strBytes.Length);
+        return result;
+    }
+    
+    private static byte[] EncodeString(string value)
+    {
+        var str = value + '\0';
+        var strBytes = Encoding.ASCII.GetBytes(str);
+        var paddedSize = Pad4(4 + strBytes.Length);
+        var result = new byte[paddedSize];
+        BitConverter.GetBytes((uint)strBytes.Length).CopyTo(result, 0);
+        Array.Copy(strBytes, 0, result, 4, strBytes.Length);
+        return result;
+    }
+    
+    private async Task<byte[]> SendCommandAsync(string command, byte[]? body, CancellationToken cancellationToken)
     {
         if (_stream == null)
             throw new InvalidOperationException("Not connected to microscope");
         
-        var request = Encoding.ASCII.GetBytes(command + "\r\n");
-        await _stream.WriteAsync(request, cancellationToken);
+        var bodySize = (uint)(body?.Length ?? 0);
+        var header = BuildHeader(command, bodySize);
+        
+        await _stream.WriteAsync(header, cancellationToken);
+        if (body != null && body.Length > 0)
+        {
+            await _stream.WriteAsync(body, cancellationToken);
+        }
+        
+        var responseHeader = new byte[HeaderSize];
+        var bytesRead = 0;
+        while (bytesRead < HeaderSize)
+        {
+            var read = await _stream.ReadAsync(responseHeader.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
+            if (read == 0) throw new IOException("Connection closed by server");
+            bytesRead += read;
+        }
+        
+        var responseBodySize = BitConverter.ToUInt32(responseHeader, 16);
+        
+        if (responseBodySize == 0)
+            return Array.Empty<byte>();
+        
+        var responseBody = new byte[responseBodySize];
+        bytesRead = 0;
+        while (bytesRead < responseBodySize)
+        {
+            var read = await _stream.ReadAsync(responseBody.AsMemory(bytesRead, (int)responseBodySize - bytesRead), cancellationToken);
+            if (read == 0) throw new IOException("Connection closed by server");
+            bytesRead += read;
+        }
+        
+        return responseBody;
+    }
+    
+    private async Task SendCommandNoResponseAsync(string command, byte[]? body, CancellationToken cancellationToken)
+    {
+        if (_stream == null)
+            throw new InvalidOperationException("Not connected to microscope");
+        
+        var bodySize = (uint)(body?.Length ?? 0);
+        var header = BuildHeader(command, bodySize, flags: 0);
+        
+        await _stream.WriteAsync(header, cancellationToken);
+        if (body != null && body.Length > 0)
+        {
+            await _stream.WriteAsync(body, cancellationToken);
+        }
+    }
+    
+    private static int DecodeInt(byte[] body, int offset)
+    {
+        return BitConverter.ToInt32(body, offset);
+    }
+    
+    private static double DecodeFloat(byte[] body, ref int offset)
+    {
+        var strLen = BitConverter.ToUInt32(body, offset);
+        offset += 4;
+        var str = Encoding.ASCII.GetString(body, offset, (int)strLen - 1);
+        offset += Pad4((int)strLen);
+        return double.Parse(str, NumberStyles.Float, InvariantCulture);
+    }
+    
+    private static string DecodeString(byte[] body, ref int offset)
+    {
+        var strLen = BitConverter.ToUInt32(body, offset);
+        offset += 4;
+        var str = Encoding.ASCII.GetString(body, offset, (int)strLen - 1);
+        offset += Pad4((int)strLen);
+        return str;
     }
     
     public async Task<MicroscopeInfo> GetMicroscopeInfoAsync(CancellationToken cancellationToken = default)
@@ -90,29 +193,45 @@ public class TescanSemController : ISemController
         
         try
         {
-            var model = await SendCommandAsync("TcpGetModel", cancellationToken);
-            info.Model = model;
+            var response = await SendCommandAsync("TcpGetModel", null, cancellationToken);
+            if (response.Length > 0)
+            {
+                int offset = 0;
+                info.Model = DecodeString(response, ref offset);
+            }
         }
         catch { }
         
         try
         {
-            var serial = await SendCommandAsync("TcpGetDevice", cancellationToken);
-            info.SerialNumber = serial;
+            var response = await SendCommandAsync("TcpGetDevice", null, cancellationToken);
+            if (response.Length > 0)
+            {
+                int offset = 0;
+                info.SerialNumber = DecodeString(response, ref offset);
+            }
         }
         catch { }
         
         try
         {
-            var swVersion = await SendCommandAsync("TcpGetSWVersion", cancellationToken);
-            info.SoftwareVersion = swVersion;
+            var response = await SendCommandAsync("TcpGetSWVersion", null, cancellationToken);
+            if (response.Length > 0)
+            {
+                int offset = 0;
+                info.SoftwareVersion = DecodeString(response, ref offset);
+            }
         }
         catch { }
         
         try
         {
-            var protocolVersion = await SendCommandAsync("TcpGetVersion", cancellationToken);
-            info.ProtocolVersion = protocolVersion;
+            var response = await SendCommandAsync("TcpGetVersion", null, cancellationToken);
+            if (response.Length > 0)
+            {
+                int offset = 0;
+                info.ProtocolVersion = DecodeString(response, ref offset);
+            }
         }
         catch { }
         
@@ -121,101 +240,133 @@ public class TescanSemController : ISemController
     
     public async Task<VacuumStatus> GetVacuumStatusAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("VacGetStatus", cancellationToken);
-        if (int.TryParse(response, out var status))
+        var response = await SendCommandAsync("VacGetStatus", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            var status = DecodeInt(response, 0);
             return (VacuumStatus)status;
+        }
         return VacuumStatus.Error;
     }
     
     public async Task<double> GetVacuumPressureAsync(VacuumGauge gauge = VacuumGauge.Chamber, CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync($"VacGetPressure {(int)gauge}", cancellationToken);
-        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var pressure))
-            return pressure;
+        var body = EncodeInt((int)gauge);
+        var response = await SendCommandAsync("VacGetPressure", body, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            return DecodeFloat(response, ref offset);
+        }
         return double.NaN;
     }
     
     public async Task<VacuumMode> GetVacuumModeAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("VacGetVPMode", cancellationToken);
-        if (int.TryParse(response, out var mode))
+        var response = await SendCommandAsync("VacGetVPMode", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            var mode = DecodeInt(response, 0);
             return (VacuumMode)mode;
+        }
         return VacuumMode.Unknown;
     }
     
     public async Task PumpAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("VacPump", cancellationToken);
+        await SendCommandNoResponseAsync("VacPump", null, cancellationToken);
     }
     
     public async Task VentAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("VacVent", cancellationToken);
+        await SendCommandNoResponseAsync("VacVent", null, cancellationToken);
     }
     
     public async Task<BeamState> GetBeamStateAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("HVGetBeam", cancellationToken);
-        if (int.TryParse(response, out var state))
+        var response = await SendCommandAsync("HVGetBeam", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            var state = DecodeInt(response, 0);
             return (BeamState)state;
+        }
         return BeamState.Unknown;
     }
     
     public async Task BeamOnAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("HVBeamOn", cancellationToken);
+        await SendCommandNoResponseAsync("HVBeamOn", null, cancellationToken);
     }
     
     public async Task BeamOffAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("HVBeamOff", cancellationToken);
+        await SendCommandNoResponseAsync("HVBeamOff", null, cancellationToken);
     }
     
     public async Task<double> GetHighVoltageAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("HVGetVoltage", cancellationToken);
-        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var voltage))
-            return voltage;
+        var response = await SendCommandAsync("HVGetVoltage", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            return DecodeFloat(response, ref offset);
+        }
         return double.NaN;
     }
     
     public async Task SetHighVoltageAsync(double voltage, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
         var asyncFlag = waitForCompletion ? 0 : 1;
-        await SendCommandNoResponseAsync(string.Format(InvariantCulture, "HVSetVoltage {0} {1}", voltage, asyncFlag), cancellationToken);
+        var body = new List<byte>();
+        body.AddRange(EncodeFloat(voltage));
+        body.AddRange(EncodeInt(asyncFlag));
+        await SendCommandNoResponseAsync("HVSetVoltage", body.ToArray(), cancellationToken);
     }
     
     public async Task<double> GetEmissionCurrentAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("HVGetEmission", cancellationToken);
-        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var emission))
-            return emission;
+        var response = await SendCommandAsync("HVGetEmission", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            return DecodeFloat(response, ref offset);
+        }
         return double.NaN;
     }
     
     public async Task<StagePosition> GetStagePositionAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("StgGetPosition", cancellationToken);
-        var parts = response.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        
+        var response = await SendCommandAsync("StgGetPosition", null, cancellationToken);
         var position = new StagePosition();
-        if (parts.Length >= 1 && double.TryParse(parts[0], NumberStyles.Float, InvariantCulture, out var x)) position.X = x;
-        if (parts.Length >= 2 && double.TryParse(parts[1], NumberStyles.Float, InvariantCulture, out var y)) position.Y = y;
-        if (parts.Length >= 3 && double.TryParse(parts[2], NumberStyles.Float, InvariantCulture, out var z)) position.Z = z;
-        if (parts.Length >= 4 && double.TryParse(parts[3], NumberStyles.Float, InvariantCulture, out var rot)) position.Rotation = rot;
-        if (parts.Length >= 5 && double.TryParse(parts[4], NumberStyles.Float, InvariantCulture, out var tiltX)) position.TiltX = tiltX;
-        if (parts.Length >= 6 && double.TryParse(parts[5], NumberStyles.Float, InvariantCulture, out var tiltY)) position.TiltY = tiltY;
+        
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            if (offset < response.Length) position.X = DecodeFloat(response, ref offset);
+            if (offset < response.Length) position.Y = DecodeFloat(response, ref offset);
+            if (offset < response.Length) position.Z = DecodeFloat(response, ref offset);
+            if (offset < response.Length) position.Rotation = DecodeFloat(response, ref offset);
+            if (offset < response.Length) position.TiltX = DecodeFloat(response, ref offset);
+            if (offset < response.Length) position.TiltY = DecodeFloat(response, ref offset);
+        }
         
         return position;
     }
     
     public async Task MoveStageAsync(StagePosition position, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
-        var command = position.TiltY.HasValue
-            ? string.Format(InvariantCulture, "StgMoveTo {0} {1} {2} {3} {4} {5}", position.X, position.Y, position.Z, position.Rotation, position.TiltX, position.TiltY)
-            : string.Format(InvariantCulture, "StgMoveTo {0} {1} {2} {3} {4}", position.X, position.Y, position.Z, position.Rotation, position.TiltX);
+        var body = new List<byte>();
+        body.AddRange(EncodeFloat(position.X));
+        body.AddRange(EncodeFloat(position.Y));
+        body.AddRange(EncodeFloat(position.Z));
+        body.AddRange(EncodeFloat(position.Rotation));
+        body.AddRange(EncodeFloat(position.TiltX));
+        if (position.TiltY.HasValue)
+        {
+            body.AddRange(EncodeFloat(position.TiltY.Value));
+        }
         
-        await SendCommandNoResponseAsync(command, cancellationToken);
+        await SendCommandNoResponseAsync("StgMoveTo", body.ToArray(), cancellationToken);
         
         if (waitForCompletion)
         {
@@ -225,11 +376,18 @@ public class TescanSemController : ISemController
     
     public async Task MoveStageRelativeAsync(StagePosition delta, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
-        var command = delta.TiltY.HasValue
-            ? string.Format(InvariantCulture, "StgMove {0} {1} {2} {3} {4} {5}", delta.X, delta.Y, delta.Z, delta.Rotation, delta.TiltX, delta.TiltY)
-            : string.Format(InvariantCulture, "StgMove {0} {1} {2} {3} {4}", delta.X, delta.Y, delta.Z, delta.Rotation, delta.TiltX);
+        var body = new List<byte>();
+        body.AddRange(EncodeFloat(delta.X));
+        body.AddRange(EncodeFloat(delta.Y));
+        body.AddRange(EncodeFloat(delta.Z));
+        body.AddRange(EncodeFloat(delta.Rotation));
+        body.AddRange(EncodeFloat(delta.TiltX));
+        if (delta.TiltY.HasValue)
+        {
+            body.AddRange(EncodeFloat(delta.TiltY.Value));
+        }
         
-        await SendCommandNoResponseAsync(command, cancellationToken);
+        await SendCommandNoResponseAsync("StgMove", body.ToArray(), cancellationToken);
         
         if (waitForCompletion)
         {
@@ -252,62 +410,40 @@ public class TescanSemController : ISemController
     
     public async Task<bool> IsStageMovingAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("StgIsBusy", cancellationToken);
-        return response == "1";
+        var response = await SendCommandAsync("StgIsBusy", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return DecodeInt(response, 0) != 0;
+        }
+        return false;
     }
     
     public async Task StopStageAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("StgStop", cancellationToken);
+        await SendCommandNoResponseAsync("StgStop", null, cancellationToken);
     }
     
     public async Task<StageLimits> GetStageLimitsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("StgGetLimits 0", cancellationToken);
-        var parts = response.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var body = EncodeInt(0);
+        var response = await SendCommandAsync("StgGetLimits", body, cancellationToken);
         
         var limits = new StageLimits();
-        if (parts.Length >= 2)
+        if (response.Length > 0)
         {
-            double.TryParse(parts[0], NumberStyles.Float, InvariantCulture, out var minX);
-            double.TryParse(parts[1], NumberStyles.Float, InvariantCulture, out var maxX);
-            limits.MinX = minX;
-            limits.MaxX = maxX;
-        }
-        if (parts.Length >= 4)
-        {
-            double.TryParse(parts[2], NumberStyles.Float, InvariantCulture, out var minY);
-            double.TryParse(parts[3], NumberStyles.Float, InvariantCulture, out var maxY);
-            limits.MinY = minY;
-            limits.MaxY = maxY;
-        }
-        if (parts.Length >= 6)
-        {
-            double.TryParse(parts[4], NumberStyles.Float, InvariantCulture, out var minZ);
-            double.TryParse(parts[5], NumberStyles.Float, InvariantCulture, out var maxZ);
-            limits.MinZ = minZ;
-            limits.MaxZ = maxZ;
-        }
-        if (parts.Length >= 8)
-        {
-            double.TryParse(parts[6], NumberStyles.Float, InvariantCulture, out var minRot);
-            double.TryParse(parts[7], NumberStyles.Float, InvariantCulture, out var maxRot);
-            limits.MinRotation = minRot;
-            limits.MaxRotation = maxRot;
-        }
-        if (parts.Length >= 10)
-        {
-            double.TryParse(parts[8], NumberStyles.Float, InvariantCulture, out var minTiltX);
-            double.TryParse(parts[9], NumberStyles.Float, InvariantCulture, out var maxTiltX);
-            limits.MinTiltX = minTiltX;
-            limits.MaxTiltX = maxTiltX;
-        }
-        if (parts.Length >= 12)
-        {
-            double.TryParse(parts[10], NumberStyles.Float, InvariantCulture, out var minTiltY);
-            double.TryParse(parts[11], NumberStyles.Float, InvariantCulture, out var maxTiltY);
-            limits.MinTiltY = minTiltY;
-            limits.MaxTiltY = maxTiltY;
+            int offset = 0;
+            if (offset < response.Length) limits.MinX = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxX = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MinY = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxY = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MinZ = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxZ = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MinRotation = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxRotation = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MinTiltX = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxTiltX = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MinTiltY = DecodeFloat(response, ref offset);
+            if (offset < response.Length) limits.MaxTiltY = DecodeFloat(response, ref offset);
         }
         
         return limits;
@@ -315,40 +451,53 @@ public class TescanSemController : ISemController
     
     public async Task CalibrateStageAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("StgCalibrate", cancellationToken);
+        await SendCommandNoResponseAsync("StgCalibrate", null, cancellationToken);
     }
     
     public async Task<bool> IsStageCallibratedAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("StgIsCalibrated", cancellationToken);
-        return response == "1";
+        var response = await SendCommandAsync("StgIsCalibrated", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return DecodeInt(response, 0) != 0;
+        }
+        return false;
     }
     
     public async Task<double> GetMagnificationAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("OpGetViewField", cancellationToken);
-        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var viewField))
+        var response = await SendCommandAsync("OpGetViewField", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            var viewField = DecodeFloat(response, ref offset);
             return 1.0 / viewField;
+        }
         return double.NaN;
     }
     
     public async Task SetMagnificationAsync(double magnification, CancellationToken cancellationToken = default)
     {
         var viewField = 1.0 / magnification;
-        await SendCommandNoResponseAsync(string.Format(InvariantCulture, "OpSetViewField {0}", viewField), cancellationToken);
+        var body = EncodeFloat(viewField);
+        await SendCommandNoResponseAsync("OpSetViewField", body, cancellationToken);
     }
     
     public async Task<double> GetWorkingDistanceAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("OpGetWD", cancellationToken);
-        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var wd))
-            return wd;
+        var response = await SendCommandAsync("OpGetWD", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            return DecodeFloat(response, ref offset);
+        }
         return double.NaN;
     }
     
     public async Task SetWorkingDistanceAsync(double workingDistance, CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync(string.Format(InvariantCulture, "OpSetWD {0}", workingDistance), cancellationToken);
+        var body = EncodeFloat(workingDistance);
+        await SendCommandNoResponseAsync("OpSetWD", body, cancellationToken);
     }
     
     public async Task<double> GetFocusAsync(CancellationToken cancellationToken = default)
@@ -363,62 +512,81 @@ public class TescanSemController : ISemController
     
     public async Task AutoFocusAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("AutoWD 0", cancellationToken);
+        var body = EncodeInt(0);
+        await SendCommandNoResponseAsync("AutoWD", body, cancellationToken);
     }
     
     public async Task<int> GetScanSpeedAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("ScGetSpeed", cancellationToken);
-        if (int.TryParse(response, out var speed))
-            return speed;
+        var response = await SendCommandAsync("ScGetSpeed", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return DecodeInt(response, 0);
+        }
         return 0;
     }
     
     public async Task SetScanSpeedAsync(int speed, CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync($"ScSetSpeed {speed}", cancellationToken);
+        var body = EncodeInt(speed);
+        await SendCommandNoResponseAsync("ScSetSpeed", body, cancellationToken);
     }
     
     public async Task<BlankerMode> GetBlankerModeAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("ScGetBlanker", cancellationToken);
-        if (int.TryParse(response, out var mode))
-            return (BlankerMode)mode;
+        var response = await SendCommandAsync("ScGetBlanker", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return (BlankerMode)DecodeInt(response, 0);
+        }
         return BlankerMode.Off;
     }
     
     public async Task SetBlankerModeAsync(BlankerMode mode, CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync($"ScSetBlanker {(int)mode}", cancellationToken);
+        var body = EncodeInt((int)mode);
+        await SendCommandNoResponseAsync("ScSetBlanker", body, cancellationToken);
     }
     
     public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
     {
-        var channelList = string.Join(" ", settings.Channels);
-        
         var right = settings.Right > 0 ? settings.Right : settings.Width;
         var bottom = settings.Bottom > 0 ? settings.Bottom : settings.Height;
         
-        await SendCommandAsync(
-            string.Format(InvariantCulture, "ScScanXY 0 {0} {1} {2} {3} {4} {5} 1 {6}",
-                settings.Width, settings.Height, settings.Left, settings.Top, right, bottom, (uint)(settings.DwellTimeUs * 1000)),
-            cancellationToken);
+        var scanBody = new List<byte>();
+        scanBody.AddRange(EncodeInt(0));
+        scanBody.AddRange(EncodeInt(settings.Width));
+        scanBody.AddRange(EncodeInt(settings.Height));
+        scanBody.AddRange(EncodeInt(settings.Left));
+        scanBody.AddRange(EncodeInt(settings.Top));
+        scanBody.AddRange(EncodeInt(right));
+        scanBody.AddRange(EncodeInt(bottom));
+        scanBody.AddRange(EncodeInt(1));
+        scanBody.AddRange(EncodeUInt((uint)(settings.DwellTimeUs * 1000)));
         
-        var response = await SendCommandAsync(
-            $"FetchImage {channelList} {settings.Width} {settings.Height}",
-            cancellationToken);
+        await SendCommandAsync("ScScanXY", scanBody.ToArray(), cancellationToken);
+        
+        var fetchBody = new List<byte>();
+        fetchBody.AddRange(EncodeInt(settings.Channels.Length));
+        foreach (var channel in settings.Channels)
+        {
+            fetchBody.AddRange(EncodeInt(channel));
+        }
+        fetchBody.AddRange(EncodeInt(settings.Width));
+        fetchBody.AddRange(EncodeInt(settings.Height));
+        
+        var response = await SendCommandAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
         
         var images = new List<SemImage>();
         var imageSize = settings.Width * settings.Height;
-        var responseBytes = Encoding.ASCII.GetBytes(response);
         
         for (int i = 0; i < settings.Channels.Length; i++)
         {
             var start = i * imageSize;
-            if (start + imageSize <= responseBytes.Length)
+            if (start + imageSize <= response.Length)
             {
                 var imageData = new byte[imageSize];
-                Array.Copy(responseBytes, start, imageData, 0, imageSize);
+                Array.Copy(response, start, imageData, 0, imageSize);
                 images.Add(new SemImage(settings.Width, settings.Height, imageData, settings.Channels[i]));
             }
         }
@@ -441,20 +609,24 @@ public class TescanSemController : ISemController
     
     public async Task StopScanAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("ScStopScan", cancellationToken);
+        await SendCommandNoResponseAsync("ScStopScan", null, cancellationToken);
     }
     
     public async Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("OpGetSpotSize", cancellationToken);
-        if (double.TryParse(response, NumberStyles.Float, InvariantCulture, out var spotSize))
-            return spotSize;
+        var response = await SendCommandAsync("OpGetSpotSize", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            return DecodeFloat(response, ref offset);
+        }
         return double.NaN;
     }
     
     public async Task SetSpotSizeAsync(double spotSize, CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync(string.Format(InvariantCulture, "OpSetSpotSize {0}", spotSize), cancellationToken);
+        var body = EncodeFloat(spotSize);
+        await SendCommandNoResponseAsync("OpSetSpotSize", body, cancellationToken);
     }
     
     public void Dispose()

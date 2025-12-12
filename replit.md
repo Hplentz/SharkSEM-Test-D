@@ -54,6 +54,12 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-12: Fixed SharkSEM binary protocol implementation
+  - Rewrote TescanSemController to use correct 32-byte binary header format
+  - Implemented proper encoding for integers, floats (as strings), and arrays
+  - Added 4-byte alignment/padding as required by protocol spec
+  - All messages now follow Message Structure from API manual
+
 - 2024-12-12: Initial implementation complete
   - Created ISemController interface with comprehensive SEM operations
   - Implemented TescanSemController for SharkSEM API
@@ -66,7 +72,22 @@ await sem.DisconnectAsync();
 - **Interface Abstraction**: All controllers implement `ISemController`
 - **Async/Await**: All operations are asynchronous
 - **IDisposable**: Controllers implement IDisposable for resource cleanup
-- **SharkSEM Protocol**: Uses TCP connection with text-based commands
+
+## SharkSEM Protocol Details
+The SharkSEM protocol uses a binary message format over TCP:
+
+### Message Header (32 bytes)
+- Bytes 0-15: Command name (null-terminated, max 15 chars)
+- Bytes 16-19: Body size (uint32, little-endian)
+- Bytes 20-23: Message ID (uint32)
+- Bytes 24-25: Flags (uint16) - bit 0 = request response
+- Bytes 26-27: Queue (uint16)
+- Bytes 28-31: Reserved (zeros)
+
+### Message Body Encoding
+- **Integers**: 4 bytes, little-endian
+- **Floats**: Encoded as null-terminated ASCII strings with 4-byte size prefix
+- **Strings/Arrays**: 4-byte size prefix + data + padding to 4-byte alignment
 
 ## Technical Details
 - .NET 8.0
