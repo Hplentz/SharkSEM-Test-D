@@ -329,7 +329,8 @@ public class TescanSemController : ISemController
         if (response.Length > 0)
         {
             int offset = 0;
-            return DecodeFloat(response, ref offset);
+            var emissionMicroAmps = DecodeFloat(response, ref offset);
+            return emissionMicroAmps * 1e-6;
         }
         return double.NaN;
     }
@@ -466,7 +467,7 @@ public class TescanSemController : ISemController
     
     public async Task<double> GetMagnificationAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("OpGetViewField", null, cancellationToken);
+        var response = await SendCommandAsync("GetViewField", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -480,12 +481,12 @@ public class TescanSemController : ISemController
     {
         var viewField = 1.0 / magnification;
         var body = EncodeFloat(viewField);
-        await SendCommandNoResponseAsync("OpSetViewField", body, cancellationToken);
+        await SendCommandNoResponseAsync("SetViewField", body, cancellationToken);
     }
     
     public async Task<double> GetWorkingDistanceAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("OpGetWD", null, cancellationToken);
+        var response = await SendCommandAsync("GetWD", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -497,7 +498,7 @@ public class TescanSemController : ISemController
     public async Task SetWorkingDistanceAsync(double workingDistance, CancellationToken cancellationToken = default)
     {
         var body = EncodeFloat(workingDistance);
-        await SendCommandNoResponseAsync("OpSetWD", body, cancellationToken);
+        await SendCommandNoResponseAsync("SetWD", body, cancellationToken);
     }
     
     public async Task<double> GetFocusAsync(CancellationToken cancellationToken = default)
@@ -614,7 +615,7 @@ public class TescanSemController : ISemController
     
     public async Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default)
     {
-        var response = await SendCommandAsync("OpGetSpotSize", null, cancellationToken);
+        var response = await SendCommandAsync("GetSpotSize", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -626,7 +627,7 @@ public class TescanSemController : ISemController
     public async Task SetSpotSizeAsync(double spotSize, CancellationToken cancellationToken = default)
     {
         var body = EncodeFloat(spotSize);
-        await SendCommandNoResponseAsync("OpSetSpotSize", body, cancellationToken);
+        await SendCommandNoResponseAsync("SetSpotSize", body, cancellationToken);
     }
     
     public void Dispose()
