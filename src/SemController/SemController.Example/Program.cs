@@ -69,8 +69,8 @@ using (ISemController sem = SemControllerFactory.CreateMock())
     var viewField = await sem.GetViewFieldAsync();
     Console.WriteLine($"\nView Field: {viewField:F1} um");
     
-    Console.WriteLine("Setting view field to 50 um...");
-    await sem.SetViewFieldAsync(50);
+    Console.WriteLine("Setting view field to 1000 um...");
+    await sem.SetViewFieldAsync(1000);
     viewField = await sem.GetViewFieldAsync();
     Console.WriteLine($"View Field: {viewField:F1} um");
     
