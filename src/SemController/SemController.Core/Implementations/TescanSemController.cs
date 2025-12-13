@@ -612,20 +612,72 @@ public class TescanSemController : ISemController
         var channelCount = settings.Channels.Length;
         var imageSize = settings.Width * settings.Height;
         
-        await SendCommandNoResponseAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
-        
-        var imageDataList = await ReadAllImagesFromDataChannelAsync(channelCount, imageSize, cancellationToken);
+        var fetchResponse = await SendCommandAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
         
         var images = new List<SemImage>();
-        for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
+        
+        if (fetchResponse.Length > 0)
         {
-            if (imageDataList[i].Length > 0)
+            var imageDataList = ParseFetchImageResponse(fetchResponse, channelCount, settings.Width, settings.Height);
+            for (int i = 0; i < imageDataList.Count; i++)
             {
-                images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
+                if (imageDataList[i].Length > 0)
+                {
+                    images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
+                }
+            }
+        }
+        else
+        {
+            var imageDataList = await ReadAllImagesFromDataChannelAsync(channelCount, imageSize, cancellationToken);
+            for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
+            {
+                if (imageDataList[i].Length > 0)
+                {
+                    images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
+                }
             }
         }
         
         return images.ToArray();
+    }
+    
+    private static List<byte[]> ParseFetchImageResponse(byte[] response, int channelCount, int width, int height)
+    {
+        var results = new List<byte[]>();
+        int offset = 0;
+        
+        for (int i = 0; i < channelCount && offset < response.Length; i++)
+        {
+            if (offset + 4 > response.Length) break;
+            
+            var imageSize = BitConverter.ToInt32(response, offset);
+            offset += 4;
+            
+            if (imageSize <= 0)
+                imageSize = width * height;
+            
+            if (offset + imageSize > response.Length)
+            {
+                var remaining = response.Length - offset;
+                var imageData = new byte[remaining];
+                Array.Copy(response, offset, imageData, 0, remaining);
+                results.Add(imageData);
+                break;
+            }
+            
+            var data = new byte[imageSize];
+            Array.Copy(response, offset, data, 0, imageSize);
+            results.Add(data);
+            offset += imageSize;
+        }
+        
+        if (results.Count == 0 && response.Length >= width * height)
+        {
+            results.Add(response);
+        }
+        
+        return results;
     }
     
     private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int channelCount, int imageSizePerChannel, CancellationToken cancellationToken)
