@@ -16,4 +16,8 @@
     <ProjectReference Include="..\SemController.Core\SemController.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+  </ItemGroup>
+
 </Project>
