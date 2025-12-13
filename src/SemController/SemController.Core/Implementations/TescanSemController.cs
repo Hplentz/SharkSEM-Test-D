@@ -630,66 +630,105 @@ public class TescanSemController : ISemController
     
     private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int channelCount, int imageSizePerChannel, CancellationToken cancellationToken)
     {
-        var results = new List<byte[]>();
+        var imagesByChannel = new Dictionary<int, List<byte>>();
+        var timeout = TimeSpan.FromSeconds(_timeoutSeconds * 2);
+        var startTime = DateTime.UtcNow;
         
+        while (DateTime.UtcNow - startTime < timeout)
+        {
+            var message = await ReadDataChannelMessageAsync(cancellationToken);
+            if (message == null)
+                break;
+            
+            var commandName = Encoding.ASCII.GetString(message.Header, 0, CommandNameSize).TrimEnd('\0');
+            
+            if (commandName == "ScData" && message.Body.Length >= 8)
+            {
+                var frameId = BitConverter.ToInt32(message.Body, 0);
+                var channel = BitConverter.ToInt32(message.Body, 4);
+                
+                int dataOffset = 8;
+                var dataSize = BitConverter.ToUInt32(message.Body, dataOffset);
+                dataOffset += 4;
+                
+                if (dataOffset + dataSize <= message.Body.Length)
+                {
+                    var pixelData = new byte[dataSize];
+                    Array.Copy(message.Body, dataOffset, pixelData, 0, (int)dataSize);
+                    
+                    if (!imagesByChannel.ContainsKey(channel))
+                        imagesByChannel[channel] = new List<byte>();
+                    imagesByChannel[channel].AddRange(pixelData);
+                }
+            }
+            else if (commandName == "FetchImage")
+            {
+                break;
+            }
+            
+            var totalBytes = imagesByChannel.Values.Sum(list => list.Count);
+            if (totalBytes >= channelCount * imageSizePerChannel)
+                break;
+        }
+        
+        var results = new List<byte[]>();
         for (int i = 0; i < channelCount; i++)
         {
-            var imageData = await ReadImageFromDataChannelAsync(imageSizePerChannel, cancellationToken);
-            results.Add(imageData);
+            if (imagesByChannel.TryGetValue(i, out var data))
+                results.Add(data.ToArray());
+            else
+                results.Add(Array.Empty<byte>());
         }
         
         return results;
     }
     
-    private static int[] ParseFetchImageResponse(byte[] response, int channelCount, int width, int height)
+    private class DataChannelMessage
     {
-        var sizes = new int[channelCount];
-        var defaultSize = width * height;
-        
-        if (response.Length >= channelCount * 4)
-        {
-            for (int i = 0; i < channelCount; i++)
-            {
-                var size = BitConverter.ToInt32(response, i * 4);
-                sizes[i] = size > 0 ? size : defaultSize;
-            }
-        }
-        else
-        {
-            for (int i = 0; i < channelCount; i++)
-                sizes[i] = defaultSize;
-        }
-        
-        return sizes;
+        public byte[] Header { get; set; } = Array.Empty<byte>();
+        public byte[] Body { get; set; } = Array.Empty<byte>();
     }
     
-    private async Task<byte[]> ReadImageFromDataChannelAsync(int expectedSize, CancellationToken cancellationToken)
+    private async Task<DataChannelMessage?> ReadDataChannelMessageAsync(CancellationToken cancellationToken)
     {
         if (_dataStream == null)
-            return Array.Empty<byte>();
+            return null;
         
         try
         {
-            var imageData = new byte[expectedSize];
+            var header = new byte[HeaderSize];
             var bytesRead = 0;
-            var timeout = TimeSpan.FromSeconds(_timeoutSeconds);
-            var startTime = DateTime.UtcNow;
-            
-            while (bytesRead < expectedSize)
+            while (bytesRead < HeaderSize)
             {
-                if (DateTime.UtcNow - startTime > timeout)
-                    break;
-                    
-                var read = await _dataStream.ReadAsync(imageData.AsMemory(bytesRead, expectedSize - bytesRead), cancellationToken);
-                if (read == 0) break;
+                var read = await _dataStream.ReadAsync(header.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
+                if (read == 0) return null;
                 bytesRead += read;
             }
             
-            return bytesRead == expectedSize ? imageData : Array.Empty<byte>();
+            var bodySize = BitConverter.ToUInt32(header, 16);
+            
+            byte[] body;
+            if (bodySize > 0)
+            {
+                body = new byte[bodySize];
+                bytesRead = 0;
+                while (bytesRead < bodySize)
+                {
+                    var read = await _dataStream.ReadAsync(body.AsMemory(bytesRead, (int)bodySize - bytesRead), cancellationToken);
+                    if (read == 0) return null;
+                    bytesRead += read;
+                }
+            }
+            else
+            {
+                body = Array.Empty<byte>();
+            }
+            
+            return new DataChannelMessage { Header = header, Body = body };
         }
         catch
         {
-            return Array.Empty<byte>();
+            return null;
         }
     }
     
