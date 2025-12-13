@@ -612,30 +612,16 @@ public class TescanSemController : ISemController
         var channelCount = settings.Channels.Length;
         var imageSize = settings.Width * settings.Height;
         
-        var fetchResponse = await SendCommandAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
+        await SendCommandNoResponseAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
+        
+        var imageDataList = await ReadAllImagesFromDataChannelAsync(channelCount, imageSize, cancellationToken);
         
         var images = new List<SemImage>();
-        
-        if (fetchResponse.Length > 0)
+        for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
         {
-            var imageDataList = ParseFetchImageResponse(fetchResponse, channelCount, settings.Width, settings.Height);
-            for (int i = 0; i < imageDataList.Count; i++)
+            if (imageDataList[i].Length > 0)
             {
-                if (imageDataList[i].Length > 0)
-                {
-                    images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
-                }
-            }
-        }
-        else
-        {
-            var imageDataList = await ReadAllImagesFromDataChannelAsync(channelCount, imageSize, cancellationToken);
-            for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
-            {
-                if (imageDataList[i].Length > 0)
-                {
-                    images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
-                }
+                images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
             }
         }
         
