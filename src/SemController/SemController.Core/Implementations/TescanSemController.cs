@@ -609,24 +609,36 @@ public class TescanSemController : ISemController
         fetchBody.AddRange(EncodeInt(settings.Width));
         fetchBody.AddRange(EncodeInt(settings.Height));
         
-        var fetchResponse = await SendCommandAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
+        var channelCount = settings.Channels.Length;
+        var imageSize = settings.Width * settings.Height;
+        
+        await SendCommandNoResponseAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
+        
+        var imageDataList = await ReadAllImagesFromDataChannelAsync(channelCount, imageSize, cancellationToken);
         
         var images = new List<SemImage>();
-        var channelCount = settings.Channels.Length;
-        
-        var imageSizes = ParseFetchImageResponse(fetchResponse, channelCount, settings.Width, settings.Height);
-        
-        for (int i = 0; i < channelCount; i++)
+        for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
         {
-            var imageSize = imageSizes.Length > i ? imageSizes[i] : settings.Width * settings.Height;
-            var imageData = await ReadImageFromDataChannelAsync(imageSize, cancellationToken);
-            if (imageData.Length > 0)
+            if (imageDataList[i].Length > 0)
             {
-                images.Add(new SemImage(settings.Width, settings.Height, imageData, settings.Channels[i]));
+                images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
             }
         }
         
         return images.ToArray();
+    }
+    
+    private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int channelCount, int imageSizePerChannel, CancellationToken cancellationToken)
+    {
+        var results = new List<byte[]>();
+        
+        for (int i = 0; i < channelCount; i++)
+        {
+            var imageData = await ReadImageFromDataChannelAsync(imageSizePerChannel, cancellationToken);
+            results.Add(imageData);
+        }
+        
+        return results;
     }
     
     private static int[] ParseFetchImageResponse(byte[] response, int channelCount, int width, int height)
