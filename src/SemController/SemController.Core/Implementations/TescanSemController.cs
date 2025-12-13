@@ -682,8 +682,14 @@ public class TescanSemController : ISemController
     
     private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int channelCount, int imageSizePerChannel, CancellationToken cancellationToken)
     {
-        var imagesByChannel = new Dictionary<int, List<byte>>();
-        var timeout = TimeSpan.FromSeconds(_timeoutSeconds * 2);
+        var imagesByChannel = new Dictionary<int, byte[]>();
+        for (int i = 0; i < channelCount; i++)
+        {
+            imagesByChannel[i] = new byte[imageSizePerChannel];
+        }
+        
+        var bytesReceivedPerChannel = new Dictionary<int, int>();
+        var timeout = TimeSpan.FromSeconds(_timeoutSeconds * 3);
         var startTime = DateTime.UtcNow;
         
         while (DateTime.UtcNow - startTime < timeout)
@@ -694,23 +700,29 @@ public class TescanSemController : ISemController
             
             var commandName = Encoding.ASCII.GetString(message.Header, 0, CommandNameSize).TrimEnd('\0');
             
-            if (commandName == "ScData" && message.Body.Length >= 8)
+            if (commandName == "ScData" && message.Body.Length >= 20)
             {
-                var frameId = BitConverter.ToInt32(message.Body, 0);
+                var frameId = BitConverter.ToUInt32(message.Body, 0);
                 var channel = BitConverter.ToInt32(message.Body, 4);
+                var pixelIndex = BitConverter.ToUInt32(message.Body, 8);
+                var bpp = BitConverter.ToInt32(message.Body, 12);
+                var dataSize = BitConverter.ToUInt32(message.Body, 16);
                 
-                int dataOffset = 8;
-                var dataSize = BitConverter.ToUInt32(message.Body, dataOffset);
-                dataOffset += 4;
+                int dataOffset = 20;
                 
-                if (dataOffset + dataSize <= message.Body.Length)
+                if (dataOffset + dataSize <= message.Body.Length && channel >= 0 && channel < channelCount)
                 {
-                    var pixelData = new byte[dataSize];
-                    Array.Copy(message.Body, dataOffset, pixelData, 0, (int)dataSize);
+                    var targetBuffer = imagesByChannel[channel];
+                    var copyLength = Math.Min((int)dataSize, targetBuffer.Length - (int)pixelIndex);
                     
-                    if (!imagesByChannel.ContainsKey(channel))
-                        imagesByChannel[channel] = new List<byte>();
-                    imagesByChannel[channel].AddRange(pixelData);
+                    if (copyLength > 0 && pixelIndex < targetBuffer.Length)
+                    {
+                        Array.Copy(message.Body, dataOffset, targetBuffer, (int)pixelIndex, copyLength);
+                        
+                        if (!bytesReceivedPerChannel.ContainsKey(channel))
+                            bytesReceivedPerChannel[channel] = 0;
+                        bytesReceivedPerChannel[channel] += copyLength;
+                    }
                 }
             }
             else if (commandName == "FetchImage")
@@ -718,7 +730,7 @@ public class TescanSemController : ISemController
                 break;
             }
             
-            var totalBytes = imagesByChannel.Values.Sum(list => list.Count);
+            var totalBytes = bytesReceivedPerChannel.Values.Sum();
             if (totalBytes >= channelCount * imageSizePerChannel)
                 break;
         }
@@ -726,10 +738,7 @@ public class TescanSemController : ISemController
         var results = new List<byte[]>();
         for (int i = 0; i < channelCount; i++)
         {
-            if (imagesByChannel.TryGetValue(i, out var data))
-                results.Add(data.ToArray());
-            else
-                results.Add(Array.Empty<byte>());
+            results.Add(imagesByChannel[i]);
         }
         
         return results;

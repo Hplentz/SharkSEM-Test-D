@@ -54,6 +54,11 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-13: Fixed chunked image acquisition via data channel
+  - ScData messages now properly parsed: frame(4) + channel(4) + index(4) + bpp(4) + size(4) + data[]
+  - Pixel index field used to place chunks at correct positions in image buffer
+  - Pre-allocated image buffers for each channel
+
 - 2024-12-12: Fixed unit conversions for TESCAN API
   - Stage positions/limits: API returns µm, converted to mm (÷1000)
   - Working Distance: API returns µm, converted to mm (÷1000)
