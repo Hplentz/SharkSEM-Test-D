@@ -13,12 +13,12 @@ Console.WriteLine("Supported SEM Types:");
 Console.WriteLine("  - TESCAN (via SharkSEM protocol)");
 Console.WriteLine("  - Mock/Simulator (for testing without hardware)\n");
 
-Console.WriteLine("--- Running Mock SEM Demo ---\n");
+Console.WriteLine("--- Connecting to TESCAN SEM at 127.0.0.1 ---\n");
 
-using (ISemController sem = SemControllerFactory.CreateMock())
+using (ISemController sem = SemControllerFactory.CreateTescan("127.0.0.1"))
 {
     await sem.ConnectAsync();
-    Console.WriteLine("Connected to mock SEM");
+    Console.WriteLine("Connected to TESCAN SEM");
     
     var info = await sem.GetMicroscopeInfoAsync();
     Console.WriteLine($"\nMicroscope Info:");
