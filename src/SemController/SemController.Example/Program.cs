@@ -131,8 +131,7 @@ using (ISemController sem = SemControllerFactory.CreateMock())
         Console.WriteLine($"Could not save image: {ex.Message}");
     }
     
-    await sem.BeamOffAsync();
-    Console.WriteLine("\nBeam turned OFF");
+    Console.WriteLine("\nBeam left ON for inspection");
     
     await sem.DisconnectAsync();
     Console.WriteLine("Disconnected\n");
