@@ -668,12 +668,15 @@ public class TescanSemController : ISemController
     private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int channelCount, int imageSizePerChannel, CancellationToken cancellationToken)
     {
         var imagesByChannel = new Dictionary<int, byte[]>();
+        var rawDataByChannel = new Dictionary<int, List<byte>>();
         for (int i = 0; i < channelCount; i++)
         {
             imagesByChannel[i] = new byte[imageSizePerChannel];
+            rawDataByChannel[i] = new List<byte>();
         }
         
-        var bytesReceivedPerChannel = new Dictionary<int, int>();
+        var pixelsReceivedPerChannel = new Dictionary<int, int>();
+        int detectedBpp = 1;
         var timeout = TimeSpan.FromSeconds(_timeoutSeconds * 3);
         var startTime = DateTime.UtcNow;
         
@@ -693,21 +696,21 @@ public class TescanSemController : ISemController
                 var bpp = BitConverter.ToInt32(message.Body, 12);
                 var dataSize = BitConverter.ToUInt32(message.Body, 16);
                 
+                if (bpp > 0) detectedBpp = bpp;
+                
                 int dataOffset = 20;
                 
                 if (dataOffset + dataSize <= message.Body.Length && channel >= 0 && channel < channelCount)
                 {
-                    var targetBuffer = imagesByChannel[channel];
-                    var copyLength = Math.Min((int)dataSize, targetBuffer.Length - (int)pixelIndex);
-                    
-                    if (copyLength > 0 && pixelIndex < targetBuffer.Length)
+                    var rawData = rawDataByChannel[channel];
+                    for (int i = 0; i < (int)dataSize; i++)
                     {
-                        Array.Copy(message.Body, dataOffset, targetBuffer, (int)pixelIndex, copyLength);
-                        
-                        if (!bytesReceivedPerChannel.ContainsKey(channel))
-                            bytesReceivedPerChannel[channel] = 0;
-                        bytesReceivedPerChannel[channel] += copyLength;
+                        rawData.Add(message.Body[dataOffset + i]);
                     }
+                    
+                    if (!pixelsReceivedPerChannel.ContainsKey(channel))
+                        pixelsReceivedPerChannel[channel] = 0;
+                    pixelsReceivedPerChannel[channel] += (int)dataSize / Math.Max(1, bpp);
                 }
             }
             else if (commandName == "FetchImage")
@@ -715,15 +718,43 @@ public class TescanSemController : ISemController
                 break;
             }
             
-            var totalBytes = bytesReceivedPerChannel.Values.Sum();
-            if (totalBytes >= channelCount * imageSizePerChannel)
+            var totalPixels = pixelsReceivedPerChannel.Values.Sum();
+            if (totalPixels >= channelCount * imageSizePerChannel)
                 break;
         }
         
         var results = new List<byte[]>();
-        for (int i = 0; i < channelCount; i++)
+        for (int ch = 0; ch < channelCount; ch++)
         {
-            results.Add(imagesByChannel[i]);
+            var rawData = rawDataByChannel[ch];
+            var output = new byte[imageSizePerChannel];
+            
+            if (detectedBpp == 2 && rawData.Count >= imageSizePerChannel * 2)
+            {
+                for (int i = 0; i < imageSizePerChannel; i++)
+                {
+                    int lo = rawData[i * 2];
+                    int hi = rawData[i * 2 + 1];
+                    int val16 = lo | (hi << 8);
+                    output[i] = (byte)(val16 >> 8);
+                }
+            }
+            else if (rawData.Count >= imageSizePerChannel)
+            {
+                for (int i = 0; i < imageSizePerChannel; i++)
+                {
+                    output[i] = rawData[i];
+                }
+            }
+            else
+            {
+                for (int i = 0; i < rawData.Count && i < imageSizePerChannel; i++)
+                {
+                    output[i] = rawData[i];
+                }
+            }
+            
+            results.Add(output);
         }
         
         return results;
