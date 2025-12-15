@@ -709,18 +709,15 @@ public class TescanSemController : ISemController
         await SendCommandWithWaitAsync("DtAutoSignal", body, WaitFlagOptics | WaitFlagAuto, cancellationToken);
     }
     
-    public async Task SetScanControlAsync(bool remoteControl, CancellationToken cancellationToken = default)
+    public async Task ScStopScanAsync(CancellationToken cancellationToken = default)
     {
-        if (remoteControl)
-        {
-            await SendCommandNoResponseAsync("ScCtrlGui", EncodeInt(0), cancellationToken);
-            await SendCommandNoResponseAsync("ScCtrlManual", EncodeInt(1), cancellationToken);
-        }
-        else
-        {
-            await SendCommandNoResponseAsync("ScCtrlManual", EncodeInt(0), cancellationToken);
-            await SendCommandNoResponseAsync("ScCtrlGui", EncodeInt(1), cancellationToken);
-        }
+        await SendCommandNoResponseAsync("ScStopScan", null, cancellationToken);
+    }
+    
+    public async Task SetGuiScanningAsync(bool enable, CancellationToken cancellationToken = default)
+    {
+        var body = EncodeInt(enable ? 1 : 0);
+        await SendCommandNoResponseAsync("GUISetScanning", body, cancellationToken);
     }
     
     public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
@@ -736,7 +733,8 @@ public class TescanSemController : ISemController
             await SendCommandNoResponseAsync("DtEnable", enableBody.ToArray(), cancellationToken);
         }
         
-        await SetScanControlAsync(true, cancellationToken);
+        await SetGuiScanningAsync(false, cancellationToken);
+        await ScStopScanAsync(cancellationToken);
         
         try
         {
@@ -773,7 +771,7 @@ public class TescanSemController : ISemController
         }
         finally
         {
-            await SetScanControlAsync(false, cancellationToken);
+            await SetGuiScanningAsync(true, cancellationToken);
         }
     }
     
