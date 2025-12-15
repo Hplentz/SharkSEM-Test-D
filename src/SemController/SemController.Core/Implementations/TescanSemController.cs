@@ -667,15 +667,13 @@ public class TescanSemController : ISemController
     
     private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int channelCount, int imageSizePerChannel, CancellationToken cancellationToken)
     {
-        var imagesByChannel = new Dictionary<int, byte[]>();
-        var rawDataByChannel = new Dictionary<int, List<byte>>();
+        var rawDataByChannel = new Dictionary<int, byte[]>();
         for (int i = 0; i < channelCount; i++)
         {
-            imagesByChannel[i] = new byte[imageSizePerChannel];
-            rawDataByChannel[i] = new List<byte>();
+            rawDataByChannel[i] = new byte[imageSizePerChannel * 2];
         }
         
-        var pixelsReceivedPerChannel = new Dictionary<int, int>();
+        var bytesReceivedPerChannel = new Dictionary<int, int>();
         int detectedBpp = 1;
         var timeout = TimeSpan.FromSeconds(_timeoutSeconds * 3);
         var startTime = DateTime.UtcNow;
@@ -702,15 +700,18 @@ public class TescanSemController : ISemController
                 
                 if (dataOffset + dataSize <= message.Body.Length && channel >= 0 && channel < channelCount)
                 {
-                    var rawData = rawDataByChannel[channel];
-                    for (int i = 0; i < (int)dataSize; i++)
-                    {
-                        rawData.Add(message.Body[dataOffset + i]);
-                    }
+                    var buffer = rawDataByChannel[channel];
+                    var byteOffset = (int)pixelIndex * Math.Max(1, bpp);
+                    var copyLen = Math.Min((int)dataSize, buffer.Length - byteOffset);
                     
-                    if (!pixelsReceivedPerChannel.ContainsKey(channel))
-                        pixelsReceivedPerChannel[channel] = 0;
-                    pixelsReceivedPerChannel[channel] += (int)dataSize / Math.Max(1, bpp);
+                    if (copyLen > 0 && byteOffset >= 0 && byteOffset < buffer.Length)
+                    {
+                        Array.Copy(message.Body, dataOffset, buffer, byteOffset, copyLen);
+                        
+                        if (!bytesReceivedPerChannel.ContainsKey(channel))
+                            bytesReceivedPerChannel[channel] = 0;
+                        bytesReceivedPerChannel[channel] += copyLen;
+                    }
                 }
             }
             else if (commandName == "FetchImage")
@@ -718,8 +719,9 @@ public class TescanSemController : ISemController
                 break;
             }
             
-            var totalPixels = pixelsReceivedPerChannel.Values.Sum();
-            if (totalPixels >= channelCount * imageSizePerChannel)
+            var totalBytes = bytesReceivedPerChannel.Values.Sum();
+            var expectedBytes = channelCount * imageSizePerChannel * detectedBpp;
+            if (totalBytes >= expectedBytes)
                 break;
         }
         
@@ -729,7 +731,7 @@ public class TescanSemController : ISemController
             var rawData = rawDataByChannel[ch];
             var output = new byte[imageSizePerChannel];
             
-            if (detectedBpp == 2 && rawData.Count >= imageSizePerChannel * 2)
+            if (detectedBpp == 2)
             {
                 for (int i = 0; i < imageSizePerChannel; i++)
                 {
@@ -739,19 +741,9 @@ public class TescanSemController : ISemController
                     output[i] = (byte)(val16 >> 8);
                 }
             }
-            else if (rawData.Count >= imageSizePerChannel)
-            {
-                for (int i = 0; i < imageSizePerChannel; i++)
-                {
-                    output[i] = rawData[i];
-                }
-            }
             else
             {
-                for (int i = 0; i < rawData.Count && i < imageSizePerChannel; i++)
-                {
-                    output[i] = rawData[i];
-                }
+                Array.Copy(rawData, 0, output, 0, imageSizePerChannel);
             }
             
             results.Add(output);
