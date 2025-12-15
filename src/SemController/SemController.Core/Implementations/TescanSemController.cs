@@ -59,19 +59,18 @@ public class TescanSemController : ISemController
     {
         if (_dataClient?.Connected == true && _dataChannelRegistered)
             return;
-            
+        
         _dataClient = new TcpClient();
         _dataClient.ReceiveTimeout = (int)(_timeoutSeconds * 1000);
         _dataClient.SendTimeout = (int)(_timeoutSeconds * 1000);
         
-        _dataClient.Client.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0));
-        var localPort = ((System.Net.IPEndPoint)_dataClient.Client.LocalEndPoint!).Port;
+        await _dataClient.ConnectAsync(_host, _port + 1, cancellationToken);
+        _dataStream = _dataClient.GetStream();
         
+        var localPort = ((System.Net.IPEndPoint)_dataClient.Client.LocalEndPoint!).Port;
         var regBody = EncodeInt(localPort);
         await SendCommandAsync("TcpRegDataPort", regBody, cancellationToken);
         
-        await _dataClient.ConnectAsync(_host, _port + 1, cancellationToken);
-        _dataStream = _dataClient.GetStream();
         _dataChannelRegistered = true;
     }
     
