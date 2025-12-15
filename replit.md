@@ -54,11 +54,12 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
-- 2024-12-15: Fixed GUI scanning control for remote image acquisition
-  - Added GUISetScanning(false) before ScScanXY to take control from UI
-  - Re-enables GUI scanning after image acquisition completes
-  - ScScanXY now uses WaitFlagScan to block until scan completes
-  - BeamOnAsync now uses wait flags to block until optics ready
+- 2024-12-15: Fixed scan control handshake for remote image acquisition
+  - Added ScCtrlGui(0) + ScCtrlManual(1) before ScScanXY to take control from UI
+  - This is the correct SharkSEM protocol - GUISetScanning was just a UI flag
+  - Re-enables GUI control after acquisition: ScCtrlManual(0) + ScCtrlGui(1)
+  - ScScanXY uses WaitFlagScan to block until scan completes
+  - BeamOnAsync uses wait flags to block until optics ready
 
 - 2024-12-15: Fixed optics synchronization for image acquisition
   - Added wait flags support (WaitFlagOptics, WaitFlagAuto) to header protocol

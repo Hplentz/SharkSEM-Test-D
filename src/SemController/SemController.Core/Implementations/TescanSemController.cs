@@ -709,20 +709,18 @@ public class TescanSemController : ISemController
         await SendCommandWithWaitAsync("DtAutoSignal", body, WaitFlagOptics | WaitFlagAuto, cancellationToken);
     }
     
-    public async Task SetGuiScanningAsync(bool enable, CancellationToken cancellationToken = default)
+    public async Task SetScanControlAsync(bool remoteControl, CancellationToken cancellationToken = default)
     {
-        var body = EncodeInt(enable ? 1 : 0);
-        await SendCommandNoResponseAsync("GUISetScanning", body, cancellationToken);
-    }
-    
-    public async Task<int> GetGuiScanningAsync(CancellationToken cancellationToken = default)
-    {
-        var response = await SendCommandAsync("GUIGetScanning", null, cancellationToken);
-        if (response.Length >= 4)
+        if (remoteControl)
         {
-            return DecodeInt(response, 0);
+            await SendCommandNoResponseAsync("ScCtrlGui", EncodeInt(0), cancellationToken);
+            await SendCommandNoResponseAsync("ScCtrlManual", EncodeInt(1), cancellationToken);
         }
-        return 0;
+        else
+        {
+            await SendCommandNoResponseAsync("ScCtrlManual", EncodeInt(0), cancellationToken);
+            await SendCommandNoResponseAsync("ScCtrlGui", EncodeInt(1), cancellationToken);
+        }
     }
     
     public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
@@ -738,7 +736,7 @@ public class TescanSemController : ISemController
             await SendCommandNoResponseAsync("DtEnable", enableBody.ToArray(), cancellationToken);
         }
         
-        await SetGuiScanningAsync(false, cancellationToken);
+        await SetScanControlAsync(true, cancellationToken);
         
         try
         {
@@ -776,7 +774,7 @@ public class TescanSemController : ISemController
         }
         finally
         {
-            await SetGuiScanningAsync(true, cancellationToken);
+            await SetScanControlAsync(false, cancellationToken);
         }
     }
     
