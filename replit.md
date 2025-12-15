@@ -54,6 +54,17 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-15: Fixed optics synchronization for image acquisition
+  - Added wait flags support (WaitFlagOptics, WaitFlagAuto) to header protocol
+  - AutoFocusAsync now blocks until optics adjustment completes
+  - AutoSignalAsync now blocks until signal adjustment completes
+  - This prevents "Optics Adjustment Running" during image capture
+
+- 2024-12-15: Added detector configuration API
+  - EnumDetectorsAsync, GetChannelCountAsync, SelectDetectorAsync
+  - EnableChannelAsync, GetSelectedDetectorAsync, GetChannelEnabledAsync
+  - AutoSignalAsync for automatic signal optimization
+
 - 2024-12-13: Fixed chunked image acquisition via data channel
   - FetchImage now uses SendCommandNoResponseAsync (triggers data channel, doesn't return image)
   - Image data always read from data channel via ScData messages

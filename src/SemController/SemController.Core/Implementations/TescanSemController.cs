@@ -27,6 +27,11 @@ public class TescanSemController : ISemController
     private const int CommandNameSize = 16;
     private const ushort FlagSendResponse = 0x0001;
     
+    private const ushort WaitFlagScan = 0x0100;
+    private const ushort WaitFlagStage = 0x0200;
+    private const ushort WaitFlagOptics = 0x0400;
+    private const ushort WaitFlagAuto = 0x0800;
+    
     public bool IsConnected => _client?.Connected ?? false;
     
     public TescanSemController(string host, int port = 8300, double timeoutSeconds = 30.0)
@@ -192,6 +197,46 @@ public class TescanSemController : ISemController
         {
             await _stream.WriteAsync(body, cancellationToken);
         }
+    }
+    
+    private async Task<byte[]> SendCommandWithWaitAsync(string command, byte[]? body, ushort waitFlags, CancellationToken cancellationToken)
+    {
+        if (_stream == null)
+            throw new InvalidOperationException("Not connected to microscope");
+        
+        var bodySize = (uint)(body?.Length ?? 0);
+        var flags = (ushort)(FlagSendResponse | waitFlags);
+        var header = BuildHeader(command, bodySize, flags);
+        
+        await _stream.WriteAsync(header, cancellationToken);
+        if (body != null && body.Length > 0)
+        {
+            await _stream.WriteAsync(body, cancellationToken);
+        }
+        
+        var responseHeader = new byte[HeaderSize];
+        var bytesRead = 0;
+        while (bytesRead < HeaderSize)
+        {
+            var read = await _stream.ReadAsync(responseHeader.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
+            if (read == 0) throw new IOException("Connection closed by server");
+            bytesRead += read;
+        }
+        
+        var responseBodySize = BitConverter.ToUInt32(responseHeader, 16);
+        if (responseBodySize == 0)
+            return Array.Empty<byte>();
+        
+        var responseBody = new byte[responseBodySize];
+        bytesRead = 0;
+        while (bytesRead < (int)responseBodySize)
+        {
+            var read = await _stream.ReadAsync(responseBody.AsMemory(bytesRead, (int)responseBodySize - bytesRead), cancellationToken);
+            if (read == 0) throw new IOException("Connection closed by server");
+            bytesRead += read;
+        }
+        
+        return responseBody;
     }
     
     private static int DecodeInt(byte[] body, int offset)
@@ -561,7 +606,7 @@ public class TescanSemController : ISemController
     public async Task AutoFocusAsync(CancellationToken cancellationToken = default)
     {
         var body = EncodeInt(0);
-        await SendCommandNoResponseAsync("AutoWD", body, cancellationToken);
+        await SendCommandWithWaitAsync("AutoWD", body, WaitFlagOptics | WaitFlagAuto, cancellationToken);
     }
     
     public async Task<int> GetScanSpeedAsync(CancellationToken cancellationToken = default)
@@ -661,7 +706,7 @@ public class TescanSemController : ISemController
     public async Task AutoSignalAsync(int channel, CancellationToken cancellationToken = default)
     {
         var body = EncodeInt(channel);
-        await SendCommandNoResponseAsync("DtAutoSignal", body, cancellationToken);
+        await SendCommandWithWaitAsync("DtAutoSignal", body, WaitFlagOptics | WaitFlagAuto, cancellationToken);
     }
     
     public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
