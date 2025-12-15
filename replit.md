@@ -54,6 +54,12 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-15: Fixed GUI scanning control for remote image acquisition
+  - Added GUISetScanning(false) before ScScanXY to take control from UI
+  - Re-enables GUI scanning after image acquisition completes
+  - ScScanXY now uses WaitFlagScan to block until scan completes
+  - BeamOnAsync now uses wait flags to block until optics ready
+
 - 2024-12-15: Fixed optics synchronization for image acquisition
   - Added wait flags support (WaitFlagOptics, WaitFlagAuto) to header protocol
   - AutoFocusAsync now blocks until optics adjustment completes

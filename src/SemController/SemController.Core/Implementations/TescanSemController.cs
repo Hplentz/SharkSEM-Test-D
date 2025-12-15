@@ -370,7 +370,7 @@ public class TescanSemController : ISemController
     
     public async Task BeamOnAsync(CancellationToken cancellationToken = default)
     {
-        await SendCommandNoResponseAsync("HVBeamOn", null, cancellationToken);
+        await SendCommandWithWaitAsync("HVBeamOn", null, WaitFlagOptics | WaitFlagAuto, cancellationToken);
     }
     
     public async Task<bool> WaitForBeamOnAsync(int timeoutMs = 30000, CancellationToken cancellationToken = default)
@@ -709,6 +709,22 @@ public class TescanSemController : ISemController
         await SendCommandWithWaitAsync("DtAutoSignal", body, WaitFlagOptics | WaitFlagAuto, cancellationToken);
     }
     
+    public async Task SetGuiScanningAsync(bool enable, CancellationToken cancellationToken = default)
+    {
+        var body = EncodeInt(enable ? 1 : 0);
+        await SendCommandNoResponseAsync("GUISetScanning", body, cancellationToken);
+    }
+    
+    public async Task<int> GetGuiScanningAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await SendCommandAsync("GUIGetScanning", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return DecodeInt(response, 0);
+        }
+        return 0;
+    }
+    
     public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
     {
         await EnsureDataChannelAsync(cancellationToken);
@@ -722,37 +738,46 @@ public class TescanSemController : ISemController
             await SendCommandNoResponseAsync("DtEnable", enableBody.ToArray(), cancellationToken);
         }
         
-        var right = settings.Right > 0 ? settings.Right : settings.Width;
-        var bottom = settings.Bottom > 0 ? settings.Bottom : settings.Height;
+        await SetGuiScanningAsync(false, cancellationToken);
         
-        var scanBody = new List<byte>();
-        scanBody.AddRange(EncodeInt(0));
-        scanBody.AddRange(EncodeInt(settings.Width));
-        scanBody.AddRange(EncodeInt(settings.Height));
-        scanBody.AddRange(EncodeInt(settings.Left));
-        scanBody.AddRange(EncodeInt(settings.Top));
-        scanBody.AddRange(EncodeInt(right));
-        scanBody.AddRange(EncodeInt(bottom));
-        scanBody.AddRange(EncodeInt(1));
-        scanBody.AddRange(EncodeUInt((uint)(settings.DwellTimeUs * 1000)));
-        
-        await SendCommandAsync("ScScanXY", scanBody.ToArray(), cancellationToken);
-        
-        var channelCount = settings.Channels.Length;
-        var imageSize = settings.Width * settings.Height;
-        
-        var imageDataList = await ReadAllImagesFromDataChannelAsync(settings.Channels, imageSize, cancellationToken);
-        
-        var images = new List<SemImage>();
-        for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
+        try
         {
-            if (imageDataList[i].Length > 0)
+            var right = settings.Right > 0 ? settings.Right : settings.Width;
+            var bottom = settings.Bottom > 0 ? settings.Bottom : settings.Height;
+            
+            var scanBody = new List<byte>();
+            scanBody.AddRange(EncodeInt(0));
+            scanBody.AddRange(EncodeInt(settings.Width));
+            scanBody.AddRange(EncodeInt(settings.Height));
+            scanBody.AddRange(EncodeInt(settings.Left));
+            scanBody.AddRange(EncodeInt(settings.Top));
+            scanBody.AddRange(EncodeInt(right));
+            scanBody.AddRange(EncodeInt(bottom));
+            scanBody.AddRange(EncodeInt(1));
+            scanBody.AddRange(EncodeUInt((uint)(settings.DwellTimeUs * 1000)));
+            
+            await SendCommandWithWaitAsync("ScScanXY", scanBody.ToArray(), WaitFlagScan, cancellationToken);
+            
+            var channelCount = settings.Channels.Length;
+            var imageSize = settings.Width * settings.Height;
+            
+            var imageDataList = await ReadAllImagesFromDataChannelAsync(settings.Channels, imageSize, cancellationToken);
+            
+            var images = new List<SemImage>();
+            for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
             {
-                images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
+                if (imageDataList[i].Length > 0)
+                {
+                    images.Add(new SemImage(settings.Width, settings.Height, imageDataList[i], settings.Channels[i]));
+                }
             }
+            
+            return images.ToArray();
         }
-        
-        return images.ToArray();
+        finally
+        {
+            await SetGuiScanningAsync(true, cancellationToken);
+        }
     }
     
     private static List<byte[]> ParseFetchImageResponse(byte[] response, int channelCount, int width, int height)
