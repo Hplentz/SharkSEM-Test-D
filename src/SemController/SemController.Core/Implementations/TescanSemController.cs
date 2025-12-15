@@ -328,6 +328,23 @@ public class TescanSemController : ISemController
         await SendCommandNoResponseAsync("HVBeamOn", null, cancellationToken);
     }
     
+    public async Task<bool> WaitForBeamOnAsync(int timeoutMs = 30000, CancellationToken cancellationToken = default)
+    {
+        var startTime = DateTime.UtcNow;
+        var timeout = TimeSpan.FromMilliseconds(timeoutMs);
+        
+        while (DateTime.UtcNow - startTime < timeout)
+        {
+            var state = await GetBeamStateAsync(cancellationToken);
+            if (state == BeamState.On)
+                return true;
+            if (state == BeamState.Off || state == BeamState.Unknown)
+                return false;
+            await Task.Delay(200, cancellationToken);
+        }
+        return false;
+    }
+    
     public async Task BeamOffAsync(CancellationToken cancellationToken = default)
     {
         await SendCommandNoResponseAsync("HVBeamOff", null, cancellationToken);
@@ -668,13 +685,14 @@ public class TescanSemController : ISemController
     private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int channelCount, int imageSizePerChannel, CancellationToken cancellationToken)
     {
         var rawDataByChannel = new Dictionary<int, byte[]>();
+        var bppByChannel = new Dictionary<int, int>();
         for (int i = 0; i < channelCount; i++)
         {
             rawDataByChannel[i] = new byte[imageSizePerChannel * 2];
+            bppByChannel[i] = 1;
         }
         
         var bytesReceivedPerChannel = new Dictionary<int, int>();
-        int detectedBpp = 1;
         var timeout = TimeSpan.FromSeconds(_timeoutSeconds * 3);
         var startTime = DateTime.UtcNow;
         
@@ -694,14 +712,14 @@ public class TescanSemController : ISemController
                 var bpp = BitConverter.ToInt32(message.Body, 12);
                 var dataSize = BitConverter.ToUInt32(message.Body, 16);
                 
-                if (bpp > 0) detectedBpp = bpp;
-                
                 int dataOffset = 20;
+                int msgBpp = bpp > 0 ? bpp : 1;
                 
                 if (dataOffset + dataSize <= message.Body.Length && channel >= 0 && channel < channelCount)
                 {
+                    bppByChannel[channel] = msgBpp;
                     var buffer = rawDataByChannel[channel];
-                    var byteOffset = (int)pixelIndex * Math.Max(1, bpp);
+                    var byteOffset = (int)pixelIndex * msgBpp;
                     var copyLen = Math.Min((int)dataSize, buffer.Length - byteOffset);
                     
                     if (copyLen > 0 && byteOffset >= 0 && byteOffset < buffer.Length)
@@ -719,9 +737,14 @@ public class TescanSemController : ISemController
                 break;
             }
             
-            var totalBytes = bytesReceivedPerChannel.Values.Sum();
-            var expectedBytes = channelCount * imageSizePerChannel * detectedBpp;
-            if (totalBytes >= expectedBytes)
+            int expectedTotal = 0;
+            int receivedTotal = 0;
+            foreach (var ch in Enumerable.Range(0, channelCount))
+            {
+                expectedTotal += imageSizePerChannel * bppByChannel[ch];
+                receivedTotal += bytesReceivedPerChannel.GetValueOrDefault(ch, 0);
+            }
+            if (receivedTotal >= expectedTotal)
                 break;
         }
         
@@ -730,14 +753,15 @@ public class TescanSemController : ISemController
         {
             var rawData = rawDataByChannel[ch];
             var output = new byte[imageSizePerChannel];
+            var bpp = bppByChannel[ch];
             
-            if (detectedBpp == 2)
+            if (bpp == 2)
             {
                 for (int i = 0; i < imageSizePerChannel; i++)
                 {
-                    int lo = rawData[i * 2];
-                    int hi = rawData[i * 2 + 1];
-                    int val16 = lo | (hi << 8);
+                    int hi = rawData[i * 2];
+                    int lo = rawData[i * 2 + 1];
+                    int val16 = (hi << 8) | lo;
                     output[i] = (byte)(val16 >> 8);
                 }
             }

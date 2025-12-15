@@ -85,6 +85,11 @@ public class MockSemController : ISemController
         return Task.CompletedTask;
     }
     
+    public Task<bool> WaitForBeamOnAsync(int timeoutMs = 30000, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_beamState == BeamState.On);
+    }
+    
     public Task BeamOffAsync(CancellationToken cancellationToken = default)
     {
         _beamState = BeamState.Off;

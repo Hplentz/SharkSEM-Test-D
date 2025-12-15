@@ -19,6 +19,7 @@ public interface ISemController : IDisposable
     
     Task<BeamState> GetBeamStateAsync(CancellationToken cancellationToken = default);
     Task BeamOnAsync(CancellationToken cancellationToken = default);
+    Task<bool> WaitForBeamOnAsync(int timeoutMs = 30000, CancellationToken cancellationToken = default);
     Task BeamOffAsync(CancellationToken cancellationToken = default);
     
     Task<double> GetHighVoltageAsync(CancellationToken cancellationToken = default);

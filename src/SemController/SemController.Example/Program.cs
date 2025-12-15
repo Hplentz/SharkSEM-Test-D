@@ -42,6 +42,14 @@ using (ISemController sem = SemControllerFactory.CreateMock())
     beamState = await sem.GetBeamStateAsync();
     Console.WriteLine($"Beam State: {beamState}");
     
+    if (beamState == BeamState.Transitioning)
+    {
+        Console.WriteLine("Waiting for beam to stabilize...");
+        var beamReady = await sem.WaitForBeamOnAsync(30000);
+        beamState = await sem.GetBeamStateAsync();
+        Console.WriteLine($"Beam State: {beamState} (ready: {beamReady})");
+    }
+    
     var hv = await sem.GetHighVoltageAsync();
     Console.WriteLine($"\nHigh Voltage: {hv / 1000:F1} kV");
     
