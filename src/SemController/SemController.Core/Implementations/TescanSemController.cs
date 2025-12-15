@@ -600,6 +600,15 @@ public class TescanSemController : ISemController
     {
         await EnsureDataChannelAsync(cancellationToken);
         
+        foreach (var channel in settings.Channels)
+        {
+            var enableBody = new List<byte>();
+            enableBody.AddRange(EncodeInt(channel));
+            enableBody.AddRange(EncodeInt(1));
+            enableBody.AddRange(EncodeInt(8));
+            await SendCommandNoResponseAsync("DtEnable", enableBody.ToArray(), cancellationToken);
+        }
+        
         var right = settings.Right > 0 ? settings.Right : settings.Width;
         var bottom = settings.Bottom > 0 ? settings.Bottom : settings.Height;
         
@@ -616,21 +625,10 @@ public class TescanSemController : ISemController
         
         await SendCommandAsync("ScScanXY", scanBody.ToArray(), cancellationToken);
         
-        var fetchBody = new List<byte>();
-        fetchBody.AddRange(EncodeInt(settings.Channels.Length));
-        foreach (var channel in settings.Channels)
-        {
-            fetchBody.AddRange(EncodeInt(channel));
-        }
-        fetchBody.AddRange(EncodeInt(settings.Width));
-        fetchBody.AddRange(EncodeInt(settings.Height));
-        
         var channelCount = settings.Channels.Length;
         var imageSize = settings.Width * settings.Height;
         
-        await SendCommandNoResponseAsync("FetchImage", fetchBody.ToArray(), cancellationToken);
-        
-        var imageDataList = await ReadAllImagesFromDataChannelAsync(channelCount, imageSize, cancellationToken);
+        var imageDataList = await ReadAllImagesFromDataChannelAsync(settings.Channels, imageSize, cancellationToken);
         
         var images = new List<SemImage>();
         for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
@@ -682,17 +680,17 @@ public class TescanSemController : ISemController
         return results;
     }
     
-    private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int channelCount, int imageSizePerChannel, CancellationToken cancellationToken)
+    private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int[] channels, int imageSizePerChannel, CancellationToken cancellationToken)
     {
-        var rawDataByChannel = new Dictionary<int, byte[]>();
-        var bppByChannel = new Dictionary<int, int>();
-        for (int i = 0; i < channelCount; i++)
+        var imageByChannel = new Dictionary<int, byte[]>();
+        var bytesReceivedByChannel = new Dictionary<int, int>();
+        
+        foreach (var ch in channels)
         {
-            rawDataByChannel[i] = new byte[imageSizePerChannel * 2];
-            bppByChannel[i] = 1;
+            imageByChannel[ch] = new byte[imageSizePerChannel];
+            bytesReceivedByChannel[ch] = 0;
         }
         
-        var bytesReceivedPerChannel = new Dictionary<int, int>();
         var timeout = TimeSpan.FromSeconds(_timeoutSeconds * 3);
         var startTime = DateTime.UtcNow;
         
@@ -707,70 +705,55 @@ public class TescanSemController : ISemController
             if (commandName == "ScData" && message.Body.Length >= 20)
             {
                 var frameId = BitConverter.ToUInt32(message.Body, 0);
-                var channel = BitConverter.ToInt32(message.Body, 4);
-                var pixelIndex = BitConverter.ToUInt32(message.Body, 8);
-                var bpp = BitConverter.ToInt32(message.Body, 12);
-                var dataSize = BitConverter.ToUInt32(message.Body, 16);
+                var msgChannel = BitConverter.ToInt32(message.Body, 4);
+                var argIndex = BitConverter.ToUInt32(message.Body, 8);
+                var argBpp = BitConverter.ToInt32(message.Body, 12);
+                var argDataSize = BitConverter.ToUInt32(message.Body, 16);
+                
+                if (!imageByChannel.ContainsKey(msgChannel))
+                    continue;
+                    
+                if (argBpp != 8)
+                    continue;
+                
+                var buffer = imageByChannel[msgChannel];
+                var currentSize = bytesReceivedByChannel[msgChannel];
+                
+                if (argIndex < currentSize)
+                {
+                    currentSize = (int)argIndex;
+                }
+                
+                if (argIndex > currentSize)
+                    continue;
                 
                 int dataOffset = 20;
-                int msgBpp = bpp > 0 ? bpp : 1;
+                var copyLen = Math.Min((int)argDataSize, buffer.Length - (int)argIndex);
                 
-                if (dataOffset + dataSize <= message.Body.Length && channel >= 0 && channel < channelCount)
+                if (copyLen > 0 && dataOffset + argDataSize <= message.Body.Length)
                 {
-                    bppByChannel[channel] = msgBpp;
-                    var buffer = rawDataByChannel[channel];
-                    var byteOffset = (int)pixelIndex * msgBpp;
-                    var copyLen = Math.Min((int)dataSize, buffer.Length - byteOffset);
-                    
-                    if (copyLen > 0 && byteOffset >= 0 && byteOffset < buffer.Length)
-                    {
-                        Array.Copy(message.Body, dataOffset, buffer, byteOffset, copyLen);
-                        
-                        if (!bytesReceivedPerChannel.ContainsKey(channel))
-                            bytesReceivedPerChannel[channel] = 0;
-                        bytesReceivedPerChannel[channel] += copyLen;
-                    }
+                    Array.Copy(message.Body, dataOffset, buffer, (int)argIndex, copyLen);
+                    bytesReceivedByChannel[msgChannel] = (int)argIndex + copyLen;
                 }
             }
-            else if (commandName == "FetchImage")
-            {
-                break;
-            }
             
-            int expectedTotal = 0;
-            int receivedTotal = 0;
-            foreach (var ch in Enumerable.Range(0, channelCount))
+            bool allComplete = true;
+            foreach (var ch in channels)
             {
-                expectedTotal += imageSizePerChannel * bppByChannel[ch];
-                receivedTotal += bytesReceivedPerChannel.GetValueOrDefault(ch, 0);
+                if (bytesReceivedByChannel[ch] < imageSizePerChannel)
+                {
+                    allComplete = false;
+                    break;
+                }
             }
-            if (receivedTotal >= expectedTotal)
+            if (allComplete)
                 break;
         }
         
         var results = new List<byte[]>();
-        for (int ch = 0; ch < channelCount; ch++)
+        foreach (var ch in channels)
         {
-            var rawData = rawDataByChannel[ch];
-            var output = new byte[imageSizePerChannel];
-            var bpp = bppByChannel[ch];
-            
-            if (bpp == 2)
-            {
-                for (int i = 0; i < imageSizePerChannel; i++)
-                {
-                    int hi = rawData[i * 2];
-                    int lo = rawData[i * 2 + 1];
-                    int val16 = (hi << 8) | lo;
-                    output[i] = (byte)(val16 >> 8);
-                }
-            }
-            else
-            {
-                Array.Copy(rawData, 0, output, 0, imageSizePerChannel);
-            }
-            
-            results.Add(output);
+            results.Add(imageByChannel[ch]);
         }
         
         return results;
