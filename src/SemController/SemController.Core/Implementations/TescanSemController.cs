@@ -752,7 +752,6 @@ public class TescanSemController : ISemController
             scanBody.AddRange(EncodeInt(right));
             scanBody.AddRange(EncodeInt(bottom));
             scanBody.AddRange(EncodeInt(1));
-            scanBody.AddRange(EncodeUInt((uint)(settings.DwellTimeUs * 1000)));
             
             await SendCommandWithWaitAsync("ScScanXY", scanBody.ToArray(), WaitFlagScan, cancellationToken);
             
