@@ -596,6 +596,74 @@ public class TescanSemController : ISemController
         await SendCommandNoResponseAsync("ScSetBlanker", body, cancellationToken);
     }
     
+    public async Task<string> EnumDetectorsAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await SendCommandAsync("DtEnumDetectors", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            return DecodeString(response, ref offset);
+        }
+        return string.Empty;
+    }
+    
+    public async Task<int> GetChannelCountAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await SendCommandAsync("DtGetChannels", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return DecodeInt(response, 0);
+        }
+        return 0;
+    }
+    
+    public async Task<int> GetSelectedDetectorAsync(int channel, CancellationToken cancellationToken = default)
+    {
+        var body = EncodeInt(channel);
+        var response = await SendCommandAsync("DtGetSelected", body, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return DecodeInt(response, 0);
+        }
+        return -1;
+    }
+    
+    public async Task SelectDetectorAsync(int channel, int detector, CancellationToken cancellationToken = default)
+    {
+        var body = new List<byte>();
+        body.AddRange(EncodeInt(channel));
+        body.AddRange(EncodeInt(detector));
+        await SendCommandNoResponseAsync("DtSelect", body.ToArray(), cancellationToken);
+    }
+    
+    public async Task<(int enabled, int bpp)> GetChannelEnabledAsync(int channel, CancellationToken cancellationToken = default)
+    {
+        var body = EncodeInt(channel);
+        var response = await SendCommandAsync("DtGetEnabled", body, cancellationToken);
+        if (response.Length >= 8)
+        {
+            var enabled = DecodeInt(response, 0);
+            var bpp = DecodeInt(response, 4);
+            return (enabled, bpp);
+        }
+        return (0, 0);
+    }
+    
+    public async Task EnableChannelAsync(int channel, bool enable, int bpp = 8, CancellationToken cancellationToken = default)
+    {
+        var body = new List<byte>();
+        body.AddRange(EncodeInt(channel));
+        body.AddRange(EncodeInt(enable ? 1 : 0));
+        body.AddRange(EncodeInt(bpp));
+        await SendCommandNoResponseAsync("DtEnable", body.ToArray(), cancellationToken);
+    }
+    
+    public async Task AutoSignalAsync(int channel, CancellationToken cancellationToken = default)
+    {
+        var body = EncodeInt(channel);
+        await SendCommandNoResponseAsync("DtAutoSignal", body, cancellationToken);
+    }
+    
     public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
     {
         await EnsureDataChannelAsync(cancellationToken);

@@ -116,12 +116,30 @@ The SharkSEM protocol uses a binary message format over TCP:
 - **Emission Current**: Amperes (API returns µA, converted)
 - **Tilt/Rotation**: Degrees (no conversion)
 
-## Image Acquisition
-The FetchImage command requires a separate data channel connection:
+## Detector Configuration
+Before acquiring images, detectors must be properly configured:
+
+### Key Methods (TescanSemController)
+- `EnumDetectorsAsync()` - Returns semicolon-separated list of detector names
+- `GetChannelCountAsync()` - Returns number of available channels
+- `SelectDetectorAsync(channel, detector)` - Assigns detector to channel
+- `EnableChannelAsync(channel, enable, bpp)` - Enables channel with bit depth
+- `GetSelectedDetectorAsync(channel)` - Gets currently selected detector
+- `GetChannelEnabledAsync(channel)` - Gets (enabled, bpp) tuple
+- `AutoSignalAsync(channel)` - Auto-adjusts signal for channel
+
+### Image Acquisition Workflow
+1. Call `EnumDetectorsAsync()` to find BSE detector index
+2. Call `SelectDetectorAsync(channel, bseIndex)` to assign BSE to channel
+3. Call `EnableChannelAsync(channel, true, 8)` to enable with 8-bit depth
+4. Call `AutoSignalAsync(channel)` to optimize signal levels
+5. Call `AcquireImagesAsync(settings)` to capture image
+
+### Data Channel
 - **Control port**: 8300 (commands and responses)
-- **Data port**: 8301 (image data transfer)
+- **Data port**: 8301 (image data transfer via ScData messages)
 
 The library automatically establishes the data channel when acquiring images:
-1. Binds to a local port
-2. Registers the data port with TcpRegDataPort
-3. Connects to port 8301 for image data transfer
+1. Connects to port 8301 first
+2. Registers the local port with TcpRegDataPort
+3. Collects ScData messages after ScScanXY command

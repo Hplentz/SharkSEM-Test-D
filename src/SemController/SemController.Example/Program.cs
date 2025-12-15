@@ -1,6 +1,7 @@
 using SemController.Core.Factory;
 using SemController.Core.Models;
 using SemController.Core.Interfaces;
+using SemController.Core.Implementations;
 using System.Drawing;
 using System.Drawing.Imaging;
 
@@ -15,7 +16,7 @@ Console.WriteLine("  - Mock/Simulator (for testing without hardware)\n");
 
 Console.WriteLine("--- Connecting to TESCAN SEM at 127.0.0.1 ---\n");
 
-using (ISemController sem = SemControllerFactory.CreateTescan("127.0.0.1"))
+using (var sem = new TescanSemController("127.0.0.1"))
 {
     await sem.ConnectAsync();
     Console.WriteLine("Connected to TESCAN SEM");
@@ -33,6 +34,46 @@ using (ISemController sem = SemControllerFactory.CreateTescan("127.0.0.1"))
     
     var pressure = await sem.GetVacuumPressureAsync(VacuumGauge.Chamber);
     Console.WriteLine($"Chamber Pressure: {pressure:E2} Pa");
+    
+    Console.WriteLine("\n--- Detector Configuration ---");
+    var detectorsStr = await sem.EnumDetectorsAsync();
+    Console.WriteLine($"Available Detectors: {detectorsStr}");
+    
+    var channelCount = await sem.GetChannelCountAsync();
+    Console.WriteLine($"Number of Channels: {channelCount}");
+    
+    for (int ch = 0; ch < Math.Min(channelCount, 4); ch++)
+    {
+        var selectedDet = await sem.GetSelectedDetectorAsync(ch);
+        var (enabled, bpp) = await sem.GetChannelEnabledAsync(ch);
+        Console.WriteLine($"  Channel {ch}: Detector={selectedDet}, Enabled={enabled}, BPP={bpp}");
+    }
+    
+    var detectorNames = detectorsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
+    int bseDetectorIndex = -1;
+    for (int i = 0; i < detectorNames.Length; i++)
+    {
+        if (detectorNames[i].Contains("BSE", StringComparison.OrdinalIgnoreCase) ||
+            detectorNames[i].Contains("Back", StringComparison.OrdinalIgnoreCase))
+        {
+            bseDetectorIndex = i;
+            Console.WriteLine($"\nFound BSE detector at index {i}: {detectorNames[i]}");
+            break;
+        }
+    }
+    
+    int imageChannel = 0;
+    if (bseDetectorIndex >= 0)
+    {
+        Console.WriteLine($"Selecting BSE detector (index {bseDetectorIndex}) for channel {imageChannel}...");
+        await sem.SelectDetectorAsync(imageChannel, bseDetectorIndex);
+    }
+    
+    Console.WriteLine($"Enabling channel {imageChannel} with 8-bit depth...");
+    await sem.EnableChannelAsync(imageChannel, true, 8);
+    
+    var (en, bp) = await sem.GetChannelEnabledAsync(imageChannel);
+    Console.WriteLine($"Channel {imageChannel} status: Enabled={en}, BPP={bp}");
     
     var beamState = await sem.GetBeamStateAsync();
     Console.WriteLine($"\nBeam State: {beamState}");
@@ -90,8 +131,11 @@ using (ISemController sem = SemControllerFactory.CreateTescan("127.0.0.1"))
     wd = await sem.GetWorkingDistanceAsync();
     Console.WriteLine($"Working Distance: {wd:F2} mm");
     
-    Console.WriteLine("\nAcquiring sample image (256x256)...");
-    var image = await sem.AcquireSingleImageAsync(0, 256, 256);
+    Console.WriteLine($"\nRunning AutoSignal on channel {imageChannel}...");
+    await sem.AutoSignalAsync(imageChannel);
+    
+    Console.WriteLine($"\nAcquiring image (256x256) on channel {imageChannel}...");
+    var image = await sem.AcquireSingleImageAsync(imageChannel, 256, 256);
     Console.WriteLine($"Image acquired: {image.Width}x{image.Height}, {image.Data.Length} bytes, Channel {image.Channel}");
     
     if (image.Data.Length > 0)
