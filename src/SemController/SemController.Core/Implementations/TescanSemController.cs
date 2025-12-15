@@ -751,7 +751,15 @@ public class TescanSemController : ISemController
             scanBody.AddRange(EncodeInt(bottom));
             scanBody.AddRange(EncodeInt(1));
             
-            await SendCommandWithWaitAsync("ScScanXY", scanBody.ToArray(), WaitFlagScan, cancellationToken);
+            var scanResult = await SendCommandAsync("ScScanXY", scanBody.ToArray(), cancellationToken);
+            if (scanResult.Length >= 4)
+            {
+                var frameId = DecodeInt(scanResult, 0);
+                if (frameId < 0)
+                {
+                    throw new InvalidOperationException($"ScScanXY failed with error code: {frameId}");
+                }
+            }
             
             var channelCount = settings.Channels.Length;
             var imageSize = settings.Width * settings.Height;
