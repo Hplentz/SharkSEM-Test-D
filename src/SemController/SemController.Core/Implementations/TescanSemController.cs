@@ -738,8 +738,8 @@ public class TescanSemController : ISemController
         
         try
         {
-            var right = settings.Right > 0 ? settings.Right : settings.Width;
-            var bottom = settings.Bottom > 0 ? settings.Bottom : settings.Height;
+            var right = settings.Right > 0 ? settings.Right : (settings.Width - 1);
+            var bottom = settings.Bottom > 0 ? settings.Bottom : (settings.Height - 1);
             
             var scanBody = new List<byte>();
             scanBody.AddRange(EncodeInt(0));
