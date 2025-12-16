@@ -54,12 +54,16 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-16: Fixed data channel connection order for image acquisition
+  - **Critical fix**: Data channel must bind → register port → connect (not connect first)
+  - This matches the official Python SharkSEM library exactly
+  - Order: 1) Bind socket to get local port, 2) Register port with TcpRegDataPort, 3) Connect to data port
+  - Image data now received correctly via ScData chunks on data channel
+
 - 2024-12-15: Fixed scan control handshake for remote image acquisition
-  - Added ScCtrlGui(0) + ScCtrlManual(1) before ScScanXY to take control from UI
-  - This is the correct SharkSEM protocol - GUISetScanning was just a UI flag
-  - Re-enables GUI control after acquisition: ScCtrlManual(0) + ScCtrlGui(1)
-  - ScScanXY uses WaitFlagScan to block until scan completes
-  - BeamOnAsync uses wait flags to block until optics ready
+  - Using GUISetScanning and ScStopScan instead of ScCtrlGui/ScCtrlManual (not available in v3.2.9)
+  - Re-enables GUI control after acquisition
+  - ScScanXY uses 8 integer parameters (no dwell_time)
 
 - 2024-12-15: Fixed optics synchronization for image acquisition
   - Added wait flags support (WaitFlagOptics, WaitFlagAuto) to header protocol

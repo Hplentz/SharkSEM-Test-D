@@ -72,19 +72,12 @@ public class TescanSemController : ISemController
         _dataClient.Client.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0));
         
         var localPort = ((System.Net.IPEndPoint)_dataClient.Client.LocalEndPoint!).Port;
-        Console.WriteLine($"[DEBUG] Data channel local port: {localPort}");
         
         var regBody = EncodeInt(localPort);
-        var regResult = await SendCommandAsync("TcpRegDataPort", regBody, cancellationToken);
-        if (regResult.Length >= 4)
-        {
-            var regStatus = DecodeInt(regResult, 0);
-            Console.WriteLine($"[DEBUG] TcpRegDataPort result: {regStatus}");
-        }
+        await SendCommandAsync("TcpRegDataPort", regBody, cancellationToken);
         
         await _dataClient.ConnectAsync(_host, _port + 1, cancellationToken);
         _dataStream = _dataClient.GetStream();
-        Console.WriteLine($"[DEBUG] Data channel connected to {_host}:{_port + 1}");
         
         _dataChannelRegistered = true;
     }
@@ -762,26 +755,20 @@ public class TescanSemController : ISemController
             scanBody.AddRange(EncodeInt(1));
             
             var scanResult = await SendCommandAsync("ScScanXY", scanBody.ToArray(), cancellationToken);
-            int scannedFrameId = -1;
             if (scanResult.Length >= 4)
             {
-                scannedFrameId = DecodeInt(scanResult, 0);
-                Console.WriteLine($"[DEBUG] ScScanXY returned frame ID: {scannedFrameId}");
+                var scannedFrameId = DecodeInt(scanResult, 0);
                 if (scannedFrameId < 0)
                 {
                     throw new InvalidOperationException($"ScScanXY failed with error code: {scannedFrameId}");
                 }
             }
             
-            var channelCount = settings.Channels.Length;
             var imageSize = settings.Width * settings.Height;
-            
-            Console.WriteLine($"[DEBUG] Waiting for image data on channels: [{string.Join(", ", settings.Channels)}], expecting {imageSize} bytes per channel");
             var imageDataList = await ReadAllImagesFromDataChannelAsync(settings.Channels, imageSize, cancellationToken);
-            Console.WriteLine($"[DEBUG] Received {imageDataList.Count} image buffers");
             
             var images = new List<SemImage>();
-            for (int i = 0; i < channelCount && i < imageDataList.Count; i++)
+            for (int i = 0; i < settings.Channels.Length && i < imageDataList.Count; i++)
             {
                 if (imageDataList[i].Length > 0)
                 {
@@ -849,32 +836,20 @@ public class TescanSemController : ISemController
         var timeout = TimeSpan.FromSeconds(_timeoutSeconds * 3);
         var startTime = DateTime.UtcNow;
         
-        int messageCount = 0;
         while (DateTime.UtcNow - startTime < timeout)
         {
             var message = await ReadDataChannelMessageAsync(cancellationToken);
             if (message == null)
-            {
-                Console.WriteLine($"[DEBUG] ReadDataChannelMessageAsync returned null after {messageCount} messages");
                 break;
-            }
             
             var commandName = Encoding.ASCII.GetString(message.Header, 0, CommandNameSize).TrimEnd('\0');
-            messageCount++;
-            
-            if (commandName != "ScData")
-            {
-                Console.WriteLine($"[DEBUG] Data channel message: '{commandName}', body length={message.Body.Length}");
-            }
             
             if (commandName == "ScData" && message.Body.Length >= 20)
             {
-                var frameId = BitConverter.ToUInt32(message.Body, 0);
                 var msgChannel = BitConverter.ToInt32(message.Body, 4);
                 var argIndex = BitConverter.ToUInt32(message.Body, 8);
                 var argBpp = BitConverter.ToInt32(message.Body, 12);
                 var argDataSize = BitConverter.ToUInt32(message.Body, 16);
-                Console.WriteLine($"[DEBUG] ScData: frame={frameId}, channel={msgChannel}, index={argIndex}, bpp={argBpp}, dataSize={argDataSize}, bodyLen={message.Body.Length}");
                 
                 if (!imageByChannel.ContainsKey(msgChannel))
                     continue;
