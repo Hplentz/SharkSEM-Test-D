@@ -35,6 +35,115 @@ public class TescanSemController : ISemController
     
     internal double TimeoutSeconds => _timeoutSeconds;
     
+    public string ProtocolVersionString { get; private set; } = "";
+    public Version? ProtocolVersion { get; private set; }
+    
+    private static readonly Dictionary<string, Version> CommandMinVersions = new()
+    {
+        ["TcpGetVersion"] = new Version(2, 0, 0),
+        ["TcpGetModel"] = new Version(3, 2, 20),
+        ["TcpGetDevice"] = new Version(2, 0, 0),
+        ["TcpGetSWVersion"] = new Version(2, 0, 0),
+        ["TcpRegDataPort"] = new Version(2, 0, 0),
+        
+        ["VacGetStatus"] = new Version(2, 0, 0),
+        ["VacGetPressure"] = new Version(2, 0, 0),
+        ["VacGetVPMode"] = new Version(2, 0, 0),
+        ["VacPump"] = new Version(2, 0, 0),
+        ["VacVent"] = new Version(2, 0, 0),
+        
+        ["HVGetBeam"] = new Version(2, 0, 0),
+        ["HVBeamOn"] = new Version(2, 0, 0),
+        ["HVBeamOff"] = new Version(2, 0, 0),
+        ["HVGetVoltage"] = new Version(2, 0, 0),
+        ["HVSetVoltage"] = new Version(2, 0, 0),
+        ["HVGetEmission"] = new Version(2, 0, 0),
+        
+        ["StgGetPosition"] = new Version(2, 0, 0),
+        ["StgMoveTo"] = new Version(2, 0, 0),
+        ["StgMove"] = new Version(2, 0, 0),
+        ["StgIsBusy"] = new Version(2, 0, 0),
+        ["StgStop"] = new Version(2, 0, 0),
+        ["StgGetLimits"] = new Version(2, 0, 0),
+        ["StgCalibrate"] = new Version(2, 0, 0),
+        ["StgIsCalibrated"] = new Version(2, 0, 0),
+        
+        ["GetViewField"] = new Version(2, 0, 0),
+        ["SetViewField"] = new Version(2, 0, 0),
+        ["GetWD"] = new Version(2, 0, 0),
+        ["SetWD"] = new Version(2, 0, 0),
+        ["AutoWD"] = new Version(2, 0, 0),
+        ["GetSpotSize"] = new Version(2, 0, 0),
+        ["SetSpotSize"] = new Version(2, 0, 0),
+        
+        ["ScGetSpeed"] = new Version(2, 0, 0),
+        ["ScSetSpeed"] = new Version(2, 0, 0),
+        ["ScGetBlanker"] = new Version(2, 0, 0),
+        ["ScSetBlanker"] = new Version(2, 0, 0),
+        ["ScStopScan"] = new Version(2, 0, 0),
+        ["ScScanXY"] = new Version(2, 0, 0),
+        ["GUISetScanning"] = new Version(2, 0, 0),
+        
+        ["DtEnumDetectors"] = new Version(2, 0, 0),
+        ["DtGetChannels"] = new Version(2, 0, 0),
+        ["DtGetSelected"] = new Version(2, 0, 0),
+        ["DtSelect"] = new Version(2, 0, 0),
+        ["DtGetEnabled"] = new Version(2, 0, 0),
+        ["DtEnable"] = new Version(2, 0, 0),
+        ["DtAutoSignal"] = new Version(2, 0, 0),
+    };
+    
+    internal bool CheckVersionSupport(string commandName)
+    {
+        if (ProtocolVersion == null)
+        {
+            return true;
+        }
+        
+        if (CommandMinVersions.TryGetValue(commandName, out var minVersion))
+        {
+            if (ProtocolVersion < minVersion)
+            {
+                Console.WriteLine($"[Version Check] Command '{commandName}' requires protocol version {minVersion} or later, but current version is {ProtocolVersionString}. Skipping call.");
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private async Task FetchProtocolVersionAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await SendCommandInternalAsync("TcpGetVersion", null, cancellationToken, skipVersionCheck: true);
+            if (response.Length > 0)
+            {
+                int offset = 0;
+                ProtocolVersionString = DecodeStringInternal(response, ref offset);
+                
+                var parts = ProtocolVersionString.Split('.');
+                if (parts.Length >= 3 &&
+                    int.TryParse(parts[0], out var major) &&
+                    int.TryParse(parts[1], out var minor) &&
+                    int.TryParse(parts[2], out var build))
+                {
+                    ProtocolVersion = new Version(major, minor, build);
+                }
+                else if (parts.Length >= 2 &&
+                    int.TryParse(parts[0], out major) &&
+                    int.TryParse(parts[1], out minor))
+                {
+                    ProtocolVersion = new Version(major, minor, 0);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Warning] Could not retrieve protocol version: {ex.Message}");
+        }
+    }
+    
     public TescanSemStage Stage { get; }
     public TescanSemDetectors Detectors { get; }
     public TescanSemHighVoltage HighVoltage { get; }
@@ -75,6 +184,13 @@ public class TescanSemController : ISemController
         _stream = _client.GetStream();
         
         _dataChannelRegistered = false;
+        
+        await FetchProtocolVersionAsync(cancellationToken);
+        
+        if (ProtocolVersion != null)
+        {
+            Console.WriteLine($"Connected to SEM with protocol version {ProtocolVersionString}");
+        }
     }
     
     internal async Task EnsureDataChannelInternalAsync(CancellationToken cancellationToken)
@@ -164,8 +280,11 @@ public class TescanSemController : ISemController
         return result;
     }
     
-    internal async Task<byte[]> SendCommandInternalAsync(string command, byte[]? body, CancellationToken cancellationToken)
+    internal async Task<byte[]> SendCommandInternalAsync(string command, byte[]? body, CancellationToken cancellationToken, bool skipVersionCheck = false)
     {
+        if (!skipVersionCheck && !CheckVersionSupport(command))
+            return Array.Empty<byte>();
+        
         if (_stream == null)
             throw new InvalidOperationException("Not connected to microscope");
         
@@ -204,8 +323,11 @@ public class TescanSemController : ISemController
         return responseBody;
     }
     
-    internal async Task SendCommandNoResponseInternalAsync(string command, byte[]? body, CancellationToken cancellationToken)
+    internal async Task<bool> SendCommandNoResponseInternalAsync(string command, byte[]? body, CancellationToken cancellationToken)
     {
+        if (!CheckVersionSupport(command))
+            return false;
+        
         if (_stream == null)
             throw new InvalidOperationException("Not connected to microscope");
         
@@ -217,10 +339,14 @@ public class TescanSemController : ISemController
         {
             await _stream.WriteAsync(body, cancellationToken);
         }
+        return true;
     }
     
     internal async Task<byte[]> SendCommandWithWaitInternalAsync(string command, byte[]? body, ushort waitFlags, CancellationToken cancellationToken)
     {
+        if (!CheckVersionSupport(command))
+            return Array.Empty<byte>();
+        
         if (_stream == null)
             throw new InvalidOperationException("Not connected to microscope");
         
