@@ -63,6 +63,13 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-17: Added protocol version checking
+  - Protocol version fetched automatically on connect via `TcpGetVersion`
+  - Each API command has a minimum required version (e.g., `TcpGetModel` requires 3.2.20)
+  - If command not supported by current protocol version, logs warning to console and skips call
+  - Properties exposed: `ProtocolVersionString` (e.g., "3.2.9"), `ProtocolVersion` (System.Version)
+  - Example: `TcpGetModel` requires v3.2.20, so on v3.2.9 it will log a warning instead of failing
+
 - 2024-12-17: Major refactoring - split TescanSemController into modular sub-classes
   - TescanSemStage: Stage control (position, movement, limits, calibration)
   - TescanSemDetectors: Detector configuration (enum, select, enable, auto signal)
