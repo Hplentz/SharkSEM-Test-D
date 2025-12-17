@@ -14,7 +14,16 @@ src/SharkSEM-Test-B/
 ├── SemController.Core/            # Main library
 │   ├── Interfaces/                # ISemController, ISemConnection
 │   ├── Models/                    # StagePosition, ScanSettings, SemImage, etc.
-│   ├── Implementations/           # TescanSemController, MockSemController
+│   ├── Implementations/           # Controller implementations (modular design)
+│   │   ├── TescanSemController.cs     # Main controller (connection, protocol)
+│   │   ├── TescanSemStage.cs          # Stage control (position, movement, limits)
+│   │   ├── TescanSemDetectors.cs      # Detector configuration
+│   │   ├── TescanSemHighVoltage.cs    # Beam & HV control
+│   │   ├── TescanSemElectronOptics.cs # Focus, WD, ViewField, SpotSize
+│   │   ├── TescanSemScanning.cs       # Scan control & image acquisition
+│   │   ├── TescanSemVacuum.cs         # Vacuum control
+│   │   ├── TescanSemMisc.cs           # Miscellaneous (GetMicroscopeInfo)
+│   │   └── MockSemController.cs       # Mock controller for testing
 │   └── Factory/                   # SemControllerFactory
 └── SemController.Example/         # Demo console application
 ```
@@ -54,6 +63,17 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-17: Major refactoring - split TescanSemController into modular sub-classes
+  - TescanSemStage: Stage control (position, movement, limits, calibration)
+  - TescanSemDetectors: Detector configuration (enum, select, enable, auto signal)
+  - TescanSemHighVoltage: Beam & HV control (on/off, voltage, emission)
+  - TescanSemElectronOptics: Optics (view field, WD, focus, spot size)
+  - TescanSemScanning: Scan control & image acquisition
+  - TescanSemVacuum: Vacuum control (status, pump, vent)
+  - TescanSemMisc: Miscellaneous (microscope info)
+  - Backward compatibility maintained via delegation pattern
+  - Can use either `sem.Stage.GetPositionAsync()` or `sem.GetStagePositionAsync()`
+
 - 2024-12-16: Fixed data channel connection order for image acquisition
   - **Critical fix**: Data channel must bind → register port → connect (not connect first)
   - This matches the official Python SharkSEM library exactly
@@ -105,6 +125,14 @@ await sem.DisconnectAsync();
 ## Architecture Notes
 - **Factory Pattern**: Use `SemControllerFactory` to create controllers
 - **Interface Abstraction**: All controllers implement `ISemController`
+- **Modular Design**: TescanSemController exposes sub-objects for organized access
+  - `sem.Stage` - Stage control operations
+  - `sem.Detectors` - Detector configuration
+  - `sem.HighVoltage` - Beam and HV control
+  - `sem.Optics` - Electron optics (focus, WD, view field)
+  - `sem.Scanning` - Image acquisition
+  - `sem.Vacuum` - Vacuum control
+  - `sem.Misc` - Miscellaneous operations
 - **Async/Await**: All operations are asynchronous
 - **IDisposable**: Controllers implement IDisposable for resource cleanup
 
