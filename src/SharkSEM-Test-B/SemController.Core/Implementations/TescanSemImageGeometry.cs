@@ -23,9 +23,9 @@ public class TescanSemImageGeometry
             foreach (var line in geoMap.Split('\n', StringSplitOptions.RemoveEmptyEntries))
             {
                 var parts = line.Split('=', 2);
-                if (parts.Length == 2 && parts[0].StartsWith("geometry.") && parts[0].EndsWith(".name"))
+                if (parts.Length == 2 && parts[0].StartsWith("geom.") && parts[0].EndsWith(".name"))
                 {
-                    var indexStr = parts[0].Replace("geometry.", "").Replace(".name", "");
+                    var indexStr = parts[0].Replace("geom.", "").Replace(".name", "");
                     if (int.TryParse(indexStr, out var index))
                     {
                         geometries.Add(new ImageGeometry(index, parts[1].Trim()));
