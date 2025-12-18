@@ -111,7 +111,7 @@ using (var sem = new TescanSemController("127.0.0.1"))
     Console.WriteLine($"Stage Z Range: {limits.MinZ:F1} to {limits.MaxZ:F1} mm");
     
     Console.WriteLine("\nMoving stage to X=10mm, Y=5mm...");
-    await sem.MoveStageAsync(new StagePosition(0.010, 0.005));
+    await sem.MoveStageAsync(new StagePosition(10.0, 5.0));
     stagePos = await sem.GetStagePositionAsync();
     Console.WriteLine($"New Position: {stagePos}");
     
