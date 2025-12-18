@@ -77,4 +77,32 @@ public class TescanSemElectronOptics
         var body = TescanSemController.EncodeFloatInternal(spotSize);
         await _controller.SendCommandNoResponseInternalAsync("SetSpotSize", body, cancellationToken);
     }
+    
+    public async Task<double> GetBeamCurrentAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _controller.SendCommandInternalAsync("GetBeamCurrent", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            return TescanSemController.DecodeFloatInternal(response, ref offset);
+        }
+        return double.NaN;
+    }
+    
+    public async Task SetBeamCurrentAsync(double beamCurrentPicoamps, CancellationToken cancellationToken = default)
+    {
+        var body = TescanSemController.EncodeFloatInternal(beamCurrentPicoamps);
+        await _controller.SendCommandNoResponseInternalAsync("SetBeamCurrent", body, cancellationToken);
+    }
+    
+    public async Task<string> EnumPCIndexesAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _controller.SendCommandInternalAsync("EnumPCIndexes", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            return TescanSemController.DecodeStringInternal(response, ref offset);
+        }
+        return string.Empty;
+    }
 }

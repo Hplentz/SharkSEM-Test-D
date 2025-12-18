@@ -102,6 +102,44 @@ using (var sem = new TescanSemController("127.0.0.1"))
     var emission = await sem.GetEmissionCurrentAsync();
     Console.WriteLine($"Emission Current: {emission * 1e6:F1} uA");
     
+    Console.WriteLine("\n--- Probe Current (PC) Indexes ---");
+    var pcIndexes = await sem.Optics.EnumPCIndexesAsync();
+    if (!string.IsNullOrEmpty(pcIndexes))
+    {
+        Console.WriteLine("EnumPCIndexes response:");
+        var lines = pcIndexes.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var line in lines.Take(10))
+        {
+            Console.WriteLine($"  {line.Trim()}");
+        }
+        if (lines.Length > 10)
+        {
+            Console.WriteLine($"  ... and {lines.Length - 10} more entries");
+        }
+    }
+    else
+    {
+        Console.WriteLine("EnumPCIndexes returned empty (may not be available)");
+    }
+    
+    Console.WriteLine("\n--- Beam Current ---");
+    var beamCurrentPa = await sem.Optics.GetBeamCurrentAsync();
+    if (!double.IsNaN(beamCurrentPa))
+    {
+        if (beamCurrentPa >= 1000)
+        {
+            Console.WriteLine($"Beam Current: {beamCurrentPa / 1000:F2} nA");
+        }
+        else
+        {
+            Console.WriteLine($"Beam Current: {beamCurrentPa:F1} pA");
+        }
+    }
+    else
+    {
+        Console.WriteLine("GetBeamCurrent not available");
+    }
+    
     var stagePos = await sem.GetStagePositionAsync();
     Console.WriteLine($"\nStage Position: {stagePos}");
     
