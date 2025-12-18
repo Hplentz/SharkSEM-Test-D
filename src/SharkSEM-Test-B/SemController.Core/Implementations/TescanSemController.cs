@@ -74,7 +74,8 @@ public class TescanSemController : ISemController
         ["SetWD"] = new Version(1, 0, 0),
         ["AutoWD"] = new Version(1, 0, 0),
         ["GetSpotSize"] = new Version(1, 0, 0),
-        ["SetSpotSize"] = new Version(1, 0, 0),
+        
+        ["GetIAbsorbed"] = new Version(1, 0, 0),
         
         ["ScGetSpeed"] = new Version(1, 0, 0),
         ["ScSetSpeed"] = new Version(1, 0, 0),
@@ -603,9 +604,6 @@ public class TescanSemController : ISemController
     
     public Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default)
         => Optics.GetSpotSizeAsync(cancellationToken);
-    
-    public Task SetSpotSizeAsync(double spotSize, CancellationToken cancellationToken = default)
-        => Optics.SetSpotSizeAsync(spotSize, cancellationToken);
     
     #endregion
     

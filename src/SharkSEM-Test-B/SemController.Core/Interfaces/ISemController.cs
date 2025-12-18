@@ -56,5 +56,4 @@ public interface ISemController : IDisposable
     Task StopScanAsync(CancellationToken cancellationToken = default);
     
     Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default);
-    Task SetSpotSizeAsync(double spotSize, CancellationToken cancellationToken = default);
 }

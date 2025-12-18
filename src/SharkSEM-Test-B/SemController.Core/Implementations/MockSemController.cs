@@ -255,11 +255,5 @@ public class MockSemController : ISemController
     public Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(_spotSize);
     
-    public Task SetSpotSizeAsync(double spotSize, CancellationToken cancellationToken = default)
-    {
-        _spotSize = spotSize;
-        return Task.CompletedTask;
-    }
-    
     public void Dispose() { }
 }

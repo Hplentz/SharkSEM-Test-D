@@ -155,6 +155,24 @@ using (var sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine("GetBeamCurrent not available");
     }
     
+    Console.WriteLine("\n--- Absorbed Current ---");
+    var absorbedCurrentPa = await sem.Optics.GetAbsorbedCurrentAsync();
+    if (!double.IsNaN(absorbedCurrentPa))
+    {
+        if (absorbedCurrentPa >= 1000)
+        {
+            Console.WriteLine($"Absorbed Current: {absorbedCurrentPa / 1000:F2} nA");
+        }
+        else
+        {
+            Console.WriteLine($"Absorbed Current: {absorbedCurrentPa:F1} pA");
+        }
+    }
+    else
+    {
+        Console.WriteLine("GetIAbsorbed not available (requires active scanning)");
+    }
+    
     var stagePos = await sem.GetStagePositionAsync();
     Console.WriteLine($"\nStage Position: {stagePos}");
     
