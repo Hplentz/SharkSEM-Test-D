@@ -128,11 +128,26 @@ using (var sem = new TescanSemController("127.0.0.1"))
     {
         if (beamCurrentPa >= 1000)
         {
-            Console.WriteLine($"Beam Current: {beamCurrentPa / 1000:F2} nA");
+            Console.WriteLine($"Current Beam Current: {beamCurrentPa / 1000:F2} nA");
         }
         else
         {
-            Console.WriteLine($"Beam Current: {beamCurrentPa:F1} pA");
+            Console.WriteLine($"Current Beam Current: {beamCurrentPa:F1} pA");
+        }
+        
+        double targetBeamCurrentNa = 1.234;
+        double targetBeamCurrentPa = targetBeamCurrentNa * 1000;
+        Console.WriteLine($"Setting beam current to {targetBeamCurrentNa:F3} nA ({targetBeamCurrentPa:F0} pA)...");
+        await sem.Optics.SetBeamCurrentAsync(targetBeamCurrentPa);
+        
+        beamCurrentPa = await sem.Optics.GetBeamCurrentAsync();
+        if (beamCurrentPa >= 1000)
+        {
+            Console.WriteLine($"New Beam Current: {beamCurrentPa / 1000:F2} nA");
+        }
+        else
+        {
+            Console.WriteLine($"New Beam Current: {beamCurrentPa:F1} pA");
         }
     }
     else

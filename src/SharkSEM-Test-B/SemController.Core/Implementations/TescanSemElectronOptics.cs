@@ -92,7 +92,7 @@ public class TescanSemElectronOptics
     public async Task SetBeamCurrentAsync(double beamCurrentPicoamps, CancellationToken cancellationToken = default)
     {
         var body = TescanSemController.EncodeFloatInternal(beamCurrentPicoamps);
-        await _controller.SendCommandNoResponseInternalAsync("SetBeamCurrent", body, cancellationToken);
+        await _controller.SendCommandWithWaitInternalAsync("SetBeamCurrent", body, TescanSemController.WaitFlagOpticsInternal, cancellationToken);
     }
     
     public async Task<string> EnumPCIndexesAsync(CancellationToken cancellationToken = default)
