@@ -8,14 +8,20 @@ namespace SemController.Core.Implementations;
 public class TescanSemScanning
 {
     private readonly TescanSemController _controller;
+    private List<ScanSpeed>? _cachedSpeeds;
     
     internal TescanSemScanning(TescanSemController controller)
     {
         _controller = controller;
     }
     
-    public async Task<List<ScanSpeed>> EnumSpeedsAsync(CancellationToken cancellationToken = default)
+    public async Task<List<ScanSpeed>> EnumSpeedsAsync(bool forceRefresh = false, CancellationToken cancellationToken = default)
     {
+        if (_cachedSpeeds != null && !forceRefresh)
+        {
+            return _cachedSpeeds;
+        }
+        
         var speeds = new List<ScanSpeed>();
         
         var response = await _controller.SendCommandInternalAsync("ScEnumSpeeds", null, cancellationToken);
@@ -42,12 +48,18 @@ public class TescanSemScanning
             speeds.Sort((a, b) => a.Index.CompareTo(b.Index));
         }
         
+        _cachedSpeeds = speeds;
         return speeds;
+    }
+    
+    public void ClearSpeedCache()
+    {
+        _cachedSpeeds = null;
     }
     
     public async Task<int?> FindSpeedIndexByDwellTimeAsync(double targetDwellTimeMicroseconds, CancellationToken cancellationToken = default)
     {
-        var speeds = await EnumSpeedsAsync(cancellationToken);
+        var speeds = await EnumSpeedsAsync(false, cancellationToken);
         
         ScanSpeed? bestMatch = null;
         double smallestDiff = double.MaxValue;
