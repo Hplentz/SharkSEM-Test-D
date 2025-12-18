@@ -19,7 +19,8 @@ src/SharkSEM-Test-B/
 │   │   ├── TescanSemStage.cs          # Stage control (position, movement, limits)
 │   │   ├── TescanSemDetectors.cs      # Detector configuration
 │   │   ├── TescanSemHighVoltage.cs    # Beam & HV control
-│   │   ├── TescanSemElectronOptics.cs # Focus, WD, ViewField, SpotSize
+│   │   ├── TescanSemElectronOptics.cs # Focus, WD, ViewField, SpotSize, ScanningModes
+│   │   ├── TescanSemImageGeometry.cs  # Image geometry, shift, centerings
 │   │   ├── TescanSemScanning.cs       # Scan control & image acquisition
 │   │   ├── TescanSemVacuum.cs         # Vacuum control
 │   │   ├── TescanSemMisc.cs           # Miscellaneous (GetMicroscopeInfo)

@@ -214,13 +214,13 @@ using (var sem = new TescanSemController("127.0.0.1"))
     }
     
     Console.WriteLine("\n--- Image Geometry ---");
-    var geometries = await sem.Optics.EnumGeometriesAsync();
+    var geometries = await sem.ImageGeometry.EnumGeometriesAsync();
     if (geometries.Count > 0)
     {
         Console.WriteLine($"Available geometries ({geometries.Count} total):");
         foreach (var geo in geometries)
         {
-            var (gx, gy) = await sem.Optics.GetGeometryAsync(geo.Index);
+            var (gx, gy) = await sem.ImageGeometry.GetGeometryAsync(geo.Index);
             Console.WriteLine($"  [{geo.Index}] {geo.Name}: X={gx:F6}, Y={gy:F6}");
         }
     }
@@ -229,7 +229,7 @@ using (var sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine("EnumGeometries not available");
     }
     
-    var (imgShiftX, imgShiftY) = await sem.Optics.GetImageShiftAsync();
+    var (imgShiftX, imgShiftY) = await sem.ImageGeometry.GetImageShiftAsync();
     if (!double.IsNaN(imgShiftX))
     {
         Console.WriteLine($"\nImage Shift: X={imgShiftX:F6}, Y={imgShiftY:F6}");
@@ -240,13 +240,13 @@ using (var sem = new TescanSemController("127.0.0.1"))
     }
     
     Console.WriteLine("\n--- Centerings ---");
-    var centerings = await sem.Optics.EnumCenteringsAsync();
+    var centerings = await sem.ImageGeometry.EnumCenteringsAsync();
     if (centerings.Count > 0)
     {
         Console.WriteLine($"Available centerings ({centerings.Count} total):");
         foreach (var centering in centerings)
         {
-            var (cx, cy) = await sem.Optics.GetCenteringAsync(centering.Index);
+            var (cx, cy) = await sem.ImageGeometry.GetCenteringAsync(centering.Index);
             Console.WriteLine($"  [{centering.Index}] {centering.Name}: X={cx:F6}, Y={cy:F6}");
         }
     }

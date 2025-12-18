@@ -167,6 +167,7 @@ public class TescanSemController : ISemController
     public TescanSemScanning Scanning { get; }
     public TescanSemVacuum Vacuum { get; }
     public TescanSemMisc Misc { get; }
+    public TescanSemImageGeometry ImageGeometry { get; }
     
     public TescanSemController(string host, int port = 8300, double timeoutSeconds = 30.0)
     {
@@ -181,6 +182,7 @@ public class TescanSemController : ISemController
         Scanning = new TescanSemScanning(this);
         Vacuum = new TescanSemVacuum(this);
         Misc = new TescanSemMisc(this);
+        ImageGeometry = new TescanSemImageGeometry(this);
     }
     
     public TescanSemController(SemConnectionSettings settings)
