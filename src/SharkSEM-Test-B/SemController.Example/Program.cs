@@ -213,6 +213,48 @@ using (var sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine("SMGetPivotPos not available");
     }
     
+    Console.WriteLine("\n--- Image Geometry ---");
+    var geometries = await sem.Optics.EnumGeometriesAsync();
+    if (geometries.Count > 0)
+    {
+        Console.WriteLine($"Available geometries ({geometries.Count} total):");
+        foreach (var geo in geometries)
+        {
+            var (gx, gy) = await sem.Optics.GetGeometryAsync(geo.Index);
+            Console.WriteLine($"  [{geo.Index}] {geo.Name}: X={gx:F6}, Y={gy:F6}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("EnumGeometries not available");
+    }
+    
+    var (imgShiftX, imgShiftY) = await sem.Optics.GetImageShiftAsync();
+    if (!double.IsNaN(imgShiftX))
+    {
+        Console.WriteLine($"\nImage Shift: X={imgShiftX:F6}, Y={imgShiftY:F6}");
+    }
+    else
+    {
+        Console.WriteLine("\nGetImageShift not available");
+    }
+    
+    Console.WriteLine("\n--- Centerings ---");
+    var centerings = await sem.Optics.EnumCenteringsAsync();
+    if (centerings.Count > 0)
+    {
+        Console.WriteLine($"Available centerings ({centerings.Count} total):");
+        foreach (var centering in centerings)
+        {
+            var (cx, cy) = await sem.Optics.GetCenteringAsync(centering.Index);
+            Console.WriteLine($"  [{centering.Index}] {centering.Name}: X={cx:F6}, Y={cy:F6}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("EnumCenterings not available");
+    }
+    
     var stagePos = await sem.GetStagePositionAsync();
     Console.WriteLine($"\nStage Position: {stagePos}");
     

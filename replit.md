@@ -63,6 +63,17 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-18: Added Image Geometry commands
+  - `EnumGeometriesAsync()` - Returns list of available geometry parameters with index and name
+  - `GetGeometryAsync(int index)` - Returns (x, y) values for geometry parameter
+  - `SetGeometryAsync(int index, double x, double y)` - Sets geometry values
+  - `GetImageShiftAsync()` - Returns (x, y) image shift values
+  - `SetImageShiftAsync(double x, double y)` - Sets image shift
+  - `EnumCenteringsAsync()` - Returns list of centering parameters with index and name
+  - `GetCenteringAsync(int index)` - Returns (x, y) centering values
+  - `SetCenteringAsync(int index, double x, double y)` - Sets centering values
+  - Added ImageGeometry and Centering record models
+
 - 2024-12-18: Added Scanning Mode commands
   - `EnumScanningModesAsync()` - Returns list of available scanning modes with index and name
   - `GetScanningModeAsync()` - Returns current scanning mode index
