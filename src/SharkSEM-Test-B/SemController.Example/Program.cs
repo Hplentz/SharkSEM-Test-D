@@ -173,6 +173,46 @@ using (var sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine("GetIAbsorbed not available (requires active scanning)");
     }
     
+    Console.WriteLine("\n--- Scanning Modes ---");
+    var scanningModes = await sem.Optics.EnumScanningModesAsync();
+    if (scanningModes.Count > 0)
+    {
+        Console.WriteLine($"Available scanning modes ({scanningModes.Count} total):");
+        foreach (var mode in scanningModes)
+        {
+            Console.WriteLine($"  {mode}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("SMEnumModes not available");
+    }
+    
+    var currentModeIndex = await sem.Optics.GetScanningModeAsync();
+    if (currentModeIndex >= 0)
+    {
+        var currentModeName = scanningModes.FirstOrDefault(m => m.Index == currentModeIndex)?.Name ?? "Unknown";
+        Console.WriteLine($"\nCurrent Scanning Mode: [{currentModeIndex}] {currentModeName}");
+    }
+    else
+    {
+        Console.WriteLine("\nSMGetMode not available");
+    }
+    
+    var (pivotResult, pivotPos) = await sem.Optics.GetPivotPositionAsync();
+    if (pivotResult == 0)
+    {
+        Console.WriteLine($"Pivot Position: {pivotPos:F3} mm");
+    }
+    else if (pivotResult < 0)
+    {
+        Console.WriteLine($"Pivot Position: Unable to determine (result={pivotResult})");
+    }
+    else
+    {
+        Console.WriteLine("SMGetPivotPos not available");
+    }
+    
     var stagePos = await sem.GetStagePositionAsync();
     Console.WriteLine($"\nStage Position: {stagePos}");
     

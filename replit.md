@@ -63,6 +63,19 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-18: Added Scanning Mode commands
+  - `EnumScanningModesAsync()` - Returns list of available scanning modes with index and name
+  - `GetScanningModeAsync()` - Returns current scanning mode index
+  - `SetScanningModeAsync(int modeIndex)` - Sets scanning mode (with Wait C flag for stabilization)
+  - `GetPivotPositionAsync()` - Returns (result, pivotPosition) tuple in mm
+  - Added ScanningMode record model
+
+- 2024-12-18: Added current measurement commands
+  - `GetBeamCurrentAsync()` / `SetBeamCurrentAsync(double pA)` - Beam current in picoamps
+  - `GetAbsorbedCurrentAsync()` - Specimen absorbed current in picoamps (requires active scanning)
+  - `EnumPCIndexesAsync()` - Returns raw PC index enumeration
+  - Removed `SetSpotSizeAsync()` - Command does not exist in API (SpotSize is read-only calculated value)
+
 - 2024-12-17: Added protocol version checking
   - Protocol version fetched automatically on connect via `TcpGetVersion`
   - Each API command has a minimum required version (e.g., `TcpGetModel` requires 3.2.20)

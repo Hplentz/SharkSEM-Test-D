@@ -77,6 +77,11 @@ public class TescanSemController : ISemController
         
         ["GetIAbsorbed"] = new Version(1, 0, 0),
         
+        ["SMEnumModes"] = new Version(1, 0, 0),
+        ["SMGetMode"] = new Version(1, 0, 0),
+        ["SMSetMode"] = new Version(1, 0, 0),
+        ["SMGetPivotPos"] = new Version(2, 0, 22),
+        
         ["ScGetSpeed"] = new Version(1, 0, 0),
         ["ScSetSpeed"] = new Version(1, 0, 0),
         ["ScGetBlanker"] = new Version(1, 0, 0),

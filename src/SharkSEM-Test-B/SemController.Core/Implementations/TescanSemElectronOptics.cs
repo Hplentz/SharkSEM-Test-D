@@ -1,3 +1,5 @@
+using SemController.Core.Models;
+
 namespace SemController.Core.Implementations;
 
 public class TescanSemElectronOptics
@@ -110,5 +112,59 @@ public class TescanSemElectronOptics
             return TescanSemController.DecodeFloatInternal(response, ref offset);
         }
         return double.NaN;
+    }
+    
+    public async Task<List<ScanningMode>> EnumScanningModesAsync(CancellationToken cancellationToken = default)
+    {
+        var modes = new List<ScanningMode>();
+        var response = await _controller.SendCommandInternalAsync("SMEnumModes", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            var modeMap = TescanSemController.DecodeStringInternal(response, ref offset);
+            
+            foreach (var line in modeMap.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var parts = line.Split('=', 2);
+                if (parts.Length == 2 && parts[0].StartsWith("mode.") && parts[0].EndsWith(".name"))
+                {
+                    var indexStr = parts[0].Replace("mode.", "").Replace(".name", "");
+                    if (int.TryParse(indexStr, out var index))
+                    {
+                        modes.Add(new ScanningMode(index, parts[1].Trim()));
+                    }
+                }
+            }
+        }
+        return modes;
+    }
+    
+    public async Task<int> GetScanningModeAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _controller.SendCommandInternalAsync("SMGetMode", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return TescanSemController.DecodeIntInternal(response, 0);
+        }
+        return -1;
+    }
+    
+    public async Task SetScanningModeAsync(int modeIndex, CancellationToken cancellationToken = default)
+    {
+        var body = TescanSemController.EncodeIntInternal(modeIndex);
+        await _controller.SendCommandWithWaitInternalAsync("SMSetMode", body, TescanSemController.WaitFlagOpticsInternal, cancellationToken);
+    }
+    
+    public async Task<(int result, double pivotPositionMm)> GetPivotPositionAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _controller.SendCommandInternalAsync("SMGetPivotPos", null, cancellationToken);
+        if (response.Length >= 8)
+        {
+            var result = TescanSemController.DecodeIntInternal(response, 0);
+            int offset = 4;
+            var pivotPos = TescanSemController.DecodeFloatInternal(response, ref offset);
+            return (result, pivotPos);
+        }
+        return (-1, double.NaN);
     }
 }
