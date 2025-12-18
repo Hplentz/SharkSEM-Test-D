@@ -101,9 +101,9 @@ public class TescanSemImageGeometry
             foreach (var line in centeringMap.Split('\n', StringSplitOptions.RemoveEmptyEntries))
             {
                 var parts = line.Split('=', 2);
-                if (parts.Length == 2 && parts[0].StartsWith("centering.") && parts[0].EndsWith(".name"))
+                if (parts.Length == 2 && parts[0].StartsWith("cen.") && parts[0].EndsWith(".name"))
                 {
-                    var indexStr = parts[0].Replace("centering.", "").Replace(".name", "");
+                    var indexStr = parts[0].Replace("cen.", "").Replace(".name", "");
                     if (int.TryParse(indexStr, out var index))
                     {
                         centerings.Add(new Centering(index, parts[1].Trim()));
