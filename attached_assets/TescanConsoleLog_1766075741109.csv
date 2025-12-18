@@ -1,0 +1,147 @@
+31124,09:00:15.044,SharkSEM: 0 > TcpGetVersion( )
+31124,09:00:15.044,SharkSEM: 0 |
+31124,09:00:15.045,SharkSEM: 0 < TcpGetVersion( sz=64 ... )
+31124,09:00:15.051,SharkSEM: 0 > TcpGetDevice( )
+31124,09:00:15.051,SharkSEM: 0 |
+31124,09:00:15.051,SharkSEM: 0 < TcpGetDevice( sz=3 ... )
+31124,09:00:15.053,SharkSEM: 0 > TcpGetSWVersion( )
+31124,09:00:15.053,SharkSEM: 0 |
+31124,09:00:15.053,SharkSEM: 0 < TcpGetSWVersion( sz=29 ... )
+31124,09:00:15.053,SharkSEM: 0 > TcpGetVersion( )
+31124,09:00:15.053,SharkSEM: 0 |
+31124,09:00:15.053,SharkSEM: 0 < TcpGetVersion( sz=64 ... )
+31124,09:00:15.055,SharkSEM: 0 > VacGetStatus( )
+31124,09:00:15.055,SharkSEM: 0 |
+31124,09:00:15.055,SharkSEM: 0 < VacGetStatus( 0 )
+31124,09:00:15.061,SharkSEM: 0 > VacGetPressure( 0 )
+31124,09:00:15.061,SharkSEM: 0 |
+31124,09:00:15.061,SharkSEM: 0 < VacGetPressure( 0.04 )
+31124,09:00:15.067,SharkSEM: 0 > DtEnumDetectors( )
+31124,09:00:15.068,SharkSEM: 0 |
+31124,09:00:15.068,SharkSEM: 0 < DtEnumDetectors( sz=532 ... )
+31124,09:00:15.070,SharkSEM: 0 > DtGetChannels( )
+31124,09:00:15.070,SharkSEM: 0 |
+31124,09:00:15.070,SharkSEM: 0 < DtGetChannels( 8 )
+31124,09:00:15.073,SharkSEM: 0 > DtGetSelected( 0 )
+31124,09:00:15.073,SharkSEM: 0 |
+31124,09:00:15.073,SharkSEM: 0 < DtGetSelected( 0 )
+31124,09:00:15.074,SharkSEM: 0 > DtGetEnabled( 0 )
+31124,09:00:15.075,SharkSEM: 0 |
+31124,09:00:15.075,SharkSEM: 0 < DtGetEnabled( 0 8 )
+31124,09:00:15.077,SharkSEM: 0 > DtGetSelected( 1 )
+31124,09:00:15.077,SharkSEM: 0 |
+31124,09:00:15.077,SharkSEM: 0 < DtGetSelected( 0 )
+31124,09:00:15.078,SharkSEM: 0 > DtGetEnabled( 1 )
+31124,09:00:15.078,SharkSEM: 0 |
+31124,09:00:15.078,SharkSEM: 0 < DtGetEnabled( 0 8 )
+31124,09:00:15.078,SharkSEM: 0 > DtGetSelected( 2 )
+31124,09:00:15.078,SharkSEM: 0 |
+31124,09:00:15.079,SharkSEM: 0 < DtGetSelected( 0 )
+31124,09:00:15.079,SharkSEM: 0 > DtGetEnabled( 2 )
+31124,09:00:15.079,SharkSEM: 0 |
+31124,09:00:15.079,SharkSEM: 0 < DtGetEnabled( 0 8 )
+31124,09:00:15.079,SharkSEM: 0 > DtGetSelected( 3 )
+31124,09:00:15.079,SharkSEM: 0 |
+31124,09:00:15.079,SharkSEM: 0 < DtGetSelected( 0 )
+31124,09:00:15.079,SharkSEM: 0 > DtGetEnabled( 3 )
+31124,09:00:15.081,SharkSEM: 0 |
+31124,09:00:15.081,SharkSEM: 0 < DtGetEnabled( 0 8 )
+31124,09:00:15.082,SharkSEM: 0 > DtSelect( 0 0 )
+31124,09:00:15.083,SharkSEM: 0 |
+31124,09:00:15.083,SharkSEM: 0 > DtEnable( 0 1 8 )
+31124,09:00:15.083,SharkSEM: 0 > DtGetEnabled( 0 )
+31124,09:00:15.083,SharkSEM: 0 |
+31124,09:00:15.083,SharkSEM: 0 |
+31124,09:00:15.083,SharkSEM: 0 < DtGetEnabled( 1 8 )
+31124,09:00:15.085,SharkSEM: 0 > HVGetBeam( )
+31124,09:00:15.085,SharkSEM: 0 |
+31124,09:00:15.085,SharkSEM: 0 < HVGetBeam( 1 )
+31124,09:00:15.089,SharkSEM: 0 > HVBeamOn( )
+31124,09:00:15.089,SharkSEM: 0 |
+31124,09:00:15.089,SharkSEM: 0 < HVBeamOn( )
+31124,09:00:15.089,SharkSEM: 0 > HVGetBeam( )
+31124,09:00:15.089,SharkSEM: 0 |
+31124,09:00:15.091,SharkSEM: 0 < HVGetBeam( 1000 )
+31124,09:00:15.092,SharkSEM: 0 > HVGetBeam( )
+31124,09:00:15.092,SharkSEM: 0 |
+31124,09:00:15.092,SharkSEM: 0 < HVGetBeam( 1000 )
+31124,09:00:15.294,SharkSEM: 0 > HVGetBeam( )
+31124,09:00:15.294,SharkSEM: 0 |
+31124,09:00:15.294,SharkSEM: 0 < HVGetBeam( 1000 )
+31124,09:00:15.494,SharkSEM: 0 > HVGetBeam( )
+31124,09:00:15.494,SharkSEM: 0 |
+31124,09:00:15.494,SharkSEM: 0 < HVGetBeam( 1000 )
+31124,09:00:15.695,SharkSEM: 0 > HVGetBeam( )
+31124,09:00:15.695,SharkSEM: 0 |
+31124,09:00:15.695,SharkSEM: 0 < HVGetBeam( 1000 )
+31124,09:00:15.898,SharkSEM: 0 > HVGetBeam( )
+31124,09:00:15.898,SharkSEM: 0 |
+31124,09:00:15.898,SharkSEM: 0 < HVGetBeam( 1 )
+31124,09:00:15.898,SharkSEM: 0 > HVGetBeam( )
+31124,09:00:15.898,SharkSEM: 0 |
+31124,09:00:15.899,SharkSEM: 0 < HVGetBeam( 1 )
+31124,09:00:15.900,SharkSEM: 0 > HVGetVoltage( )
+31124,09:00:15.900,SharkSEM: 0 |
+31124,09:00:15.901,SharkSEM: 0 < HVGetVoltage( 20000 )
+31124,09:00:15.905,SharkSEM: 0 > HVSetVoltage( 20000 0 )
+31124,09:00:15.905,SharkSEM: 0 > HVGetVoltage( )
+31124,09:00:16.878,SharkSEM: 0 |
+31124,09:00:16.878,SharkSEM: 0 |
+31124,09:00:16.878,SharkSEM: 0 < HVGetVoltage( 20000 )
+31124,09:00:16.882,SharkSEM: 0 > HVGetEmission( )
+31124,09:00:16.882,SharkSEM: 0 |
+31124,09:00:16.882,SharkSEM: 0 < HVGetEmission( 64.1667 )
+31124,09:00:16.883,SharkSEM: 0 > StgGetPosition( )
+31124,09:00:16.884,SharkSEM: 0 |
+31124,09:00:16.884,SharkSEM: 0 < StgGetPosition( 0 13.5 90 0 0 )
+31124,09:00:16.886,SharkSEM: 0 > StgGetLimits( 0 )
+31124,09:00:16.886,SharkSEM: 0 |
+31124,09:00:16.886,SharkSEM: 0 < StgGetLimits( -65 65 -65 65 3 103 -360 360 -60 90 )
+31124,09:00:16.888,SharkSEM: 0 > StgIsCalibrated( )
+31124,09:00:16.888,SharkSEM: 0 |
+31124,09:00:16.888,SharkSEM: 0 < StgIsCalibrated( 1 )
+31124,09:00:16.889,SharkSEM: 0 > StgIsBusy( )
+31124,09:00:16.889,SharkSEM: 0 |
+31124,09:00:16.889,SharkSEM: 0 < StgIsBusy( 0 )
+31124,09:00:16.892,SharkSEM: 0 > StgMoveTo( 10 5 0 0 0 )
+31124,09:00:16.893,SharkSEM: 0 > StgIsBusy( )
+31124,09:00:17.086,SharkSEM: 0 |
+31124,09:00:17.086,SharkSEM: 0 |
+31124,09:00:17.086,SharkSEM: 0 < StgIsBusy( 0 )
+31124,09:00:17.087,SharkSEM: 0 > StgGetPosition( )
+31124,09:00:17.087,SharkSEM: 0 |
+31124,09:00:17.087,SharkSEM: 0 < StgGetPosition( 0 13.5 90 0 0 )
+31124,09:00:17.089,SharkSEM: 0 > GetViewField( )
+31124,09:00:17.089,SharkSEM: 0 |
+31124,09:00:17.089,SharkSEM: 0 < GetViewField( 1 )
+31124,09:00:17.091,SharkSEM: 0 > SetViewField( 1 )
+31124,09:00:17.091,SharkSEM: 0 > GetViewField( )
+31124,09:00:17.092,SharkSEM: 0 |
+31124,09:00:17.092,SharkSEM: 0 |
+31124,09:00:17.094,SharkSEM: 0 < GetViewField( 1 )
+31124,09:00:17.095,SharkSEM: 0 > GetWD( )
+31124,09:00:17.095,SharkSEM: 0 |
+31124,09:00:17.095,SharkSEM: 0 < GetWD( 14.5218 )
+31124,09:00:17.096,SharkSEM: 0 > AutoWD( 0 )
+31124,09:00:17.118,SharkSEM: 0 |
+31124,09:00:17.118,SharkSEM: 0 < AutoWD( )
+31124,09:00:17.119,SharkSEM: 0 > GetWD( )
+31124,09:00:17.119,SharkSEM: 0 |
+31124,09:00:17.119,SharkSEM: 0 < GetWD( 14.5218 )
+31124,09:00:17.120,SharkSEM: 0 > DtAutoSignal( 0 )
+31124,09:00:17.120,SharkSEM: 0 |
+31124,09:00:17.120,SharkSEM: 0 < DtAutoSignal( )
+31124,09:00:17.124,SharkSEM: 0 > TcpRegDataPort( 63660 )
+31124,09:00:17.124,SharkSEM: 0 |
+31124,09:00:17.124,SharkSEM: 0 < TcpRegDataPort( 0 )
+31124,09:00:17.129,SharkSEM: 0 > DtEnable( 0 1 8 )
+31124,09:00:17.129,SharkSEM: 0 |
+31124,09:00:17.129,SharkSEM: 0 > GUISetScanning( 0 )
+31124,09:00:17.129,SharkSEM: 0 > ScStopScan( )
+31124,09:00:17.129,SharkSEM: 0 > ScScanXY( 0 256 256 0 0 255 255 1 )
+31124,09:00:17.143,SharkSEM: 0 |
+31124,09:00:17.143,SharkSEM: 0 |
+31124,09:00:17.951,SharkSEM: 0 |
+31124,09:00:17.952,SharkSEM: 0 < ScScanXY( 0 )
+31124,09:00:18.205,SharkSEM: 0 > GUISetScanning( 1 )
+31124,09:00:19.003,SharkSEM: 0 |

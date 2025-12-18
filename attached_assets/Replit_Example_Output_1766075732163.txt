@@ -1,0 +1,157 @@
+=== SEM Controller Library Demo ===
+
+This library provides a unified interface for controlling Scanning Electron Microscopes.
+It abstracts different SEM manufacturers behind a common interface.
+
+Supported SEM Types:
+  - TESCAN (via SharkSEM protocol)
+  - Mock/Simulator (for testing without hardware)
+
+--- Connecting to TESCAN SEM at 127.0.0.1 ---
+
+Connected to SEM with protocol version 3.2.9
+Connected to TESCAN SEM
+[Version Check] Command 'TcpGetModel' requires protocol version 3.2.20 or later, but current version is 3.2.9. Skipping call.
+
+Microscope Info:
+  Manufacturer: TESCAN
+  Model:
+  Serial: 42
+  Software: Version 1.2.3.1, build 6173
+  Protocol: 3.2.9
+
+Vacuum Status: Ready
+Chamber Pressure: 4.00E-002 Pa
+
+--- Detector Configuration ---
+Available Detectors: det.0.name=SE
+det.0.detector=1
+det.1.name=CL
+det.1.detector=2
+det.2.name=LE BSE
+det.2.detector=3
+det.3.name=BSE Q1
+det.3.detector=4
+det.4.name=BSE Q2
+det.4.detector=5
+det.5.name=BSE Q3
+det.5.detector=6
+det.6.name=BSE Q4
+det.6.detector=7
+det.7.name=BSE
+det.7.detector=8
+det.8.name=AEI
+det.8.detector=9
+det.9.name=In-Beam SE
+det.9.detector=10
+det.10.name=In-Beam f-BSE
+det.10.detector=13
+det.11.name=CL R
+det.11.detector=14
+det.12.name=CL G
+det.12.detector=15
+det.13.name=CL B
+det.13.detector=16
+det.14.name=CL #2
+det.14.detector=17
+
+Number of Channels: 8
+  Channel 0: Detector=0, Enabled=0, BPP=8
+  Channel 1: Detector=0, Enabled=0, BPP=8
+  Channel 2: Detector=0, Enabled=0, BPP=8
+  Channel 3: Detector=0, Enabled=0, BPP=8
+
+Found BSE detector at index 0: det.0.name=SE
+det.0.detector=1
+det.1.name=CL
+det.1.detector=2
+det.2.name=LE BSE
+det.2.detector=3
+det.3.name=BSE Q1
+det.3.detector=4
+det.4.name=BSE Q2
+det.4.detector=5
+det.5.name=BSE Q3
+det.5.detector=6
+det.6.name=BSE Q4
+det.6.detector=7
+det.7.name=BSE
+det.7.detector=8
+det.8.name=AEI
+det.8.detector=9
+det.9.name=In-Beam SE
+det.9.detector=10
+det.10.name=In-Beam f-BSE
+det.10.detector=13
+det.11.name=CL R
+det.11.detector=14
+det.12.name=CL G
+det.12.detector=15
+det.13.name=CL B
+det.13.detector=16
+det.14.name=CL #2
+det.14.detector=17
+
+Selecting BSE detector (index 0) for channel 0...
+Enabling channel 0 with 8-bit depth...
+Channel 0 status: Enabled=1, BPP=8
+
+Beam State: On
+
+Turning beam ON...
+Beam State: Transitioning
+Waiting for beam to stabilize...
+Beam State: On (ready: True)
+
+High Voltage: 20.0 kV
+Setting HV to 20 kV...
+High Voltage: 20.0 kV
+Emission Current: 64.2 uA
+
+Stage Position: X=0.000000, Y=13.500005, Z=90.000000, R=0.00, Tx=0.00, Ty=N/A
+Stage X Range: -65.0 to 65.0 mm
+Stage Y Range: -65.0 to 65.0 mm
+Stage Z Range: 3.0 to 103.0 mm
+
+Stage Calibrated: True, Stage Busy: False
+
+Moving stage to X=10mm, Y=5mm...
+New Position: X=0.000000, Y=13.500005, Z=90.000000, R=0.00, Tx=0.00, Ty=N/A
+
+View Field: 1000.0 um
+Setting view field to 1000 um...
+View Field: 1000.0 um
+
+Working Distance: 14.52 mm
+
+Running AutoFocus...
+Working Distance: 14.52 mm
+
+Running AutoSignal on channel 0...
+
+Acquiring image (256x256) on channel 0...
+Image acquired: 256x256, 65536 bytes, Channel 0
+Image statistics: Min=66, Max=255, Avg=160.6
+Image saved to: C:\Temp\SEM_Image_20251218_090018.png
+
+Beam left ON for inspection
+Disconnected
+
+--- TESCAN Connection Example (not executed) ---
+
+To connect to a real TESCAN SEM, use:
+
+  var settings = SemConnectionSettings.Tescan("192.168.1.100", 8300);
+  using var sem = await SemControllerFactory.CreateAndConnectAsync(settings);
+
+  // Or directly:
+  using var sem = SemControllerFactory.CreateTescan("192.168.1.100");
+  await sem.ConnectAsync();
+
+The same ISemController interface is used regardless of microscope type.
+
+=== Demo Complete ===
+
+C:\Users\hlentz\Desktop\Replit\SharkSEM-Test-B\src\SharkSEM-Test-B\SemController.Example\bin\Debug\net8.0\SemController.Example.exe (process 11844) exited with code 0 (0x0).
+To automatically close the console when debugging stops, enable Tools->Options->Debugging->Automatically close the console when debugging stops.
+Press any key to close this window . . .

@@ -36,12 +36,25 @@ public class TescanSemStage
         var body = new List<byte>();
         body.AddRange(TescanSemController.EncodeFloatInternal(position.X));
         body.AddRange(TescanSemController.EncodeFloatInternal(position.Y));
-        body.AddRange(TescanSemController.EncodeFloatInternal(position.Z));
-        body.AddRange(TescanSemController.EncodeFloatInternal(position.Rotation));
-        body.AddRange(TescanSemController.EncodeFloatInternal(position.TiltX));
-        if (position.TiltY.HasValue)
+        
+        if (position.Z.HasValue)
         {
-            body.AddRange(TescanSemController.EncodeFloatInternal(position.TiltY.Value));
+            body.AddRange(TescanSemController.EncodeFloatInternal(position.Z.Value));
+            
+            if (position.Rotation.HasValue)
+            {
+                body.AddRange(TescanSemController.EncodeFloatInternal(position.Rotation.Value));
+                
+                if (position.TiltX.HasValue)
+                {
+                    body.AddRange(TescanSemController.EncodeFloatInternal(position.TiltX.Value));
+                    
+                    if (position.TiltY.HasValue)
+                    {
+                        body.AddRange(TescanSemController.EncodeFloatInternal(position.TiltY.Value));
+                    }
+                }
+            }
         }
         
         await _controller.SendCommandNoResponseInternalAsync("StgMoveTo", body.ToArray(), cancellationToken);
@@ -57,12 +70,25 @@ public class TescanSemStage
         var body = new List<byte>();
         body.AddRange(TescanSemController.EncodeFloatInternal(delta.X));
         body.AddRange(TescanSemController.EncodeFloatInternal(delta.Y));
-        body.AddRange(TescanSemController.EncodeFloatInternal(delta.Z));
-        body.AddRange(TescanSemController.EncodeFloatInternal(delta.Rotation));
-        body.AddRange(TescanSemController.EncodeFloatInternal(delta.TiltX));
-        if (delta.TiltY.HasValue)
+        
+        if (delta.Z.HasValue)
         {
-            body.AddRange(TescanSemController.EncodeFloatInternal(delta.TiltY.Value));
+            body.AddRange(TescanSemController.EncodeFloatInternal(delta.Z.Value));
+            
+            if (delta.Rotation.HasValue)
+            {
+                body.AddRange(TescanSemController.EncodeFloatInternal(delta.Rotation.Value));
+                
+                if (delta.TiltX.HasValue)
+                {
+                    body.AddRange(TescanSemController.EncodeFloatInternal(delta.TiltX.Value));
+                    
+                    if (delta.TiltY.HasValue)
+                    {
+                        body.AddRange(TescanSemController.EncodeFloatInternal(delta.TiltY.Value));
+                    }
+                }
+            }
         }
         
         await _controller.SendCommandNoResponseInternalAsync("StgMove", body.ToArray(), cancellationToken);

@@ -4,14 +4,14 @@ public class StagePosition
 {
     public double X { get; set; }
     public double Y { get; set; }
-    public double Z { get; set; }
-    public double Rotation { get; set; }
-    public double TiltX { get; set; }
+    public double? Z { get; set; }
+    public double? Rotation { get; set; }
+    public double? TiltX { get; set; }
     public double? TiltY { get; set; }
 
     public StagePosition() { }
 
-    public StagePosition(double x, double y, double z = 0, double rotation = 0, double tiltX = 0, double? tiltY = null)
+    public StagePosition(double x, double y, double? z = null, double? rotation = null, double? tiltX = null, double? tiltY = null)
     {
         X = x;
         Y = y;
@@ -22,5 +22,5 @@ public class StagePosition
     }
 
     public override string ToString() =>
-        $"X={X:F6}, Y={Y:F6}, Z={Z:F6}, R={Rotation:F2}, Tx={TiltX:F2}, Ty={TiltY?.ToString("F2") ?? "N/A"}";
+        $"X={X:F6}, Y={Y:F6}, Z={Z?.ToString("F6") ?? "N/A"}, R={Rotation?.ToString("F2") ?? "N/A"}, Tx={TiltX?.ToString("F2") ?? "N/A"}, Ty={TiltY?.ToString("F2") ?? "N/A"}";
 }
