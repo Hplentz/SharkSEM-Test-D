@@ -144,6 +144,39 @@ using (var sem = new TescanSemController("127.0.0.1"))
     Console.WriteLine($"\nRunning AutoSignal on channel {imageChannel}...");
     await sem.AutoSignalAsync(imageChannel);
     
+    Console.WriteLine("\n--- Scan Speed Configuration ---");
+    var speeds = await sem.Scanning.EnumSpeedsAsync();
+    if (speeds.Count > 0)
+    {
+        Console.WriteLine($"Available scan speeds ({speeds.Count} total):");
+        foreach (var speed in speeds.Take(10))
+        {
+            Console.WriteLine($"  {speed}");
+        }
+        if (speeds.Count > 10)
+        {
+            Console.WriteLine($"  ... and {speeds.Count - 10} more");
+        }
+        
+        double targetDwellTime = 3.2;
+        Console.WriteLine($"\nSetting scan speed to {targetDwellTime} µs/pixel...");
+        var success = await sem.Scanning.SetSpeedByDwellTimeAsync(targetDwellTime);
+        if (success)
+        {
+            var currentSpeed = await sem.Scanning.GetSpeedAsync();
+            var matchedSpeed = speeds.FirstOrDefault(s => s.Index == currentSpeed);
+            Console.WriteLine($"Scan speed set to index {currentSpeed}: {matchedSpeed?.DwellTimeMicroseconds:F1} µs/pixel");
+        }
+        else
+        {
+            Console.WriteLine("Failed to set scan speed");
+        }
+    }
+    else
+    {
+        Console.WriteLine("ScEnumSpeeds not available (requires protocol 3.1.14+)");
+    }
+    
     Console.WriteLine($"\nAcquiring image (256x256) on channel {imageChannel}...");
     var image = await sem.AcquireSingleImageAsync(imageChannel, 256, 256);
     Console.WriteLine($"Image acquired: {image.Width}x{image.Height}, {image.Data.Length} bytes, Channel {image.Channel}");

@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using SemController.Core.Models;
 
 namespace SemController.Core.Implementations;
@@ -10,6 +12,68 @@ public class TescanSemScanning
     internal TescanSemScanning(TescanSemController controller)
     {
         _controller = controller;
+    }
+    
+    public async Task<List<ScanSpeed>> EnumSpeedsAsync(CancellationToken cancellationToken = default)
+    {
+        var speeds = new List<ScanSpeed>();
+        
+        var response = await _controller.SendCommandInternalAsync("ScEnumSpeeds", null, cancellationToken);
+        if (response.Length > 0)
+        {
+            int offset = 0;
+            var speedMap = TescanSemController.DecodeStringInternal(response, ref offset);
+            
+            var regex = new Regex(@"speed\.(\d+)\.dwell=([0-9.]+)", RegexOptions.IgnoreCase);
+            var matches = regex.Matches(speedMap);
+            
+            foreach (Match match in matches)
+            {
+                if (match.Success && match.Groups.Count >= 3)
+                {
+                    if (int.TryParse(match.Groups[1].Value, out int index) &&
+                        double.TryParse(match.Groups[2].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double dwellTime))
+                    {
+                        speeds.Add(new ScanSpeed(index, dwellTime));
+                    }
+                }
+            }
+            
+            speeds.Sort((a, b) => a.Index.CompareTo(b.Index));
+        }
+        
+        return speeds;
+    }
+    
+    public async Task<int?> FindSpeedIndexByDwellTimeAsync(double targetDwellTimeMicroseconds, CancellationToken cancellationToken = default)
+    {
+        var speeds = await EnumSpeedsAsync(cancellationToken);
+        
+        ScanSpeed? bestMatch = null;
+        double smallestDiff = double.MaxValue;
+        
+        foreach (var speed in speeds)
+        {
+            var diff = Math.Abs(speed.DwellTimeMicroseconds - targetDwellTimeMicroseconds);
+            if (diff < smallestDiff)
+            {
+                smallestDiff = diff;
+                bestMatch = speed;
+            }
+        }
+        
+        return bestMatch?.Index;
+    }
+    
+    public async Task<bool> SetSpeedByDwellTimeAsync(double targetDwellTimeMicroseconds, CancellationToken cancellationToken = default)
+    {
+        var speedIndex = await FindSpeedIndexByDwellTimeAsync(targetDwellTimeMicroseconds, cancellationToken);
+        if (speedIndex.HasValue)
+        {
+            await SetSpeedAsync(speedIndex.Value, cancellationToken);
+            return true;
+        }
+        return false;
     }
     
     public async Task<int> GetSpeedAsync(CancellationToken cancellationToken = default)
