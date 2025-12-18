@@ -110,6 +110,16 @@ using (var sem = new TescanSemController("127.0.0.1"))
     Console.WriteLine($"Stage Y Range: {limits.MinY:F1} to {limits.MaxY:F1} mm");
     Console.WriteLine($"Stage Z Range: {limits.MinZ:F1} to {limits.MaxZ:F1} mm");
     
+    var isCalibrated = await sem.Stage.IsCallibratedAsync();
+    var isBusy = await sem.Stage.IsMovingAsync();
+    Console.WriteLine($"\nStage Calibrated: {isCalibrated}, Stage Busy: {isBusy}");
+    
+    if (!isCalibrated)
+    {
+        Console.WriteLine("WARNING: Stage is not calibrated - StgMoveTo will be ignored!");
+        Console.WriteLine("To calibrate, call: await sem.Stage.CalibrateAsync();");
+    }
+    
     Console.WriteLine("\nMoving stage to X=10mm, Y=5mm...");
     await sem.MoveStageAsync(new StagePosition(10.0, 5.0));
     stagePos = await sem.GetStagePositionAsync();
