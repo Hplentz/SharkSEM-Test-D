@@ -54,9 +54,11 @@ public class TescanSemImageGeometry
     {
         var body = TescanSemController.EncodeIntInternal(index);
         var response = await _controller.SendCommandInternalAsync("GetGeomLimits", body, cancellationToken);
-        if (response.Length >= 16)
+        if (response.Length >= 20)
         {
             int offset = 0;
+            var result = TescanSemController.DecodeIntInternal(response, offset);
+            offset += 4;
             var minX = TescanSemController.DecodeFloatInternal(response, ref offset);
             var maxX = TescanSemController.DecodeFloatInternal(response, ref offset);
             var minY = TescanSemController.DecodeFloatInternal(response, ref offset);
