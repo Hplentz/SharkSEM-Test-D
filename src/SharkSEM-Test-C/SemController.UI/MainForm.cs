@@ -184,9 +184,10 @@ public partial class MainForm : Form
     private List<string> ParseDetectorNames(string detectorsStr)
     {
         var names = new List<string>();
-        var regex = new System.Text.RegularExpressions.Regex(@"det\.(\d+)\.name=(.+?)(?=det\.|$)");
-        var matches = regex.Matches(detectorsStr);
         var dict = new Dictionary<int, string>();
+
+        var regex = new System.Text.RegularExpressions.Regex(@"det\.(\d+)\.name=([A-Za-z0-9_\-\s]+)");
+        var matches = regex.Matches(detectorsStr);
         foreach (System.Text.RegularExpressions.Match m in matches)
         {
             if (m.Success && int.TryParse(m.Groups[1].Value, out int idx))
@@ -194,6 +195,7 @@ public partial class MainForm : Form
                 dict[idx] = m.Groups[2].Value.Trim();
             }
         }
+
         if (dict.Count > 0)
         {
             for (int i = 0; i <= dict.Keys.Max(); i++)
@@ -201,11 +203,30 @@ public partial class MainForm : Form
                 names.Add(dict.ContainsKey(i) ? dict[i] : $"Detector {i}");
             }
         }
+
+        if (names.Count == 0)
+        {
+            int pos = 0;
+            while (pos < detectorsStr.Length)
+            {
+                int nameStart = detectorsStr.IndexOf(".name=", pos);
+                if (nameStart < 0) break;
+                nameStart += 6;
+                int nameEnd = detectorsStr.IndexOf("det.", nameStart);
+                if (nameEnd < 0) nameEnd = detectorsStr.Length;
+                var name = detectorsStr.Substring(nameStart, nameEnd - nameStart).Trim();
+                if (!string.IsNullOrEmpty(name))
+                    names.Add(name);
+                pos = nameEnd;
+            }
+        }
+
         if (names.Count == 0)
         {
             var parts = detectorsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
             names.AddRange(parts.Select(p => p.Trim()));
         }
+
         return names;
     }
 
