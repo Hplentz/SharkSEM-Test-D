@@ -165,10 +165,10 @@ public partial class MainForm : Form
             var detectorsStr = await _sem.Detectors.EnumDetectorsAsync();
             if (!string.IsNullOrEmpty(detectorsStr))
             {
-                var detectors = detectorsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 0; i < detectors.Length; i++)
+                var detectorNames = ParseDetectorNames(detectorsStr);
+                for (int i = 0; i < detectorNames.Count; i++)
                 {
-                    cboDetectors.Items.Add($"{i}: {detectors[i].Trim()}");
+                    cboDetectors.Items.Add($"{i}: {detectorNames[i]}");
                 }
 
                 var selected = await _sem.Detectors.GetSelectedDetectorAsync(0);
@@ -179,6 +179,30 @@ public partial class MainForm : Form
             }
         }
         catch { }
+    }
+
+    private List<string> ParseDetectorNames(string detectorsStr)
+    {
+        var names = new List<string>();
+        var pairs = detectorsStr.Split(new[] { '\0' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var pair in pairs)
+        {
+            if (pair.Contains(".name="))
+            {
+                var idx = pair.IndexOf(".name=");
+                if (idx >= 0)
+                {
+                    var name = pair.Substring(idx + 6);
+                    names.Add(name);
+                }
+            }
+        }
+        if (names.Count == 0)
+        {
+            var parts = detectorsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            names.AddRange(parts.Select(p => p.Trim()));
+        }
+        return names;
     }
 
     private async Task RefreshBeamAsync()

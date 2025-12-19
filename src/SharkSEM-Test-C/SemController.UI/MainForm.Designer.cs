@@ -317,12 +317,12 @@ partial class MainForm
         numImageShiftY.Leave += NumImageShiftY_Leave;
 
         lblImageShiftRangeX.Location = new Point(10, 70);
-        lblImageShiftRangeX.Size = new Size(150, 16);
+        lblImageShiftRangeX.Size = new Size(145, 16);
         lblImageShiftRangeX.Text = "X range: -- to --";
         lblImageShiftRangeX.Font = new Font(this.Font.FontFamily, 8f);
 
-        lblImageShiftRangeY.Location = new Point(165, 70);
-        lblImageShiftRangeY.Size = new Size(150, 16);
+        lblImageShiftRangeY.Location = new Point(160, 70);
+        lblImageShiftRangeY.Size = new Size(145, 16);
         lblImageShiftRangeY.Text = "Y range: -- to --";
         lblImageShiftRangeY.Font = new Font(this.Font.FontFamily, 8f);
 
@@ -552,7 +552,7 @@ partial class MainForm
         btnAcquireImage.Click += BtnAcquireImage_Click;
 
         picImage.Location = new Point(10, 90);
-        picImage.Size = new Size(400, 480);
+        picImage.Size = new Size(400, 400);
         picImage.BorderStyle = BorderStyle.FixedSingle;
         picImage.SizeMode = PictureBoxSizeMode.Zoom;
         picImage.BackColor = Color.Black;
