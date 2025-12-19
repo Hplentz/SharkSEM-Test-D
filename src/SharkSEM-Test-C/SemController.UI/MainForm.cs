@@ -184,7 +184,7 @@ public partial class MainForm : Form
     private List<string> ParseDetectorNames(string detectorsStr)
     {
         var names = new List<string>();
-        var regex = new System.Text.RegularExpressions.Regex(@"det\.(\d+)\.name=([^d][^e][^t]*)");
+        var regex = new System.Text.RegularExpressions.Regex(@"det\.(\d+)\.name=(.+?)(?=det\.|$)");
         var matches = regex.Matches(detectorsStr);
         var dict = new Dictionary<int, string>();
         foreach (System.Text.RegularExpressions.Match m in matches)
@@ -337,8 +337,8 @@ public partial class MainForm : Form
                 numImageShiftY.Value = (decimal)y;
 
                 var (minX, maxX, minY, maxY) = await _sem.ImageGeometry.GetGeomLimitsAsync(_imageShiftIndex);
-                lblImageShiftRangeX.Text = $"X range: {minX:F4} to {maxX:F4}";
-                lblImageShiftRangeY.Text = $"Y range: {minY:F4} to {maxY:F4}";
+                lblImageShiftRangeX.Text = $"X: {minX:F4} to {maxX:F4}";
+                lblImageShiftRangeY.Text = $"Y: {minY:F4} to {maxY:F4}";
             }
 
             if (_imageRotationIndex >= 0)
@@ -439,14 +439,12 @@ public partial class MainForm : Form
             btnAcquireImage.Enabled = false;
             btnAcquireImage.Text = "Acquiring...";
 
-            var image = await _sem.AcquireSingleImageAsync(0, 1024, 768);
+            var image = await _sem.AcquireSingleImageAsync(0, 400, 400);
             if (image != null && image.Data != null && image.Data.Length > 0)
             {
                 var bitmap = CreateBitmapFromImageData(image);
-                var squareBitmap = CropToSquare(bitmap);
-                bitmap.Dispose();
                 picImage.Image?.Dispose();
-                picImage.Image = squareBitmap;
+                picImage.Image = bitmap;
             }
         }
         catch (Exception ex)
@@ -485,46 +483,6 @@ public partial class MainForm : Form
         }
 
         return bitmap;
-    }
-
-    private static Bitmap CropToSquare(Bitmap source)
-    {
-        int size = Math.Min(source.Width, source.Height);
-        int offsetX = (source.Width - size) / 2;
-        int offsetY = (source.Height - size) / 2;
-
-        if (source.PixelFormat == PixelFormat.Format8bppIndexed)
-        {
-            var cropped = new Bitmap(size, size, PixelFormat.Format8bppIndexed);
-            cropped.Palette = source.Palette;
-
-            var srcData = source.LockBits(new Rectangle(offsetX, offsetY, size, size), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
-            var dstData = cropped.LockBits(new Rectangle(0, 0, size, size), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
-            try
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    var srcRow = new byte[size];
-                    System.Runtime.InteropServices.Marshal.Copy(srcData.Scan0 + y * srcData.Stride, srcRow, 0, size);
-                    System.Runtime.InteropServices.Marshal.Copy(srcRow, 0, dstData.Scan0 + y * dstData.Stride, size);
-                }
-            }
-            finally
-            {
-                source.UnlockBits(srcData);
-                cropped.UnlockBits(dstData);
-            }
-            return cropped;
-        }
-        else
-        {
-            var cropped = new Bitmap(size, size, source.PixelFormat);
-            using (var g = Graphics.FromImage(cropped))
-            {
-                g.DrawImage(source, new Rectangle(0, 0, size, size), new Rectangle(offsetX, offsetY, size, size), GraphicsUnit.Pixel);
-            }
-            return cropped;
-        }
     }
 
     private async void CboDetectors_SelectedIndexChanged(object? sender, EventArgs e)
