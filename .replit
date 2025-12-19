@@ -32,15 +32,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "SharkSEM-Test-B Demo"
+args = "SharkSEM-Test-C Demo"
 
 [[workflows.workflow]]
-name = "SharkSEM-Test-B Demo"
+name = "SharkSEM-Test-C Demo"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd src/SharkSEM-Test-B/SemController.Example && dotnet run"
+args = "cd src/SharkSEM-Test-C/SemController.Example && dotnet run"
 
 [workflows.workflow.metadata]
 outputType = "console"

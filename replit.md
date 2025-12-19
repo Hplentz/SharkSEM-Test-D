@@ -1,4 +1,4 @@
-# SharkSEM-Test-B (SEM Controller Library)
+# SharkSEM-Test-C (SEM Controller Library)
 
 ## Overview
 A C# library providing a unified interface for controlling Scanning Electron Microscopes (SEMs). The library abstracts vendor-specific APIs behind a common interface (`ISemController`), allowing application code to work with any supported microscope without modification.
@@ -9,7 +9,7 @@ A C# library providing a unified interface for controlling Scanning Electron Mic
 
 ## Project Structure
 ```
-src/SharkSEM-Test-B/
+src/SharkSEM-Test-C/
 ├── SemController.sln              # Solution file
 ├── SemController.Core/            # Main library
 │   ├── Interfaces/                # ISemController, ISemConnection
