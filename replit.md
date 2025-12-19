@@ -66,6 +66,15 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-19: Added WinForms UI application (SemController.UI)
+  - Auto-connects to TESCAN SEM (127.0.0.1) on startup
+  - Displays: Microscope Info, Vacuum, Detector, Beam, Scanning Modes, Geometries, Stage, View Field
+  - Editable controls call API on focus loss
+  - Image acquisition and display
+  - Connect/Disconnect and Refresh buttons
+
+- 2024-12-19: Added GetPCIndexAsync and SetPCIndexAsync to TescanSemElectronOptics
+
 - 2024-12-18: Added Image Geometry commands
   - `EnumGeometriesAsync()` - Returns list of available geometry parameters with index and name
   - `GetGeometryAsync(int index)` - Returns (x, y) values for geometry parameter
