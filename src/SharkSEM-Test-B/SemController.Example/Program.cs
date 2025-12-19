@@ -221,7 +221,13 @@ using (var sem = new TescanSemController("127.0.0.1"))
         foreach (var geo in geometries)
         {
             var (gx, gy) = await sem.ImageGeometry.GetGeometryAsync(geo.Index);
-            Console.WriteLine($"  [{geo.Index}] {geo.Name}: X={gx:F6}, Y={gy:F6}");
+            var (minX, maxX, minY, maxY) = await sem.ImageGeometry.GetGeomLimitsAsync(geo.Index);
+            Console.WriteLine($"  [{geo.Index}] {geo.Name}:");
+            Console.WriteLine($"       X={gx:F6} (range: {minX:F6} to {maxX:F6})");
+            if (!double.IsNaN(minY))
+            {
+                Console.WriteLine($"       Y={gy:F6} (range: {minY:F6} to {maxY:F6})");
+            }
         }
     }
     else

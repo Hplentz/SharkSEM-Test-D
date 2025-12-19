@@ -50,6 +50,22 @@ public class TescanSemImageGeometry
         return (double.NaN, double.NaN);
     }
     
+    public async Task<(double minX, double maxX, double minY, double maxY)> GetGeomLimitsAsync(int index, CancellationToken cancellationToken = default)
+    {
+        var body = TescanSemController.EncodeIntInternal(index);
+        var response = await _controller.SendCommandInternalAsync("GetGeomLimits", body, cancellationToken);
+        if (response.Length >= 16)
+        {
+            int offset = 0;
+            var minX = TescanSemController.DecodeFloatInternal(response, ref offset);
+            var maxX = TescanSemController.DecodeFloatInternal(response, ref offset);
+            var minY = TescanSemController.DecodeFloatInternal(response, ref offset);
+            var maxY = TescanSemController.DecodeFloatInternal(response, ref offset);
+            return (minX, maxX, minY, maxY);
+        }
+        return (double.NaN, double.NaN, double.NaN, double.NaN);
+    }
+    
     public async Task SetGeometryAsync(int index, double x, double y, CancellationToken cancellationToken = default)
     {
         var body = new byte[TescanSemController.EncodeIntInternal(index).Length + 
