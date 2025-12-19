@@ -11,6 +11,7 @@ A C# library providing a unified interface for controlling Scanning Electron Mic
 ```
 src/SharkSEM-Test-C/
 ├── SemController.sln              # Solution file
+├── SemController.UI/              # WinForms application (startup project)
 ├── SemController.Core/            # Main library
 │   ├── Interfaces/                # ISemController, ISemConnection
 │   ├── Models/                    # StagePosition, ScanSettings, SemImage, etc.
