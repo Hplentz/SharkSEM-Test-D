@@ -184,17 +184,21 @@ public partial class MainForm : Form
     private List<string> ParseDetectorNames(string detectorsStr)
     {
         var names = new List<string>();
-        var pairs = detectorsStr.Split(new[] { '\0' }, StringSplitOptions.RemoveEmptyEntries);
-        foreach (var pair in pairs)
+        var regex = new System.Text.RegularExpressions.Regex(@"det\.(\d+)\.name=([^d][^e][^t]*)");
+        var matches = regex.Matches(detectorsStr);
+        var dict = new Dictionary<int, string>();
+        foreach (System.Text.RegularExpressions.Match m in matches)
         {
-            if (pair.Contains(".name="))
+            if (m.Success && int.TryParse(m.Groups[1].Value, out int idx))
             {
-                var idx = pair.IndexOf(".name=");
-                if (idx >= 0)
-                {
-                    var name = pair.Substring(idx + 6);
-                    names.Add(name);
-                }
+                dict[idx] = m.Groups[2].Value.Trim();
+            }
+        }
+        if (dict.Count > 0)
+        {
+            for (int i = 0; i <= dict.Keys.Max(); i++)
+            {
+                names.Add(dict.ContainsKey(i) ? dict[i] : $"Detector {i}");
             }
         }
         if (names.Count == 0)
@@ -439,8 +443,10 @@ public partial class MainForm : Form
             if (image != null && image.Data != null && image.Data.Length > 0)
             {
                 var bitmap = CreateBitmapFromImageData(image);
+                var squareBitmap = CropToSquare(bitmap);
+                bitmap.Dispose();
                 picImage.Image?.Dispose();
-                picImage.Image = bitmap;
+                picImage.Image = squareBitmap;
             }
         }
         catch (Exception ex)
@@ -479,6 +485,46 @@ public partial class MainForm : Form
         }
 
         return bitmap;
+    }
+
+    private static Bitmap CropToSquare(Bitmap source)
+    {
+        int size = Math.Min(source.Width, source.Height);
+        int offsetX = (source.Width - size) / 2;
+        int offsetY = (source.Height - size) / 2;
+
+        if (source.PixelFormat == PixelFormat.Format8bppIndexed)
+        {
+            var cropped = new Bitmap(size, size, PixelFormat.Format8bppIndexed);
+            cropped.Palette = source.Palette;
+
+            var srcData = source.LockBits(new Rectangle(offsetX, offsetY, size, size), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
+            var dstData = cropped.LockBits(new Rectangle(0, 0, size, size), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
+            try
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    var srcRow = new byte[size];
+                    System.Runtime.InteropServices.Marshal.Copy(srcData.Scan0 + y * srcData.Stride, srcRow, 0, size);
+                    System.Runtime.InteropServices.Marshal.Copy(srcRow, 0, dstData.Scan0 + y * dstData.Stride, size);
+                }
+            }
+            finally
+            {
+                source.UnlockBits(srcData);
+                cropped.UnlockBits(dstData);
+            }
+            return cropped;
+        }
+        else
+        {
+            var cropped = new Bitmap(size, size, source.PixelFormat);
+            using (var g = Graphics.FromImage(cropped))
+            {
+                g.DrawImage(source, new Rectangle(0, 0, size, size), new Rectangle(offsetX, offsetY, size, size), GraphicsUnit.Pixel);
+            }
+            return cropped;
+        }
     }
 
     private async void CboDetectors_SelectedIndexChanged(object? sender, EventArgs e)

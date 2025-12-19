@@ -283,7 +283,7 @@ partial class MainForm
         ((System.ComponentModel.ISupportInitialize)numImageRotation).BeginInit();
 
         grpGeometries.Location = new Point(320, 304);
-        grpGeometries.Size = new Size(320, 130);
+        grpGeometries.Size = new Size(360, 130);
         grpGeometries.Text = "Geometries";
 
         lblImageShiftLabel.Location = new Point(10, 22);
@@ -317,12 +317,12 @@ partial class MainForm
         numImageShiftY.Leave += NumImageShiftY_Leave;
 
         lblImageShiftRangeX.Location = new Point(10, 70);
-        lblImageShiftRangeX.Size = new Size(145, 16);
+        lblImageShiftRangeX.Size = new Size(170, 16);
         lblImageShiftRangeX.Text = "X range: -- to --";
         lblImageShiftRangeX.Font = new Font(this.Font.FontFamily, 8f);
 
-        lblImageShiftRangeY.Location = new Point(160, 70);
-        lblImageShiftRangeY.Size = new Size(145, 16);
+        lblImageShiftRangeY.Location = new Point(185, 70);
+        lblImageShiftRangeY.Size = new Size(170, 16);
         lblImageShiftRangeY.Text = "Y range: -- to --";
         lblImageShiftRangeY.Font = new Font(this.Font.FontFamily, 8f);
 
