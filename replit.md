@@ -5,6 +5,7 @@ A C# library providing a unified interface for controlling Scanning Electron Mic
 
 ## Current State
 - **Completed**: Core library with ISemController interface, TescanSemController (SharkSEM API), MockSemController for testing
+- **Completed**: WinForms UI application (SemController.UI) with full control interface
 - **Working**: Demo application runs successfully showing all major features
 
 ## Project Structure

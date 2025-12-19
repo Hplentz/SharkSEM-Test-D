@@ -102,6 +102,22 @@ public class TescanSemElectronOptics
         return string.Empty;
     }
     
+    public async Task<int> GetPCIndexAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _controller.SendCommandInternalAsync("GetPCIndex", null, cancellationToken);
+        if (response.Length >= 4)
+        {
+            return TescanSemController.DecodeIntInternal(response, 0);
+        }
+        return -1;
+    }
+    
+    public async Task SetPCIndexAsync(int index, CancellationToken cancellationToken = default)
+    {
+        var body = TescanSemController.EncodeIntInternal(index);
+        await _controller.SendCommandWithWaitInternalAsync("SetPCIndex", body, TescanSemController.WaitFlagOpticsInternal, cancellationToken);
+    }
+    
     public async Task<double> GetAbsorbedCurrentAsync(CancellationToken cancellationToken = default)
     {
         var body = TescanSemController.EncodeIntInternal(0);
