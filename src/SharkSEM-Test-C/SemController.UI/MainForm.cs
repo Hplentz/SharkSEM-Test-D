@@ -187,8 +187,8 @@ public partial class MainForm : Form
 
         try
         {
-            var beamOn = await _sem.HighVoltage.IsBeamOnAsync();
-            lblBeamState.Text = $"Beam State: {(beamOn ? "ON" : "OFF")}";
+            var beamState = await _sem.HighVoltage.GetBeamStateAsync();
+            lblBeamState.Text = $"Beam State: {beamState}";
 
             var hv = await _sem.GetHighVoltageAsync();
             numHighVoltage.Value = (decimal)hv;
@@ -377,7 +377,7 @@ public partial class MainForm : Form
                 if (_scanSpeeds[i].Index == currentSpeed)
                 {
                     cboScanSpeeds.SelectedIndex = i;
-                    lblDwellTime.Text = $"{_scanSpeeds[i].DwellTime:F2} µs/pixel";
+                    lblDwellTime.Text = $"{_scanSpeeds[i].DwellTimeMicroseconds:F2} µs/pixel";
                     break;
                 }
             }
@@ -487,7 +487,7 @@ public partial class MainForm : Form
         if (cboScanSpeeds.SelectedIndex < _scanSpeeds.Count)
         {
             await _sem.SetScanSpeedAsync(_scanSpeeds[cboScanSpeeds.SelectedIndex].Index);
-            lblDwellTime.Text = $"{_scanSpeeds[cboScanSpeeds.SelectedIndex].DwellTime:F2} µs/pixel";
+            lblDwellTime.Text = $"{_scanSpeeds[cboScanSpeeds.SelectedIndex].DwellTimeMicroseconds:F2} µs/pixel";
         }
     }
 
@@ -530,31 +530,36 @@ public partial class MainForm : Form
     private async void NumStageX_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        await _sem.MoveStageAsync(x: (double)numStageX.Value);
+        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value };
+        await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumStageY_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        await _sem.MoveStageAsync(y: (double)numStageY.Value);
+        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value };
+        await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumStageZ_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        await _sem.MoveStageAsync(z: (double)numStageZ.Value);
+        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value };
+        await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumStageR_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        await _sem.MoveStageAsync(rotation: (double)numStageR.Value);
+        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value, Rotation = (double)numStageR.Value };
+        await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumStageTx_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        await _sem.MoveStageAsync(tiltX: (double)numStageTx.Value);
+        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value, Rotation = (double)numStageR.Value, TiltX = (double)numStageTx.Value };
+        await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumViewField_Leave(object? sender, EventArgs e)
