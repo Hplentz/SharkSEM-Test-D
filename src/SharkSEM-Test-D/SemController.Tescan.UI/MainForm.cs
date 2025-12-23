@@ -4,7 +4,7 @@ using SemController.Core.Models;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 
-namespace SemController.UI;
+namespace SemController.Tescan.UI;
 
 public partial class MainForm : Form
 {

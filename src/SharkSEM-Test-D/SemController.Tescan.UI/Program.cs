@@ -1,4 +1,4 @@
-namespace SemController.UI;
+namespace SemController.Tescan.UI;
 
 static class Program
 {

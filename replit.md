@@ -11,27 +11,27 @@ A C# library providing a unified interface for controlling Scanning Electron Mic
 ## Project Structure
 ```
 src/SharkSEM-Test-D/
-├── SemController.sln              # Solution file
-├── SemController.UI/              # WinForms application (startup project)
-├── SemController.Core/            # Main library
-│   ├── Interfaces/                # ISemController, ISemConnection
-│   ├── Models/                    # StagePosition, ScanSettings, SemImage, etc.
-│   ├── Implementations/           # Controller implementations (vendor-segregated)
-│   │   ├── Tescan/                    # TESCAN SharkSEM implementation
-│   │   │   ├── TescanSemController.cs     # Main controller (connection, protocol)
-│   │   │   ├── TescanSemStage.cs          # Stage control
-│   │   │   ├── TescanSemDetectors.cs      # Detector configuration
-│   │   │   ├── TescanSemHighVoltage.cs    # Beam & HV control
-│   │   │   ├── TescanSemElectronOptics.cs # Focus, WD, ViewField, SpotSize
-│   │   │   ├── TescanSemImageGeometry.cs  # Image geometry, shift, centerings
-│   │   │   ├── TescanSemScanning.cs       # Scan control & image acquisition
-│   │   │   ├── TescanSemVacuum.cs         # Vacuum control
-│   │   │   └── TescanSemMisc.cs           # Miscellaneous (GetMicroscopeInfo)
-│   │   ├── Thermo/                    # Thermo Fisher Scientific (planned)
+├── SemController.sln                  # Solution file
+├── SemController.Core/                # Main library (shared)
+│   ├── Interfaces/                    # ISemController, ISemConnection
+│   ├── Models/                        # StagePosition, ScanSettings, SemImage, etc.
+│   ├── Implementations/               # Controller implementations (vendor-segregated)
+│   │   ├── Tescan/                        # TESCAN SharkSEM implementation
+│   │   │   ├── TescanSemController.cs         # Main controller (connection, protocol)
+│   │   │   ├── TescanSemStage.cs              # Stage control
+│   │   │   ├── TescanSemDetectors.cs          # Detector configuration
+│   │   │   ├── TescanSemHighVoltage.cs        # Beam & HV control
+│   │   │   ├── TescanSemElectronOptics.cs     # Focus, WD, ViewField, SpotSize
+│   │   │   ├── TescanSemImageGeometry.cs      # Image geometry, shift, centerings
+│   │   │   ├── TescanSemScanning.cs           # Scan control & image acquisition
+│   │   │   ├── TescanSemVacuum.cs             # Vacuum control
+│   │   │   └── TescanSemMisc.cs               # Miscellaneous (GetMicroscopeInfo)
+│   │   ├── Thermo/                        # Thermo Fisher Scientific (planned)
 │   │   │   └── (ThermoSemController.cs, etc.)
-│   │   └── MockSemController.cs       # Mock controller for testing
-│   └── Factory/                   # SemControllerFactory
-└── SemController.Example/         # Demo console application
+│   │   └── MockSemController.cs           # Mock controller for testing
+│   └── Factory/                       # SemControllerFactory
+├── SemController.Tescan.Example/      # TESCAN demo console application
+└── SemController.Tescan.UI/           # TESCAN WinForms application
 ```
 
 ## Key Interfaces
@@ -69,6 +69,12 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-23: Renamed Example and UI projects for vendor specificity
+  - `SemController.Example` → `SemController.Tescan.Example`
+  - `SemController.UI` → `SemController.Tescan.UI`
+  - Updated namespaces accordingly (e.g., `SemController.Tescan.UI`)
+  - Prepares for separate Thermo Example and UI projects
+
 - 2024-12-23: Reorganized Implementations folder for vendor segregation
   - Created `Implementations/Tescan/` subfolder for all TESCAN-specific code
   - Created `Implementations/Thermo/` subfolder (placeholder for Thermo Fisher implementation)
