@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>specimen.stage.safety_settings.lock_axis</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../../Resources/page-custom-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../../Resources/syntax-highlight-style.css">
+    <script src="../../../../../../Resources/common.js"></script>
+    <script src="../../../../../../Resources/page.js"></script>
+    <script src="../../../../../../Resources/prism.js"></script>
+    <script src="../../../../../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../../../../../Resources/prism-c.js"></script>
+    <script src="../../../../../../Resources/prism-cpp.js"></script>
+    <script src="../../../../../../Resources/prism-csharp.js"></script>
+    <script src="../../../../../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../../../../../shell.html');
+        });
+    </script>
+</head>
+<body>
+    <h1><a class="header-path" href="../../../../../SdbMicroscopeClient/specimen.html">specimen</a>.<a class="header-path" href="../../../../../sdb_microscope/_specimen/Specimen/stage.html">stage</a>.<a class="header-path" href="../../../../../sdb_microscope/specimen/_stage/Stage/safety_settings.html">safety_settings</a>.<a class="header-path" href="../../../../../sdb_microscope/specimen/stage/_safety_settings/SafetySettings/lock_axis.html">lock_axis</a></h1>
+    <p>Locks the specified axis.</p>
+    <h2>Syntax</h2>
+    <pre><code class="language-python">lock_axis(axis)</code></pre>
+    <h2>Parameters</h2>
+    <table>
+        <tr>
+            <td>axis</td>
+            <td>str</td>
+            <td>The axis to be locked.</td>
+        </tr>
+    </table>
+<!-- Custom part - START -->
+    <h2>Remarks</h2>
+    <p>Method takes the name of the axis as a parameter, e.g. <code class="language-python">"X"</code>, <code class="language-python">"Y"</code>.</p>
+    <h2>Examples</h2>
+    <pre><code class="language-python">
+        # Lock the X axis:
+        microscope.specimen.stage.safety_settings.lock_axis("X")
+    </code></pre>
+    <!--<h2>See also</h2>-->
+<!-- Custom part - END -->
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->

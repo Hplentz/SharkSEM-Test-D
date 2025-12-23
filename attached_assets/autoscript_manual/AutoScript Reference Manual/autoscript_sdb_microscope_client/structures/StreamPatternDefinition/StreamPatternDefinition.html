@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StreamPatternDefinition</title>
+    <link rel="stylesheet" type="text/css" href="../../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../Resources/page-custom-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../Resources/syntax-highlight-style.css">
+    <script src="../../../Resources/common.js"></script>
+    <script src="../../../Resources/page.js"></script>
+    <script src="../../../Resources/prism.js"></script>
+    <script src="../../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../../Resources/prism-c.js"></script>
+    <script src="../../../Resources/prism-cpp.js"></script>
+    <script src="../../../Resources/prism-csharp.js"></script>
+    <script src="../../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../../shell.html');
+        });
+    </script>
+</head>
+<body>
+    <h1><a class="header-path" href="../../structures/StreamPatternDefinition/StreamPatternDefinition.html">StreamPatternDefinition</a></h1>
+    <p>Contains the definition of a stream pattern.</p>
+    <h2>Items</h2>
+    <table>
+        <tr>
+            <td><a href="../../structures/StreamPatternDefinition/raw_points.html">raw_points</a></td>
+            <td>bytes</td>
+            <td>Patterning points in a raw form.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/StreamPatternDefinition/repeat_count.html">repeat_count</a></td>
+            <td>int</td>
+            <td>The number of patterning cycles.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/StreamPatternDefinition/bit_depth.html">bit_depth</a></td>
+            <td>int</td>
+            <td>Bit depth of the point coordinates. It can be either 12 or 16.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/StreamPatternDefinition/points.html">points</a></td>
+            <td>Numpy.ndarray</td>
+            <td>Patterning points in a form of 2D numpy.ndarray.</td>
+        </tr>
+    </table>
+    <h2>Methods</h2>
+    <table>
+        <tr>
+            <td><a href="../../structures/StreamPatternDefinition/load.html">load()</a></td>
+            <td>Loads the stream pattern definition from a stream file.</td>
+        </tr>
+    </table>
+<!-- Custom part - START -->
+    <h2>Remarks</h2>
+    <p>Stream pattern definition can be initialized in the following ways:</p>
+    <ul>
+        <li><strong>Loaded from a stream file:</strong> use static <code class="language-python">load()</code> method.</li>
+        <li>
+            <strong>Created directly in the script:</strong> at least <code class="language-python">points</code> and <code class="language-python">repeat_count</code> properties need to be set,
+            while <code class="language-python">bit_detph</code> defaults to 16.
+        </li>
+    </ul>
+    <p>The above mentioned ways can also be combined: you can load the definition from a stream file and then adjust it in the script.</p>
+    <p>
+        Patterning points can be manipulated in a form of 2D <code class="language-python">numpy.array</code> via <code class="language-python">points</code> property. In this array,
+        each point is represented by a 4-tuple <code class="language-python">[x, y, dwell_time, flags]</code>, with the values having the following semantics:
+    </p>
+    <ul>
+        <li><code class="language-python">x</code> is a horizontal coordinate of the point in a range of [0, 2<sup>bit_depth</sup>], raising from left to right.</li>
+        <li><code class="language-python">y</code> is a vertical coordinate of the point in a range of [0, 2<sup>bit_depth</sup>], raising from top to bottom.</li>
+        <li>
+            <code class="language-python">dwell_time</code> is dwell time setting in seconds, which has to be a multiple of 25ns for <code class="language-python">bit_depth = 16</code>
+            and a multiple of 100ns for <code class="language-python">bit_depth = 12</code>.
+        </li>
+        <li><code class="language-python">flags</code> specify additional point properties: use 0 for no flags, 1 to blank the point.</li>
+    </ul>
+    <p>
+        Please note that X and Y coordinates are subject to offset defined by stream pattern center. Point in the center of available ranges (e.g., [32768, 32768] for
+		<code class="language-python">bit_depth = 16</code>) maps to the center of the stream pattern.
+    </p>
+    <h2>Examples</h2>
+    <p>The following example shows how to create stream pattern definition directly in the script:</p>
+    <pre><code class="language-python">
+        import numpy
+        
+        spd = StreamPatternDefinition()
+        spd.points = numpy.array([[1000, 11922, 1e-06, 0],  # X = 1000, Y = 11922, dwell_time = 1us, flags = 0 (no blanking)
+                                  [32767, 11922, 1e-06, 0],
+                                  [64535, 11922, 1e-06, 0],
+                                  [64535, 53613, 1e-06, 0],
+                                  [32767, 53613, 1e-06, 0],
+                                  [1000, 53613, 1e-06, 0]])
+        spd.repeat_count = 1000
+    </code></pre>
+    <p>The following example shows how to load stream pattern definition from a stream file:</p>
+    <pre><code class="language-python">
+        stream_file_path = "c:\\ProgramData\\Thermo Scientific AutoScript\\UserGuide\\Resources\\grid_pattern_definition.str"
+        stream_pattern_definition = StreamPatternDefinition.load(stream_file_path)
+    </code></pre>
+    <!--<h2>See also</h2>-->
+<!-- Custom part - END -->
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->

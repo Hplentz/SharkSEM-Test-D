@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AdornedImage</title>
+    <link rel="stylesheet" type="text/css" href="../../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../Resources/page-custom-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../Resources/syntax-highlight-style.css">
+    <script src="../../../Resources/common.js"></script>
+    <script src="../../../Resources/page.js"></script>
+    <script src="../../../Resources/prism.js"></script>
+    <script src="../../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../../Resources/prism-c.js"></script>
+    <script src="../../../Resources/prism-cpp.js"></script>
+    <script src="../../../Resources/prism-csharp.js"></script>
+    <script src="../../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../../shell.html');
+        });
+    </script>
+</head>
+<body>
+    <h1><a class="header-path" href="../../structures/AdornedImage/AdornedImage.html">AdornedImage</a></h1>
+    <p>Contains microscope image data along with metadata describing the state of the microscope under which the image was acquired.</p>
+    <h2>Items</h2>
+    <table>
+        <tr>
+            <td><a href="../../structures/AdornedImage/width.html">width</a></td>
+            <td><em>[Read only]</em> int</td>
+            <td>The width of the image.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/AdornedImage/height.html">height</a></td>
+            <td><em>[Read only]</em> int</td>
+            <td>The height of the image.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/AdornedImage/bit_depth.html">bit_depth</a></td>
+            <td><em>[Read only]</em> int</td>
+            <td>The bit depth of the image data.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/AdornedImage/metadata.html">metadata</a></td>
+            <td><em>[Optional]</em> <a href="../../structures/AdornedImageMetadata/AdornedImageMetadata.html">AdornedImageMetadata</a></td>
+            <td>Metadata containing information about system state at the time this image was acquired.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/AdornedImage/data.html">data</a></td>
+            <td><em>[Read only]</em> Numpy.ndarray</td>
+            <td>Image data arranged either in 2D (for grayscale images) or 3D (for RGB images) numpy array.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/AdornedImage/encoding.html">encoding</a></td>
+            <td><em>[Read only]</em> int</td>
+            <td>Encoding of the image. To explain this property use enumeration <a href="../../enumerations/ImageDataEncoding/ImageDataEncoding.html">ImageDataEncoding</a>.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/AdornedImage/checksum.html">checksum</a></td>
+            <td><em>[Read only]</em> int</td>
+            <td>Checksum of the raw-data.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/AdornedImage/thumbnail.html">thumbnail</a></td>
+            <td><em>[Read only]</em> <a href="../../structures/AdornedImage/AdornedImage.html">AdornedImage</a></td>
+            <td>Thumbnail of the original image.</td>
+        </tr>
+    </table>
+    <h2>Methods</h2>
+    <table>
+        <tr>
+            <td><a href="../../structures/AdornedImage/load.html">load()</a></td>
+            <td>Loads an image from a TIFF file.</td>
+        </tr>
+        <tr>
+            <td><a href="../../structures/AdornedImage/save.html">save()</a></td>
+            <td>Saves the image at the specified path as a TIFF file.</td>
+        </tr>
+    </table>
+<!-- Custom part - START -->
+    <h2>Remarks</h2>
+    <p>The new AdornedImage can be constructed either empty or from the given data if passed. The data has to be in a format of a <code class="language-python">numpy.ndarray</code>.</p>
+    <!--<h2>Examples</h2>-->
+    <!--<h2>See also</h2>-->
+<!-- Custom part - END -->
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->

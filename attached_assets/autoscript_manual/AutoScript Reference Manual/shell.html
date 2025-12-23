@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AutoScript Manual</title>
+    <link rel="icon" href="Resources/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="Resources/shell-style.css">
+    <script src="Resources/common.js"></script>
+    <script src="Resources/shell.js"></script>
+    <script>
+        window.addEventListener('resize', function () {
+            sendResizeInfo('content-frame');
+        });
+    </script>
+</head>
+<body onload="onBodyLoaded('content-frame', 'navtree');">
+    <div id="header">
+        <img alt="" class="company-logo" src="Resources/company-logo.png" />
+        <img alt="" class="product-logo" src="Resources/product-logo.png" style="visibility: hidden;" onload="this.style.visibility='visible'">
+    </div>
+    <div id="inner-left">
+        <input type="text" id="filterInput" oninput="filterMenu('filterInput', 'navtree')" placeholder="Filter menu...">
+        <ul id="navtree">
+<!-- Head custom part - START -->
+            <li>
+                <input type="checkbox" checked id="custom-checkbox1"/><label for="custom-checkbox1">AutoScript</label>
+                <ul>
+                    <li><a href="index.html" target="content-frame">About AutoScript</a></li>
+                    <li><a href="Extras\AutoScript\Eula.html" target="content-frame">License</a></li>
+                    <li><a href="Extras\AutoScript\InstallationConfigurations.html" target="content-frame">Installation configurations</a></li>
+                    <li><a href="Extras\AutoScript\PyCharm.html" target="content-frame">PyCharm editor</a></li>
+                    <li><a href="Extras\AutoScript\PythonDistribution.html" target="content-frame">Python distribution</a></li>
+                    <li><a href="Extras\AutoScript\Tooling.html" target="content-frame">AutoScript tooling</a></li>
+                    <li><a href="Extras\AutoScript\CoordinateSystems.html" target="content-frame">Coordinate systems</a></li>
+                </ul>
+            </li>
+<!-- Head custom part - END -->
+            <li>
+				<input type="checkbox" checked id="checkbox0"/><label for="checkbox0"><a href="autoscript_sdb_microscope_client/index.html" target="content-frame">Microscope API</a></label>
+				<ul>
+                    <li>
+                        <input type="checkbox" checked id="checkbox1"/><label for="checkbox1"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/SdbMicroscopeClient.html" target="content-frame">SdbMicroscopeClient object</a></label>
+                        <ul>
+                            <li><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/connect.html" target="content-frame">connect()</a></li>
+                            <li><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/disconnect.html" target="content-frame">disconnect()</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <input type="checkbox" checked id="checkbox2"/><label for="checkbox2"><a href="autoscript_sdb_microscope_client/sdb_microscope/index.html" target="content-frame">Static tree</a></label>
+                        <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox3"/><label for="checkbox3"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/analysis.html" target="content-frame">analysis</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox4"/><label for="checkbox4"><a href="autoscript_sdb_microscope_client/sdb_microscope/_analysis/Analysis/eds.html" target="content-frame">eds</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/analysis/_eds/Eds/acquire_spectrum.html" target="content-frame">acquire_spectrum()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/analysis/_eds/Eds/get_composition.html" target="content-frame">get_composition()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/analysis/_eds/Eds/get_peak_id.html" target="content-frame">get_peak_id()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/analysis/_eds/Eds/get_spectrum.html" target="content-frame">get_spectrum()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/analysis/_eds/Eds/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/analysis/_eds/Eds/reset_spectrum.html" target="content-frame">reset_spectrum()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox5"/><label for="checkbox5"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/auto_functions.html" target="content-frame">auto_functions</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_auto_functions/AutoFunctions/run_auto_cb.html" target="content-frame">run_auto_cb()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_auto_functions/AutoFunctions/run_auto_focus.html" target="content-frame">run_auto_focus()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_auto_functions/AutoFunctions/run_auto_lens_alignment.html" target="content-frame">run_auto_lens_alignment()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_auto_functions/AutoFunctions/run_auto_source_tilt.html" target="content-frame">run_auto_source_tilt()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_auto_functions/AutoFunctions/run_auto_stigmator.html" target="content-frame">run_auto_stigmator()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_auto_functions/AutoFunctions/run_auto_stigmator_centering.html" target="content-frame">run_auto_stigmator_centering()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox6"/><label for="checkbox6"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/beams.html" target="content-frame">beams</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox7"/><label for="checkbox7"><a href="autoscript_sdb_microscope_client/sdb_microscope/_beams/Beams/electron_beam.html" target="content-frame">electron_beam</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox8"/><label for="checkbox8"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/angular_correction.html" target="content-frame">angular_correction</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox9"/><label for="checkbox9"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_angular_correction/AngularCorrection/angle.html" target="content-frame">angle</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_angle/Angle/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_angle/Angle/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox10"/><label for="checkbox10"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_angular_correction/AngularCorrection/dynamic_focus.html" target="content-frame">dynamic_focus</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_dynamic_focus/DynamicFocus/is_on.html" target="content-frame">is_on</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_dynamic_focus/DynamicFocus/turn_off.html" target="content-frame">turn_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_dynamic_focus/DynamicFocus/turn_on.html" target="content-frame">turn_on()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_angular_correction/AngularCorrection/mode.html" target="content-frame">mode</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox11"/><label for="checkbox11"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_angular_correction/AngularCorrection/specimen_pretilt.html" target="content-frame">specimen_pretilt</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_specimen_pretilt/SpecimenPretilt/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_specimen_pretilt/SpecimenPretilt/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox12"/><label for="checkbox12"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_angular_correction/AngularCorrection/tilt_correction.html" target="content-frame">tilt_correction</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_tilt_correction/TiltCorrection/is_on.html" target="content-frame">is_on</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_tilt_correction/TiltCorrection/turn_off.html" target="content-frame">turn_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/angular_correction/_tilt_correction/TiltCorrection/turn_on.html" target="content-frame">turn_on()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox13"/><label for="checkbox13"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/beam_current.html" target="content-frame">beam_current</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_current/BeamCurrent/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_current/BeamCurrent/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox14"/><label for="checkbox14"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/beam_deceleration.html" target="content-frame">beam_deceleration</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_deceleration/BeamDeceleration/is_on.html" target="content-frame">is_on</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox15"/><label for="checkbox15"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_deceleration/BeamDeceleration/stage_bias.html" target="content-frame">stage_bias</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/beam_deceleration/_stage_bias/StageBias/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/beam_deceleration/_stage_bias/StageBias/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_deceleration/BeamDeceleration/turn_off.html" target="content-frame">turn_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_deceleration/BeamDeceleration/turn_on.html" target="content-frame">turn_on()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox16"/><label for="checkbox16"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/beam_mode.html" target="content-frame">beam_mode</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_mode/BeamMode/available_values.html" target="content-frame">available_values</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_mode/BeamMode/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox17"/><label for="checkbox17"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/beam_shift.html" target="content-frame">beam_shift</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_shift/BeamShift/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_beam_shift/BeamShift/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/blank.html" target="content-frame">blank()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox18"/><label for="checkbox18"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/crossover_zoom.html" target="content-frame">crossover_zoom</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_crossover_zoom/CrossoverZoom/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_crossover_zoom/CrossoverZoom/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox19"/><label for="checkbox19"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/emission_current.html" target="content-frame">emission_current</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_emission_current/EmissionCurrent/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox20"/><label for="checkbox20"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/high_voltage.html" target="content-frame">high_voltage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_high_voltage/HighVoltage/is_controllable.html" target="content-frame">is_controllable</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_high_voltage/HighVoltage/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_high_voltage/HighVoltage/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox21"/><label for="checkbox21"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/horizontal_field_width.html" target="content-frame">horizontal_field_width</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_horizontal_field_width/HorizontalFieldWidth/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_horizontal_field_width/HorizontalFieldWidth/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/is_blanked.html" target="content-frame">is_blanked</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/is_on.html" target="content-frame">is_on</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox22"/><label for="checkbox22"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/lens_alignment.html" target="content-frame">lens_alignment</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_lens_alignment/LensAlignment/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_lens_alignment/LensAlignment/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox23"/><label for="checkbox23"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/optical_mode.html" target="content-frame">optical_mode</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_optical_mode/OpticalMode/available_values.html" target="content-frame">available_values</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_optical_mode/OpticalMode/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox24"/><label for="checkbox24"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/scanning.html" target="content-frame">scanning</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_scanning/Scanning/bit_depth.html" target="content-frame">bit_depth</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox25"/><label for="checkbox25"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_scanning/Scanning/dwell_time.html" target="content-frame">dwell_time</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_dwell_time/DwellTime/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_dwell_time/DwellTime/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox26"/><label for="checkbox26"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_scanning/Scanning/mode.html" target="content-frame">mode</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_mode/Mode/set_crossover.html" target="content-frame">set_crossover()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_mode/Mode/set_external.html" target="content-frame">set_external()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_mode/Mode/set_full_frame.html" target="content-frame">set_full_frame()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_mode/Mode/set_line.html" target="content-frame">set_line()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_mode/Mode/set_reduced_area.html" target="content-frame">set_reduced_area()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_mode/Mode/set_spot.html" target="content-frame">set_spot()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_mode/Mode/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox27"/><label for="checkbox27"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_scanning/Scanning/resolution.html" target="content-frame">resolution</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_resolution/Resolution/available_values.html" target="content-frame">available_values</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_resolution/Resolution/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox28"/><label for="checkbox28"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_scanning/Scanning/rotation.html" target="content-frame">rotation</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_rotation/Rotation/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_rotation/Rotation/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox29"/><label for="checkbox29"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_scanning/Scanning/spot.html" target="content-frame">spot</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_spot/Spot/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/scanning/_spot/Spot/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox30"/><label for="checkbox30"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/source.html" target="content-frame">source</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_source/Source/is_broken.html" target="content-frame">is_broken</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox31"/><label for="checkbox31"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/source_tilt.html" target="content-frame">source_tilt</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_source_tilt/SourceTilt/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_source_tilt/SourceTilt/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox32"/><label for="checkbox32"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/stigmator.html" target="content-frame">stigmator</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_stigmator/Stigmator/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_stigmator/Stigmator/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/turn_off.html" target="content-frame">turn_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/turn_on.html" target="content-frame">turn_on()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/unblank.html" target="content-frame">unblank()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox33"/><label for="checkbox33"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_electron_beam/ElectronBeam/working_distance.html" target="content-frame">working_distance</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_working_distance/WorkingDistance/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_working_distance/WorkingDistance/set_value_no_degauss.html" target="content-frame">set_value_no_degauss()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/electron_beam/_working_distance/WorkingDistance/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox34"/><label for="checkbox34"><a href="autoscript_sdb_microscope_client/sdb_microscope/_beams/Beams/ion_beam.html" target="content-frame">ion_beam</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox35"/><label for="checkbox35"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/beam_current.html" target="content-frame">beam_current</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_beam_current/BeamCurrent/available_values.html" target="content-frame">available_values</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_beam_current/BeamCurrent/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox36"/><label for="checkbox36"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/beam_shift.html" target="content-frame">beam_shift</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_beam_shift/BeamShift/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_beam_shift/BeamShift/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/blank.html" target="content-frame">blank()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox37"/><label for="checkbox37"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/high_voltage.html" target="content-frame">high_voltage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_high_voltage/HighVoltage/is_controllable.html" target="content-frame">is_controllable</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_high_voltage/HighVoltage/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_high_voltage/HighVoltage/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox38"/><label for="checkbox38"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/horizontal_field_width.html" target="content-frame">horizontal_field_width</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_horizontal_field_width/HorizontalFieldWidth/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_horizontal_field_width/HorizontalFieldWidth/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/is_blanked.html" target="content-frame">is_blanked</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/is_on.html" target="content-frame">is_on</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox39"/><label for="checkbox39"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/scanning.html" target="content-frame">scanning</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_scanning/Scanning/bit_depth.html" target="content-frame">bit_depth</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox40"/><label for="checkbox40"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_scanning/Scanning/dwell_time.html" target="content-frame">dwell_time</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_dwell_time/DwellTime/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_dwell_time/DwellTime/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox41"/><label for="checkbox41"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_scanning/Scanning/mode.html" target="content-frame">mode</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_mode/Mode/set_external.html" target="content-frame">set_external()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_mode/Mode/set_full_frame.html" target="content-frame">set_full_frame()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_mode/Mode/set_line.html" target="content-frame">set_line()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_mode/Mode/set_reduced_area.html" target="content-frame">set_reduced_area()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_mode/Mode/set_spot.html" target="content-frame">set_spot()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_mode/Mode/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox42"/><label for="checkbox42"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_scanning/Scanning/resolution.html" target="content-frame">resolution</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_resolution/Resolution/available_values.html" target="content-frame">available_values</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_resolution/Resolution/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox43"/><label for="checkbox43"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_scanning/Scanning/rotation.html" target="content-frame">rotation</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_rotation/Rotation/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/scanning/_rotation/Rotation/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox44"/><label for="checkbox44"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/source.html" target="content-frame">source</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_source/Source/heat.html" target="content-frame">heat()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox45"/><label for="checkbox45"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_source/Source/plasma_gas.html" target="content-frame">plasma_gas</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/source/_plasma_gas/PlasmaGas/available_values.html" target="content-frame">available_values</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/source/_plasma_gas/PlasmaGas/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_source/Source/time_to_heat.html" target="content-frame">time_to_heat</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox46"/><label for="checkbox46"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/stigmator.html" target="content-frame">stigmator</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_stigmator/Stigmator/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_stigmator/Stigmator/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/turn_off.html" target="content-frame">turn_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/turn_on.html" target="content-frame">turn_on()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/unblank.html" target="content-frame">unblank()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox47"/><label for="checkbox47"><a href="autoscript_sdb_microscope_client/sdb_microscope/beams/_ion_beam/IonBeam/working_distance.html" target="content-frame">working_distance</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_working_distance/WorkingDistance/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/beams/ion_beam/_working_distance/WorkingDistance/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox48"/><label for="checkbox48"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/detector.html" target="content-frame">detector</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox49"/><label for="checkbox49"><a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/brightness.html" target="content-frame">brightness</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_brightness/Brightness/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_brightness/Brightness/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox50"/><label for="checkbox50"><a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/contrast.html" target="content-frame">contrast</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_contrast/Contrast/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_contrast/Contrast/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox51"/><label for="checkbox51"><a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/custom_settings.html" target="content-frame">custom_settings</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox52"/><label for="checkbox52"><a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/converter_voltage.html" target="content-frame">converter_voltage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/custom_settings/_converter_voltage/ConverterVoltage/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/get_segment_polarity.html" target="content-frame">get_segment_polarity()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox53"/><label for="checkbox53"><a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/grid_voltage.html" target="content-frame">grid_voltage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/custom_settings/_grid_voltage/GridVoltage/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/list_all_segments.html" target="content-frame">list_all_segments()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox54"/><label for="checkbox54"><a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/md_shutter.html" target="content-frame">md_shutter</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/custom_settings/_md_shutter/MdShutter/insert.html" target="content-frame">insert()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/custom_settings/_md_shutter/MdShutter/is_needed.html" target="content-frame">is_needed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/custom_settings/_md_shutter/MdShutter/retract.html" target="content-frame">retract()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox55"/><label for="checkbox55"><a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/mirror_voltage.html" target="content-frame">mirror_voltage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/custom_settings/_mirror_voltage/MirrorVoltage/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/reset_segments.html" target="content-frame">reset_segments()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox56"/><label for="checkbox56"><a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/scintillator_voltage.html" target="content-frame">scintillator_voltage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/custom_settings/_scintillator_voltage/ScintillatorVoltage/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/set_segment_polarity.html" target="content-frame">set_segment_polarity()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox57"/><label for="checkbox57"><a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_custom_settings/CustomSettings/suction_tube_voltage.html" target="content-frame">suction_tube_voltage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/custom_settings/_suction_tube_voltage/SuctionTubeVoltage/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/insert.html" target="content-frame">insert()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox58"/><label for="checkbox58"><a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/mode.html" target="content-frame">mode</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_mode/Mode/available_values.html" target="content-frame">available_values</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_mode/Mode/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/retract.html" target="content-frame">retract()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/set_type_mode.html" target="content-frame">set_type_mode()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/state.html" target="content-frame">state</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox59"/><label for="checkbox59"><a href="autoscript_sdb_microscope_client/sdb_microscope/_detector/Detector/type.html" target="content-frame">type</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_type/Type/available_values.html" target="content-frame">available_values</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/detector/_type/Type/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox60"/><label for="checkbox60"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/gas.html" target="content-frame">gas</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_gas/Gas/get_gis_port.html" target="content-frame">get_gis_port()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_gas/Gas/get_multichem.html" target="content-frame">get_multichem()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_gas/Gas/list_all_gis_ports.html" target="content-frame">list_all_gis_ports()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox61"/><label for="checkbox61"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/imaging.html" target="content-frame">imaging</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/get_active_device.html" target="content-frame">get_active_device()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/get_active_view.html" target="content-frame">get_active_view()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/get_image.html" target="content-frame">get_image()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/grab_frame.html" target="content-frame">grab_frame()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/grab_frame_to_disk.html" target="content-frame">grab_frame_to_disk()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/grab_multiple_frames.html" target="content-frame">grab_multiple_frames()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/match_template.html" target="content-frame">match_template()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox62"/><label for="checkbox62"><a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/scanning_filter.html" target="content-frame">scanning_filter</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/imaging/_scanning_filter/ScanningFilter/number_of_frames.html" target="content-frame">number_of_frames</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/imaging/_scanning_filter/ScanningFilter/type.html" target="content-frame">type</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/set_active_device.html" target="content-frame">set_active_device()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/set_active_view.html" target="content-frame">set_active_view()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/set_image.html" target="content-frame">set_image()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/start_acquisition.html" target="content-frame">start_acquisition()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_imaging/Imaging/stop_acquisition.html" target="content-frame">stop_acquisition()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox63"/><label for="checkbox63"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/patterning.html" target="content-frame">patterning</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/clear_patterns.html" target="content-frame">clear_patterns()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/create_bitmap.html" target="content-frame">create_bitmap()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/create_circle.html" target="content-frame">create_circle()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/create_cleaning_cross_section.html" target="content-frame">create_cleaning_cross_section()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/create_line.html" target="content-frame">create_line()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/create_rectangle.html" target="content-frame">create_rectangle()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/create_regular_cross_section.html" target="content-frame">create_regular_cross_section()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/create_stream.html" target="content-frame">create_stream()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/list_all_application_files.html" target="content-frame">list_all_application_files()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/mode.html" target="content-frame">mode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/pause.html" target="content-frame">pause()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox64"/><label for="checkbox64"><a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/real_time_monitor.html" target="content-frame">real_time_monitor</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/patterning/_real_time_monitor/RealTimeMonitor/get_data.html" target="content-frame">get_data()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/patterning/_real_time_monitor/RealTimeMonitor/get_positions.html" target="content-frame">get_positions()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/patterning/_real_time_monitor/RealTimeMonitor/mode.html" target="content-frame">mode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/patterning/_real_time_monitor/RealTimeMonitor/restart.html" target="content-frame">restart()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/patterning/_real_time_monitor/RealTimeMonitor/start.html" target="content-frame">start()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/patterning/_real_time_monitor/RealTimeMonitor/stop.html" target="content-frame">stop()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/resume.html" target="content-frame">resume()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/run.html" target="content-frame">run()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/set_default_application_file.html" target="content-frame">set_default_application_file()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/set_default_beam_type.html" target="content-frame">set_default_beam_type()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/start.html" target="content-frame">start()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/state.html" target="content-frame">state</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_patterning/Patterning/stop.html" target="content-frame">stop()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox65"/><label for="checkbox65"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/service.html" target="content-frame">service</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox66"/><label for="checkbox66"><a href="autoscript_sdb_microscope_client/sdb_microscope/_service/Service/autoscript.html" target="content-frame">autoscript</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox67"/><label for="checkbox67"><a href="autoscript_sdb_microscope_client/sdb_microscope/service/_autoscript/AutoScript/client.html" target="content-frame">client</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/service/autoscript/_client/Client/get_preferred_unit.html" target="content-frame">get_preferred_unit()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/service/autoscript/_client/Client/set_preferred_unit.html" target="content-frame">set_preferred_unit()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/service/autoscript/_client/Client/version.html" target="content-frame">version</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox68"/><label for="checkbox68"><a href="autoscript_sdb_microscope_client/sdb_microscope/service/_autoscript/AutoScript/server.html" target="content-frame">server</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/service/autoscript/_server/Server/is_offline.html" target="content-frame">is_offline</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/service/autoscript/_server/Server/version.html" target="content-frame">version</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox69"/><label for="checkbox69"><a href="autoscript_sdb_microscope_client/sdb_microscope/_service/Service/system.html" target="content-frame">system</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/service/_system/System/name.html" target="content-frame">name</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/service/_system/System/serial_number.html" target="content-frame">serial_number</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/service/_system/System/version.html" target="content-frame">version</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox70"/><label for="checkbox70"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/specimen.html" target="content-frame">specimen</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox71"/><label for="checkbox71"><a href="autoscript_sdb_microscope_client/sdb_microscope/_specimen/Specimen/cap_probe.html" target="content-frame">cap_probe</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_cap_probe/CapProbe/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_cap_probe/CapProbe/move_to_trained_height.html" target="content-frame">move_to_trained_height()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_cap_probe/CapProbe/train.html" target="content-frame">train()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox72"/><label for="checkbox72"><a href="autoscript_sdb_microscope_client/sdb_microscope/_specimen/Specimen/compustage.html" target="content-frame">compustage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/absolute_move.html" target="content-frame">absolute_move()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/current_position.html" target="content-frame">current_position</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/flip.html" target="content-frame">flip()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/home.html" target="content-frame">home()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/insert.html" target="content-frame">insert()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/is_homed.html" target="content-frame">is_homed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/is_linked.html" target="content-frame">is_linked</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/link.html" target="content-frame">link()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox73"/><label for="checkbox73"><a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/neutral_mill_position.html" target="content-frame">neutral_mill_position</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/compustage/_neutral_mill_position/NeutralMillPosition/set.html" target="content-frame">set()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/compustage/_neutral_mill_position/NeutralMillPosition/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/relative_move.html" target="content-frame">relative_move()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_compustage/Compustage/retract.html" target="content-frame">retract()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox74"/><label for="checkbox74"><a href="autoscript_sdb_microscope_client/sdb_microscope/_specimen/Specimen/loadlock.html" target="content-frame">loadlock</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_loadlock/LoadLock/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_loadlock/LoadLock/load.html" target="content-frame">load()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_loadlock/LoadLock/state.html" target="content-frame">state</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_loadlock/LoadLock/unload.html" target="content-frame">unload()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox75"/><label for="checkbox75"><a href="autoscript_sdb_microscope_client/sdb_microscope/_specimen/Specimen/manipulator.html" target="content-frame">manipulator</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/absolute_move.html" target="content-frame">absolute_move()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/current_position.html" target="content-frame">current_position</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/get_saved_position.html" target="content-frame">get_saved_position()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/insert.html" target="content-frame">insert()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/relative_move.html" target="content-frame">relative_move()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/retract.html" target="content-frame">retract()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/set_default_coordinate_system.html" target="content-frame">set_default_coordinate_system()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_manipulator/Manipulator/state.html" target="content-frame">state</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox76"/><label for="checkbox76"><a href="autoscript_sdb_microscope_client/sdb_microscope/_specimen/Specimen/sample_cleaning.html" target="content-frame">sample_cleaning</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_sample_cleaning/SampleCleaning/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_sample_cleaning/SampleCleaning/run.html" target="content-frame">run()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox77"/><label for="checkbox77"><a href="autoscript_sdb_microscope_client/sdb_microscope/_specimen/Specimen/stage.html" target="content-frame">stage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/absolute_move.html" target="content-frame">absolute_move()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/current_position.html" target="content-frame">current_position</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/home.html" target="content-frame">home()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/is_homed.html" target="content-frame">is_homed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/is_linked.html" target="content-frame">is_linked</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/link.html" target="content-frame">link()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/move_to_device.html" target="content-frame">move_to_device()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/relative_move.html" target="content-frame">relative_move()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox78"/><label for="checkbox78"><a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/safety_settings.html" target="content-frame">safety_settings</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/stage/_safety_settings/SafetySettings/lock_axis.html" target="content-frame">lock_axis()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/stage/_safety_settings/SafetySettings/locked_axes.html" target="content-frame">locked_axes</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/stage/_safety_settings/SafetySettings/unlock_axis.html" target="content-frame">unlock_axis()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/set_default_coordinate_system.html" target="content-frame">set_default_coordinate_system()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/set_default_move_settings.html" target="content-frame">set_default_move_settings()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/unlink.html" target="content-frame">unlink()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox79"/><label for="checkbox79"><a href="autoscript_sdb_microscope_client/sdb_microscope/_specimen/Specimen/temperature_stage.html" target="content-frame">temperature_stage</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox80"/><label for="checkbox80"><a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/humidity.html" target="content-frame">humidity</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_humidity/Humidity/is_on.html" target="content-frame">is_on</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_humidity/Humidity/target_value.html" target="content-frame">target_value</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_humidity/Humidity/turn_off.html" target="content-frame">turn_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_humidity/Humidity/turn_on.html" target="content-frame">turn_on()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_humidity/Humidity/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/is_installed.html" target="content-frame">is_installed</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/is_on.html" target="content-frame">is_on</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/ramp.html" target="content-frame">ramp()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox81"/><label for="checkbox81"><a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/ramping_speed.html" target="content-frame">ramping_speed</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_ramping_speed/RampingSpeed/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_ramping_speed/RampingSpeed/target_value.html" target="content-frame">target_value</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_ramping_speed/RampingSpeed/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/select_heat_shield.html" target="content-frame">select_heat_shield()</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox82"/><label for="checkbox82"><a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/temperature.html" target="content-frame">temperature</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_temperature/Temperature/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_temperature/Temperature/target_value.html" target="content-frame">target_value</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/temperature_stage/_temperature/Temperature/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/turn_off.html" target="content-frame">turn_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/turn_on.html" target="content-frame">turn_on()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/specimen/_temperature_stage/TemperatureStage/type.html" target="content-frame">type</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox83"/><label for="checkbox83"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/state.html" target="content-frame">state</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox84"/><label for="checkbox84"><a href="autoscript_sdb_microscope_client/sdb_microscope/_state/State/chamber_pressure.html" target="content-frame">chamber_pressure</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/state/_chamber_pressure/ChamberPressure/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox85"/><label for="checkbox85"><a href="autoscript_sdb_microscope_client/sdb_microscope/_state/State/specimen_current.html" target="content-frame">specimen_current</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/state/_specimen_current/SpecimenCurrent/is_valid.html" target="content-frame">is_valid</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/state/_specimen_current/SpecimenCurrent/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox86"/><label for="checkbox86"><a href="autoscript_sdb_microscope_client/SdbMicroscopeClient/vacuum.html" target="content-frame">vacuum</a></label>
+                            <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox87"/><label for="checkbox87"><a href="autoscript_sdb_microscope_client/sdb_microscope/_vacuum/Vacuum/chamber_pressure.html" target="content-frame">chamber_pressure</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/vacuum/_chamber_pressure/ChamberPressure/limits.html" target="content-frame">limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/vacuum/_chamber_pressure/ChamberPressure/value.html" target="content-frame">value</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_vacuum/Vacuum/chamber_state.html" target="content-frame">chamber_state</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_vacuum/Vacuum/pump.html" target="content-frame">pump()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/sdb_microscope/_vacuum/Vacuum/vent.html" target="content-frame">vent()</a>
+                            </li>
+                            </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="checkbox88"/><label for="checkbox88"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/index.html" target="content-frame">Dynamic objects</a></label>
+                        <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox89"/><label for="checkbox89"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/BitmapPattern.html" target="content-frame">BitmapPattern</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/application_file.html" target="content-frame">application_file</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/beam_type.html" target="content-frame">beam_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/blur.html" target="content-frame">blur</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/center_x.html" target="content-frame">center_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/center_y.html" target="content-frame">center_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/defocus.html" target="content-frame">defocus</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/depth.html" target="content-frame">depth</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/dose.html" target="content-frame">dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/dwell_time.html" target="content-frame">dwell_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/enabled.html" target="content-frame">enabled</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/fix_aspect_ratio.html" target="content-frame">fix_aspect_ratio</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/gas_flow.html" target="content-frame">gas_flow</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/gas_type.html" target="content-frame">gas_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/height.html" target="content-frame">height</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/id.html" target="content-frame">id</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/interaction_diameter.html" target="content-frame">interaction_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/is_exclusion_zone.html" target="content-frame">is_exclusion_zone</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/pass_count.html" target="content-frame">pass_count</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/refresh_time.html" target="content-frame">refresh_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/rotation.html" target="content-frame">rotation</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/scan_direction.html" target="content-frame">scan_direction</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/scan_type.html" target="content-frame">scan_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/time.html" target="content-frame">time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/volume_per_dose.html" target="content-frame">volume_per_dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/BitmapPattern/width.html" target="content-frame">width</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox90"/><label for="checkbox90"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/CirclePattern.html" target="content-frame">CirclePattern</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/application_file.html" target="content-frame">application_file</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/beam_type.html" target="content-frame">beam_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/blur.html" target="content-frame">blur</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/center_x.html" target="content-frame">center_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/center_y.html" target="content-frame">center_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/defocus.html" target="content-frame">defocus</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/depth.html" target="content-frame">depth</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/dose.html" target="content-frame">dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/dwell_time.html" target="content-frame">dwell_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/enabled.html" target="content-frame">enabled</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/gas_flow.html" target="content-frame">gas_flow</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/gas_type.html" target="content-frame">gas_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/id.html" target="content-frame">id</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/inner_diameter.html" target="content-frame">inner_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/interaction_diameter.html" target="content-frame">interaction_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/is_exclusion_zone.html" target="content-frame">is_exclusion_zone</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/outer_diameter.html" target="content-frame">outer_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/overlap_r.html" target="content-frame">overlap_r</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/overlap_t.html" target="content-frame">overlap_t</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/pass_count.html" target="content-frame">pass_count</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/pitch_r.html" target="content-frame">pitch_r</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/pitch_t.html" target="content-frame">pitch_t</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/refresh_time.html" target="content-frame">refresh_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/rotation.html" target="content-frame">rotation</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/scan_direction.html" target="content-frame">scan_direction</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/scan_type.html" target="content-frame">scan_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/time.html" target="content-frame">time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CirclePattern/volume_per_dose.html" target="content-frame">volume_per_dose</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox91"/><label for="checkbox91"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/CleaningCrossSectionPattern.html" target="content-frame">CleaningCrossSectionPattern</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/application_file.html" target="content-frame">application_file</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/beam_type.html" target="content-frame">beam_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/blur.html" target="content-frame">blur</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/center_x.html" target="content-frame">center_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/center_y.html" target="content-frame">center_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/defocus.html" target="content-frame">defocus</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/depth.html" target="content-frame">depth</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/dose.html" target="content-frame">dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/dwell_time.html" target="content-frame">dwell_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/enabled.html" target="content-frame">enabled</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/gas_flow.html" target="content-frame">gas_flow</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/gas_type.html" target="content-frame">gas_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/height.html" target="content-frame">height</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/id.html" target="content-frame">id</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/interaction_diameter.html" target="content-frame">interaction_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/is_exclusion_zone.html" target="content-frame">is_exclusion_zone</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/overlap_x.html" target="content-frame">overlap_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/overlap_y.html" target="content-frame">overlap_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/pass_count.html" target="content-frame">pass_count</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/pitch_x.html" target="content-frame">pitch_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/pitch_y.html" target="content-frame">pitch_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/refresh_time.html" target="content-frame">refresh_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/rotation.html" target="content-frame">rotation</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/scan_direction.html" target="content-frame">scan_direction</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/scan_type.html" target="content-frame">scan_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/time.html" target="content-frame">time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/volume_per_dose.html" target="content-frame">volume_per_dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/CleaningCrossSectionPattern/width.html" target="content-frame">width</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox92"/><label for="checkbox92"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/GisPort/GisPort.html" target="content-frame">GisPort</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/GisPort/close.html" target="content-frame">close()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/GisPort/get_temperature.html" target="content-frame">get_temperature()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/GisPort/insert.html" target="content-frame">insert()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/GisPort/open.html" target="content-frame">open()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/GisPort/retract.html" target="content-frame">retract()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/GisPort/turn_heater_off.html" target="content-frame">turn_heater_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/GisPort/turn_heater_on.html" target="content-frame">turn_heater_on()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox93"/><label for="checkbox93"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/LinePattern.html" target="content-frame">LinePattern</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/application_file.html" target="content-frame">application_file</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/beam_type.html" target="content-frame">beam_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/blur.html" target="content-frame">blur</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/defocus.html" target="content-frame">defocus</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/depth.html" target="content-frame">depth</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/dose.html" target="content-frame">dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/dwell_time.html" target="content-frame">dwell_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/enabled.html" target="content-frame">enabled</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/end_x.html" target="content-frame">end_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/end_y.html" target="content-frame">end_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/gas_flow.html" target="content-frame">gas_flow</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/gas_type.html" target="content-frame">gas_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/id.html" target="content-frame">id</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/interaction_diameter.html" target="content-frame">interaction_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/is_exclusion_zone.html" target="content-frame">is_exclusion_zone</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/length.html" target="content-frame">length</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/overlap.html" target="content-frame">overlap</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/pass_count.html" target="content-frame">pass_count</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/pitch.html" target="content-frame">pitch</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/refresh_time.html" target="content-frame">refresh_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/rotation.html" target="content-frame">rotation</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/start_x.html" target="content-frame">start_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/start_y.html" target="content-frame">start_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/time.html" target="content-frame">time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/LinePattern/volume_per_dose.html" target="content-frame">volume_per_dose</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox94"/><label for="checkbox94"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/Multichem.html" target="content-frame">Multichem</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/close.html" target="content-frame">close()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/get_temperature.html" target="content-frame">get_temperature()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/insert.html" target="content-frame">insert()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/list_all_gases.html" target="content-frame">list_all_gases()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/open.html" target="content-frame">open()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/retract.html" target="content-frame">retract()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/turn_heater_off.html" target="content-frame">turn_heater_off()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/Multichem/turn_heater_on.html" target="content-frame">turn_heater_on()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox95"/><label for="checkbox95"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/RectanglePattern.html" target="content-frame">RectanglePattern</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/application_file.html" target="content-frame">application_file</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/beam_type.html" target="content-frame">beam_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/blur.html" target="content-frame">blur</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/center_x.html" target="content-frame">center_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/center_y.html" target="content-frame">center_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/defocus.html" target="content-frame">defocus</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/depth.html" target="content-frame">depth</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/dose.html" target="content-frame">dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/dwell_time.html" target="content-frame">dwell_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/enabled.html" target="content-frame">enabled</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/gas_flow.html" target="content-frame">gas_flow</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/gas_type.html" target="content-frame">gas_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/height.html" target="content-frame">height</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/id.html" target="content-frame">id</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/interaction_diameter.html" target="content-frame">interaction_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/is_exclusion_zone.html" target="content-frame">is_exclusion_zone</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/overlap_x.html" target="content-frame">overlap_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/overlap_y.html" target="content-frame">overlap_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/pass_count.html" target="content-frame">pass_count</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/pitch_x.html" target="content-frame">pitch_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/pitch_y.html" target="content-frame">pitch_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/refresh_time.html" target="content-frame">refresh_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/rotation.html" target="content-frame">rotation</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/scan_direction.html" target="content-frame">scan_direction</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/scan_type.html" target="content-frame">scan_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/time.html" target="content-frame">time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/volume_per_dose.html" target="content-frame">volume_per_dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RectanglePattern/width.html" target="content-frame">width</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox96"/><label for="checkbox96"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/RegularCrossSectionPattern.html" target="content-frame">RegularCrossSectionPattern</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/application_file.html" target="content-frame">application_file</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/beam_type.html" target="content-frame">beam_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/blur.html" target="content-frame">blur</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/center_x.html" target="content-frame">center_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/center_y.html" target="content-frame">center_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/defocus.html" target="content-frame">defocus</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/depth.html" target="content-frame">depth</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/dose.html" target="content-frame">dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/dwell_time.html" target="content-frame">dwell_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/enabled.html" target="content-frame">enabled</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/gas_flow.html" target="content-frame">gas_flow</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/gas_type.html" target="content-frame">gas_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/height.html" target="content-frame">height</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/id.html" target="content-frame">id</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/interaction_diameter.html" target="content-frame">interaction_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/is_exclusion_zone.html" target="content-frame">is_exclusion_zone</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/multi_scan_pass_count.html" target="content-frame">multi_scan_pass_count</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/overlap_x.html" target="content-frame">overlap_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/overlap_y.html" target="content-frame">overlap_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/pass_count.html" target="content-frame">pass_count</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/pitch_x.html" target="content-frame">pitch_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/pitch_y.html" target="content-frame">pitch_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/refresh_time.html" target="content-frame">refresh_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/rotation.html" target="content-frame">rotation</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/scan_direction.html" target="content-frame">scan_direction</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/scan_method.html" target="content-frame">scan_method</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/scan_ratio.html" target="content-frame">scan_ratio</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/scan_type.html" target="content-frame">scan_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/time.html" target="content-frame">time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/volume_per_dose.html" target="content-frame">volume_per_dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/RegularCrossSectionPattern/width.html" target="content-frame">width</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox97"/><label for="checkbox97"><a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/StreamPattern.html" target="content-frame">StreamPattern</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/application_file.html" target="content-frame">application_file</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/beam_type.html" target="content-frame">beam_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/blur.html" target="content-frame">blur</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/center_x.html" target="content-frame">center_x</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/center_y.html" target="content-frame">center_y</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/defocus.html" target="content-frame">defocus</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/dose.html" target="content-frame">dose</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/enabled.html" target="content-frame">enabled</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/gas_flow.html" target="content-frame">gas_flow</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/gas_type.html" target="content-frame">gas_type</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/id.html" target="content-frame">id</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/interaction_diameter.html" target="content-frame">interaction_diameter</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/pass_count.html" target="content-frame">pass_count</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/refresh_time.html" target="content-frame">refresh_time</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/rotation.html" target="content-frame">rotation</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/_dynamic_object_proxies/StreamPattern/volume_per_dose.html" target="content-frame">volume_per_dose</a>
+                            </li>
+                            </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="checkbox98"/><label for="checkbox98"><a href="autoscript_sdb_microscope_client/structures/index.html" target="content-frame">Data structures</a></label>
+                        <ul>
+                            <li>
+                            <input type="checkbox" id="checkbox99"/><label for="checkbox99"><a href="autoscript_sdb_microscope_client/structures/AdornedImage/AdornedImage.html" target="content-frame">AdornedImage</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/AdornedImage/load.html" target="content-frame">load()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/AdornedImage/save.html" target="content-frame">save()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/AdornedImageMetadata/AdornedImageMetadata.html" target="content-frame">AdornedImageMetadata</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox100"/><label for="checkbox100"><a href="autoscript_sdb_microscope_client/structures/AdornedSpectrum/AdornedSpectrum.html" target="content-frame">AdornedSpectrum</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/AdornedSpectrum/load.html" target="content-frame">load()</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/AdornedSpectrum/save.html" target="content-frame">save()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/AdornedSpectrumMetadata/AdornedSpectrumMetadata.html" target="content-frame">AdornedSpectrumMetadata</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox101"/><label for="checkbox101"><a href="autoscript_sdb_microscope_client/structures/BitmapPatternDefinition/BitmapPatternDefinition.html" target="content-frame">BitmapPatternDefinition</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/BitmapPatternDefinition/load.html" target="content-frame">load()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/ChemicalCompositionEntry/ChemicalCompositionEntry.html" target="content-frame">ChemicalCompositionEntry</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/ChemicalElement/ChemicalElement.html" target="content-frame">ChemicalElement</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/CompustagePosition/CompustagePosition.html" target="content-frame">CompustagePosition</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/DetectorInsertSettings/DetectorInsertSettings.html" target="content-frame">DetectorInsertSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/GetRtmDataSettings/GetRtmDataSettings.html" target="content-frame">GetRtmDataSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/GetRtmPositionSettings/GetRtmPositionSettings.html" target="content-frame">GetRtmPositionSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/GrabFrameSettings/GrabFrameSettings.html" target="content-frame">GrabFrameSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/ImageMatch/ImageMatch.html" target="content-frame">ImageMatch</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/Limits/Limits.html" target="content-frame">Limits</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/Limits2d/Limits2d.html" target="content-frame">Limits2d</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/ManipulatorPosition/ManipulatorPosition.html" target="content-frame">ManipulatorPosition</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/MoveSettings/MoveSettings.html" target="content-frame">MoveSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/Point/Point.html" target="content-frame">Point</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/Rectangle/Rectangle.html" target="content-frame">Rectangle</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/Region/Region.html" target="content-frame">Region</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RtmDataSet/RtmDataSet.html" target="content-frame">RtmDataSet</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RtmPosition/RtmPosition.html" target="content-frame">RtmPosition</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RtmPositionSet/RtmPositionSet.html" target="content-frame">RtmPositionSet</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RunAutoCbSettings/RunAutoCbSettings.html" target="content-frame">RunAutoCbSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RunAutoFocusSettings/RunAutoFocusSettings.html" target="content-frame">RunAutoFocusSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RunAutoLensAlignmentSettings/RunAutoLensAlignmentSettings.html" target="content-frame">RunAutoLensAlignmentSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RunAutoSourceTiltSettings/RunAutoSourceTiltSettings.html" target="content-frame">RunAutoSourceTiltSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RunAutoStigmatorCenteringSettings/RunAutoStigmatorCenteringSettings.html" target="content-frame">RunAutoStigmatorCenteringSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/RunAutoStigmatorSettings/RunAutoStigmatorSettings.html" target="content-frame">RunAutoStigmatorSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/StagePosition/StagePosition.html" target="content-frame">StagePosition</a>
+                            </li>
+                            <li>
+                            <input type="checkbox" id="checkbox102"/><label for="checkbox102"><a href="autoscript_sdb_microscope_client/structures/StreamPatternDefinition/StreamPatternDefinition.html" target="content-frame">StreamPatternDefinition</a></label>
+                            <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/StreamPatternDefinition/load.html" target="content-frame">load()</a>
+                            </li>
+                            </ul>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/StreamPatternPoint/StreamPatternPoint.html" target="content-frame">StreamPatternPoint</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/TemperatureSettings/TemperatureSettings.html" target="content-frame">TemperatureSettings</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/structures/VacuumSettings/VacuumSettings.html" target="content-frame">VacuumSettings</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="checkbox103"/><label for="checkbox103"><a href="autoscript_sdb_microscope_client/enumerations/index.html" target="content-frame">Enumerations</a></label>
+                        <ul>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/AngularCorrectionMode/AngularCorrectionMode.html" target="content-frame">AngularCorrectionMode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/AutoFunctionMethod/AutoFunctionMethod.html" target="content-frame">AutoFunctionMethod</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/AutoLensAlignmentModulationType/AutoLensAlignmentModulationType.html" target="content-frame">AutoLensAlignmentModulationType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/BeamType/BeamType.html" target="content-frame">BeamType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/CoordinateSystem/CoordinateSystem.html" target="content-frame">CoordinateSystem</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/DetectorMode/DetectorMode.html" target="content-frame">DetectorMode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/DetectorSegment/DetectorSegment.html" target="content-frame">DetectorSegment</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/DetectorType/DetectorType.html" target="content-frame">DetectorType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ElectronBeamMode/ElectronBeamMode.html" target="content-frame">ElectronBeamMode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ImageDataEncoding/ImageDataEncoding.html" target="content-frame">ImageDataEncoding</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ImageFileFormat/ImageFileFormat.html" target="content-frame">ImageFileFormat</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ImagingDevice/ImagingDevice.html" target="content-frame">ImagingDevice</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/LoadLockState/LoadLockState.html" target="content-frame">LoadLockState</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ManipulatorCoordinateSystem/ManipulatorCoordinateSystem.html" target="content-frame">ManipulatorCoordinateSystem</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ManipulatorSavedPosition/ManipulatorSavedPosition.html" target="content-frame">ManipulatorSavedPosition</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ManipulatorState/ManipulatorState.html" target="content-frame">ManipulatorState</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/MultiChemInsertPosition/MultiChemInsertPosition.html" target="content-frame">MultiChemInsertPosition</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/OpticalMode/OpticalMode.html" target="content-frame">OpticalMode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/PatterningMode/PatterningMode.html" target="content-frame">PatterningMode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/PatterningState/PatterningState.html" target="content-frame">PatterningState</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/PatternScanDirection/PatternScanDirection.html" target="content-frame">PatternScanDirection</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/PatternScanType/PatternScanType.html" target="content-frame">PatternScanType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/PlasmaGasType/PlasmaGasType.html" target="content-frame">PlasmaGasType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/Quantity/Quantity.html" target="content-frame">Quantity</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/RegionType/RegionType.html" target="content-frame">RegionType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/RegularCrossSectionScanMethod/RegularCrossSectionScanMethod.html" target="content-frame">RegularCrossSectionScanMethod</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/RetractableDeviceState/RetractableDeviceState.html" target="content-frame">RetractableDeviceState</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/RtmCoordinateSystem/RtmCoordinateSystem.html" target="content-frame">RtmCoordinateSystem</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/RtmMode/RtmMode.html" target="content-frame">RtmMode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ScanningFilterType/ScanningFilterType.html" target="content-frame">ScanningFilterType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ScanningMode/ScanningMode.html" target="content-frame">ScanningMode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/ScanningResolution/ScanningResolution.html" target="content-frame">ScanningResolution</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/SegmentPolarity/SegmentPolarity.html" target="content-frame">SegmentPolarity</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/StageAxis/StageAxis.html" target="content-frame">StageAxis</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/Stem4Positions/Stem4Positions.html" target="content-frame">Stem4Positions</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/TemperatureStageHeatShieldType/TemperatureStageHeatShieldType.html" target="content-frame">TemperatureStageHeatShieldType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/TemperatureStageType/TemperatureStageType.html" target="content-frame">TemperatureStageType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/Unit/Unit.html" target="content-frame">Unit</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/VacuumGasType/VacuumGasType.html" target="content-frame">VacuumGasType</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/VacuumMode/VacuumMode.html" target="content-frame">VacuumMode</a>
+                            </li>
+                            <li>
+                            <a href="autoscript_sdb_microscope_client/enumerations/VacuumState/VacuumState.html" target="content-frame">VacuumState</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+<!-- Tail custom part - START -->
+            <li>
+                <input type="checkbox" id="custom-checkbox1"/><label for="custom-checkbox1"><a href="autoscript_toolkit/autoscript_toolkit.html" target="content-frame">AutoScript Toolkit</a></label>
+                <ul>
+                    <li><a href="autoscript_toolkit/vision/index.html" target="content-frame">Computer vision</a></li>
+                    <li><a href="autoscript_toolkit/drift_correction/index.html" target="content-frame">Drift correction</a></li>
+                    <li><a href="autoscript_toolkit/template_matchers/index.html" target="content-frame">Template matchers</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <input type="checkbox" id="custom-checkbox2"/><label for="custom-checkbox2"><a href="Extras/UserGuide/UserGuide.html" target="content-frame">User guide</a></label>
+                <ul>
+                    <li><a href="Extras/UserGuide/PackageImport.html" target="content-frame">Package import</a></li>
+                    <li><a href="Extras/UserGuide/ClientStartup.html" target="content-frame">Client start-up</a></li>
+                    <li><a href="Extras/UserGuide/Specimen.html" target="content-frame">Specimen</a></li>
+                    <li><a href="Extras/UserGuide/Beams.html" target="content-frame">Beams</a></li>
+                    <li><a href="Extras/UserGuide/Detectors.html" target="content-frame">Detectors</a></li>
+                    <li><a href="Extras/UserGuide/Imaging.html" target="content-frame">Imaging</a></li>
+                    <li><a href="Extras/UserGuide/LargeImageAcquisition.html" target="content-frame">Large image acquisition</a></li>
+                    <li><a href="Extras/UserGuide/Autofunctions.html" target="content-frame">Auto functions</a></li>
+                    <li><a href="Extras/UserGuide/Patterning.html" target="content-frame">Patterning</a></li>
+                    <li><a href="Extras/UserGuide/Gases.html" target="content-frame">Gases</a></li>
+                    <li><a href="Extras/UserGuide/TemperatureStages.html" target="content-frame">Temperature stages</a></li>
+                    <li><a href="Extras/UserGuide/ComputerVision.html" target="content-frame">Computer vision</a></li>
+                    <li><a href="Extras/UserGuide/DriftCorrection.html" target="content-frame">Drift correction</a></li>
+                </ul>
+            </li>
+<!-- Tail custom part - END -->
+        </ul>
+    </div>
+    <div id="inner-right">
+        <iframe name="content-frame" onload="onFrameLoaded(this, 'navtree');"></iframe>
+    </div>
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->

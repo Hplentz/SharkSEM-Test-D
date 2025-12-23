@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>imaging.grab_frame</title>
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/page-custom-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/syntax-highlight-style.css">
+    <script src="../../../../Resources/common.js"></script>
+    <script src="../../../../Resources/page.js"></script>
+    <script src="../../../../Resources/prism.js"></script>
+    <script src="../../../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../../../Resources/prism-c.js"></script>
+    <script src="../../../../Resources/prism-cpp.js"></script>
+    <script src="../../../../Resources/prism-csharp.js"></script>
+    <script src="../../../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../../../shell.html');
+        });
+    </script>
+</head>
+<body>
+    <h1><a class="header-path" href="../../../SdbMicroscopeClient/imaging.html">imaging</a>.<a class="header-path" href="../../../sdb_microscope/_imaging/Imaging/grab_frame.html">grab_frame</a></h1>
+    <p>Scans a new frame in the active view and provides the corresponding image.</p>
+    <h2>Syntax</h2>
+    <pre><code class="language-python">grab_frame()
+grab_frame(settings)</code></pre>
+    <h2>Parameters</h2>
+    <table>
+        <tr>
+            <td>settings</td>
+            <td><a href="../../../structures/GrabFrameSettings/GrabFrameSettings.html">GrabFrameSettings</a></td>
+            <td>The custom scan settings to be used instead of default values.</td>
+        </tr>
+    </table>
+    <h2>Return value</h2>
+    <table>
+        <tr>
+            <td><a href="../../../structures/AdornedImage/AdornedImage.html">AdornedImage</a></td>
+            <td>The microscope image corresponding to the acquired frame.</td>
+        </tr>
+    </table>
+<!-- Custom part - START -->
+    <h2>Remarks</h2>
+    <ul>
+        <li>
+            The function initiates scanning of a new frame and waits until it is completely scanned.
+        </li>
+        <li>
+            Custom scan settings can be provided by the <code>settings</code> parameter.
+            If not specified, the actual scan settings are determined as follows:
+            
+            <ul>
+                <li><code>resolution</code>, <code>dwell_time</code> and <code>reduced_area</code> will default to the current settings in the active view.</li>
+                <li>Other settings will fallback to predefined constant default values:
+                    <ul>
+                        <li><code>bit_depth</code> will be 8.</li>
+                        <li><code>line_integration</code> will be 1.</li>
+                        <li><code>scan_interlacing</code> will be 1.</li>
+                        <li><code>frame_integration</code> will be 1.</li>
+                        <li><code>drift_correction</code> will be False.</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li>
+            Maximum resolution accepted by grab_frame() is <strong>6144x6144</strong>. For higher resolutions use <a href="grab_frame_to_disk.html">imaging.grab_frame_to_disk()</a>.
+        </li>
+        <li>
+            It is recommended to use one of the standard resolutions for common imaging tasks, that is a resolution from the <a href="../../../enumerations/ScanningResolution/ScanningResolution.html">ScanningResolution</a> enumeration.
+          
+            If a non-standard resolution is specified in <code>settings</code>, the function will use a less effective method of imaging and
+            some of the scan parameters will not be applicable. See <a href="../../../../Extras/UserGuide/Imaging.html">User guide: Imaging</a>
+            and <a href="../../../../Extras/UserGuide/LargeImageAcquisition.html">User guide: Large image acquisition</a> for more information.
+            
+        </li>
+        <li>
+            Parameter <code>preview_resolution</code> specified in <code>settings</code> is ignored by the grab_frame() function. 
+        </li>
+    </ul>
+    
+    <h2>Examples</h2>
+    
+    <pre><code class="language-python">
+        from matplotlib import pyplot as plot
+        
+        # Take one image with the specified resolution and dwell time and display it on a pop-up window
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, dwell_time=500e-9)
+        image = microscope.imaging.grab_frame(settings)
+        
+        plot.imshow(image.data, cmap='gray')
+        plot.show()
+    </code></pre>
+    
+    <pre><code class="language-python">
+        from matplotlib import pyplot as plot
+
+        # Take one image in a rectangular sub-region of the full frame, so called reduced area, and display it on a pop-up window
+        settings = GrabFrameSettings(reduced_area=Rectangle(0.60, 0.60, 0.30, 0.30))
+        image = microscope.imaging.grab_frame(settings)
+        
+        plot.imshow(image.data, cmap='gray')
+        plot.show()
+    </code></pre>
+
+    <pre><code class="language-python">
+        # Acquire an image by integrating 8 consecutive frames and correcting them for drift
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, dwell_time=100e-9,
+                                     frame_integration=8, drift_correction=True)
+        image = microscope.imaging.grab_frame(settings)
+    </code></pre>
+
+    <pre><code class="language-python">
+        # Acquire an image with a non-standard resolution of 800x200
+        settings = GrabFrameSettings(resolution="800x200")
+        image = microscope.imaging.grab_frame(settings)
+    </code></pre>
+
+    <h2>See also</h2>
+    <a href="grab_multiple_frames.html">imaging.grab_multiple_frames()</a><br>
+    <a href="grab_frame_to_disk.html">imaging.grab_frame_to_disk()</a>
+<!-- Custom part - END -->
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->

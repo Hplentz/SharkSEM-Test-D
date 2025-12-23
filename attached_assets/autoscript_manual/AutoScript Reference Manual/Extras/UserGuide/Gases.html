@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User guide: Gases</title>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+
+<h1><a class="header-path" href="UserGuide.html">User guide: </a> <a class="header-path" href="#">Gases</a></h1>
+
+<p>This chapter shows how to <strong>control gas injection systems</strong> including <em>GIS</em> and <em>MultiChem</em>.</p>
+
+<p>
+Before proceeding with the code snippets listed below, initialize AutoScript with the following code.
+Do not forget to set the server address or host name (parameters of the <code class="language-python">connect()</code> function) according to your environment.
+</p>
+
+    <pre><code class="language-python">
+    from autoscript_sdb_microscope_client import SdbMicroscopeClient
+    from autoscript_sdb_microscope_client.enumerations import *
+    from autoscript_sdb_microscope_client.structures import *
+    
+    microscope = SdbMicroscopeClient()
+    microscope.connect("localhost")
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Get list of available GIS (gas injection system) ports</strong> and inspect it.</p>
+
+    <pre><code class="language-python">
+    ports = microscope.gas.list_all_gis_ports()
+    print(ports)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Insert and retract platinum deposition GIS needle</strong>:</p>
+
+    <pre><code class="language-python">
+    # First, link stage Z coordinate to working distance to enable needle insertion
+    microscope.specimen.stage.link()
+
+    platinum_gis = microscope.gas.get_gis_port("Pt dep")
+    platinum_gis.insert()
+    platinum_gis.retract()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Insert and retract MultiChem needle:</strong></p>
+
+    <pre><code class="language-python">
+    # First, link stage Z coordinate to working distance to enable needle insertion
+    microscope.specimen.stage.link()
+    
+    multichem = microscope.gas.get_multichem()
+    multichem.insert()
+    multichem.retract()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+</body>
+</html>

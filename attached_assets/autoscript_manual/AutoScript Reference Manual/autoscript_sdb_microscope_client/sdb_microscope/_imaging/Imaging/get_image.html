@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>imaging.get_image</title>
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/page-custom-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/syntax-highlight-style.css">
+    <script src="../../../../Resources/common.js"></script>
+    <script src="../../../../Resources/page.js"></script>
+    <script src="../../../../Resources/prism.js"></script>
+    <script src="../../../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../../../Resources/prism-c.js"></script>
+    <script src="../../../../Resources/prism-cpp.js"></script>
+    <script src="../../../../Resources/prism-csharp.js"></script>
+    <script src="../../../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../../../shell.html');
+        });
+    </script>
+</head>
+<body>
+    <h1><a class="header-path" href="../../../SdbMicroscopeClient/imaging.html">imaging</a>.<a class="header-path" href="../../../sdb_microscope/_imaging/Imaging/get_image.html">get_image</a></h1>
+    <p>Retrieves a microscope image currently present in the active view.</p>
+    <h2>Syntax</h2>
+    <pre><code class="language-python">get_image()</code></pre>
+    <h2>Return value</h2>
+    <table>
+        <tr>
+            <td><a href="../../../structures/AdornedImage/AdornedImage.html">AdornedImage</a></td>
+            <td>The microscope image retrieved from the active view.</td>
+        </tr>
+    </table>
+<!-- Custom part - START -->
+    <h2>Remarks</h2>
+    The method does not initiate the scanning of a new image frame.
+    It inspects the imaging view and returns the image stored there from previous calls to grab_frame().<br>
+    If you want to acquire a new image with the active imaging device, call <a href="grab_frame.html">grab_frame()</a> instead.
+    
+    <!--<h2>Examples</h2>-->
+    <h2>See also</h2>
+    <a href="grab_frame.html">grab_frame()</a>
+    
+<!-- Custom part - END -->
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->

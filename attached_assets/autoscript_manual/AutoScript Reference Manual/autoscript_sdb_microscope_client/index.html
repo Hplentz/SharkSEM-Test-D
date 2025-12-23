@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Microscope API</title>
+    <link rel="stylesheet" type="text/css" href="../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../Resources/page-custom-style.css">
+    <link rel="stylesheet" type="text/css" href="../Resources/syntax-highlight-style.css">
+    <script src="../Resources/common.js"></script>
+    <script src="../Resources/page.js"></script>
+    <script src="../Resources/prism.js"></script>
+    <script src="../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../Resources/prism-c.js"></script>
+    <script src="../Resources/prism-cpp.js"></script>
+    <script src="../Resources/prism-csharp.js"></script>
+    <script src="../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../shell.html');
+        });
+    </script>
+</head>
+<body>
+    <h1>Microscope API</h1>
+<!-- Custom part - START -->
+    <p>The Python package <code class="language-python">autoscript_sdb_microscope_client</code> enables the control
+    of microscope systems from Thermo Fisher Scientific <strong>SEM</strong> (scanning electron microscope) and <strong>DB</strong> (dual beam) families.</p>
+
+    <p>
+        The most important class in this package is <a href="SdbMicroscopeClient/SdbMicroscopeClient.html">SdbMicroscopeClient</a>,
+        which after instantiation and connection to an AutoScript server provides a wide range of functions through its members
+        (child objects, members and functions) organized in a <a class="toplevel" href="sdb_microscope/Index.html">static tree</a>.
+    </p>
+
+    <p>
+    The package also contains other classes. 
+    <strong>Data structures</strong> make parameters and return values of static tree methods more comprehensive,
+    while <strong>enumerations</strong> can save some time and help avoid typos when used instead of string or integer values.
+    <strong>Dynamic objects</strong> are objects whose lifetime is expected to be shorter than the lifetime of <code class="language-python">SdbMicroscopeClient</code>
+    and which often have to be created explicitly during script execution.
+    Patterns can serve as a good example of dynamic objects.
+    </p>
+
+    <p>In the following sections you will find detailed information on all the above mentioned parts:</p>
+<!-- Custom part - END -->
+    <table>
+        <tr><td><a href="SdbMicroscopeClient/SdbMicroscopeClient.html">SdbMicroscopeClient object</a></td></tr>
+        <tr><td><a href="sdb_microscope/index.html">Static tree</a></td></tr>
+		<tr><td><a href="_dynamic_object_proxies/index.html">Dynamic objects</a></td></tr>
+		<tr><td><a href="structures/index.html">Data structures</a></td></tr>
+		<tr><td><a href="enumerations/index.html">Enumerations</a></td></tr>
+    </table>
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->

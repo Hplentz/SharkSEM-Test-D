@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User guide: Package import</title>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+
+<h1><a class="header-path" href="UserGuide.html">User guide: </a> <a class="header-path" href="#">Package import</a></h1>
+
+<p>This chapter shows how to <strong>import AutoScript packages</strong> into a Python script.</p>
+
+<p style="height:1px"/>
+<p><strong>Import SDB microscope client</strong> from <em>SDB microscope package</em>:</p>
+
+<pre><code class="language-python">
+from autoscript_sdb_microscope_client import SdbMicroscopeClient
+</code></pre>
+<p style="height:1px"/>
+
+<p><strong>Import enumerations and structures</strong> from <em>SDB microscope package</em>:</p>
+
+<pre><code class="language-python">
+from autoscript_sdb_microscope_client.enumerations import *
+from autoscript_sdb_microscope_client.structures import *
+</code></pre>
+<p style="height:1px"/>
+
+</body>
+</html>

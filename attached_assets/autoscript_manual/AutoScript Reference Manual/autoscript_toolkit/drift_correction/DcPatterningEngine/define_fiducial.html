@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DcPatterningEngine.define_fiducial</title>
+    <link rel="stylesheet" type="text/css" href="../../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../Resources/syntax-highlight-style.css">
+    <script src="../../../Resources/common.js"></script>
+    <script src="../../../Resources/page.js"></script>
+    <script src="../../../Resources/prism.js"></script>
+    <script src="../../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../../Resources/prism-c.js"></script>
+    <script src="../../../Resources/prism-cpp.js"></script>
+    <script src="../../../Resources/prism-csharp.js"></script>
+    <script src="../../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../../shell.html');
+        });
+    </script>
+</head>
+<body>
+	<h1><a class="header-path" href="../DcPatterningEngine.html">DcPatterningEngine</a>.<a class="header-path" href="#">define_fiducial</a></h1>
+	<p>This method defines fiducial according to the given center point and size.</p>
+	<h2>Syntax</h2>
+	<pre><code class="language-python">define_fiducial(image, center, size)</code></pre>
+	<h2>Parameters</h2>
+	<table>
+		<tr>
+			<td>image</td>
+			<td><a href="../../../autoscript_sdb_microscope_client/structures/AdornedImage/AdornedImage.html">AdornedImage</a></td>
+			<td>Image to be used for fiducial definition.</td>
+		</tr>
+		<tr>
+			<td>center</td>
+			<td>float</td>
+			<td>Center point of the fiducial, in meters. For more information on coordinate system, see the notes below.</td>
+		</tr>
+		<tr>
+			<td>size</td>
+			<td>float</td>
+			<td>Size of the fiducial, in meters. For more information on coordinate system, see the notes below.</td>
+		</tr>
+	</table>
+	<h2>Remarks</h2>
+	<p>
+		<em>Coordinate system</em> used for parameters referring to meters (<code class="language-python">center</code>, <code class="language-python">size</code>)
+		is the same as the coordinate system used for patterns, with origin [0, 0] in the center of the view, X axis coordinates growing from left to right and Y axis
+		coordinates growing from bottom to top.
+	</p>
+    <!--<h2>Examples</h2>-->
+    <!--<h2>See also</h2>-->
+</body>
+</html>

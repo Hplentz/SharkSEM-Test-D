@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+	<h1>Computer vision</h1>
+	<p>This module provides aid for <strong>computer vision</strong> tasks.</p>
+    <h2>Classes</h2>
+	<table>
+		<tr>
+			<td><a href="FeatureLocation.html">FeatureLocation</a></td>
+			<td>This class contains various information about a feature located in an image.</td>
+		</tr>
+	</table>
+	<h2>Methods</h2>
+	<table>
+		<tr>
+			<td><a href="cut_image.html">cut_image()</a></td>
+			<td>This method cuts out a part of the given image according to the given target area definition.</td>
+		</tr>
+		<tr>
+			<td><a href="locate_feature.html">locate_feature()</a></td>
+			<td>This method locates a feature according to the given template in the given image.</td>
+		</tr>
+		<tr>
+			<td><a href="plot_match.html">plot_match()</a></td>
+			<td>This method presents a searched image and a feature located in it.</td>
+		</tr>
+	</table>
+	<h2>Remarks</h2>
+	<p>This module uses the <a href="../template_matchers/Index.html">template_matchers</a> module for <em>image template matching</em> purposes.</p>
+    <!--<h2>Examples</h2>-->
+    <!--<h2>See also</h2>-->
+</body>
+</html>

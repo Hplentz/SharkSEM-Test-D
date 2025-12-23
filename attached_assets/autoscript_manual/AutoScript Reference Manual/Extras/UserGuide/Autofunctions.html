@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User guide: Auto functions</title>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+
+<h1><a class="header-path" href="UserGuide.html">User guide: </a> <a class="header-path" href="#">Auto functions</a></h1>
+
+<p>This chapter shows how to run <strong>auto functions</strong> - automated routines for optimizing microscope optics
+and detector parameters for the best possible quality of the acquired images.</p>
+
+<p>
+Before proceeding with the code snippets listed below, initialize AutoScript with the following code.
+Do not forget to set the server address or host name (parameters of the <code class="language-python">connect()</code> function) according to your environment.
+</p>
+
+    <pre><code class="language-python">
+    from autoscript_sdb_microscope_client import SdbMicroscopeClient
+    from autoscript_sdb_microscope_client.enumerations import *
+    from autoscript_sdb_microscope_client.structures import *
+    
+    microscope = SdbMicroscopeClient()
+    microscope.connect("localhost")
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Setup imaging environment</strong>:</p>
+
+    <pre><code class="language-python">
+    microscope.imaging.set_active_view(1)
+    microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Run auto contrast/brightness</strong> routine in active view using default method:</p>
+
+    <pre><code class="language-python">
+    microscope.auto_functions.run_auto_cb()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Run auto contrast/brightness</strong> using specialized <em>MaxContrast</em> method:</p>
+
+    <pre><code class="language-python">
+    settings = RunAutoCbSettings(method="MaxContrast")
+    microscope.auto_functions.run_auto_cb(settings)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Run auto contrast/brightness</strong> using specialized <em>MaxContrast</em> method and set up specific settings:</p>
+
+    <pre><code class="language-python">
+    settings = RunAutoCbSettings(method="MaxContrast", resolution="192x128", calibrate_detector=True)
+    microscope.auto_functions.run_auto_cb(settings)
+    </code></pre>
+    <p style="height:1px"/>
+    
+
+<p><strong>Run auto stigmator</strong> using the <em>OngEtAl </em>method:</p>
+
+    <pre><code class="language-python">
+    microscope.auto_functions.run_auto_stigmator(RunAutoStigmatorSettings(method="OngEtAl"))
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Run auto stigmator centering </strong> using the <em>Volumescope</em> method:</p>
+
+    <pre><code class="language-python">
+    microscope.auto_functions.run_auto_stigmator_centering(RunAutoStigmatorCenteringSettings(method="Volumescope"))
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p>Other auto functions can be run in a similar way. Please take a look at the reference manual for more information on available auto functions and their settings.</p>
+
+
+
+</html>

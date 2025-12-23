@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+	<h1><a class="header-path" href="#">cut_image</a></h1>
+	<p>Cuts out a portion of an image according to the specified target area definition.</p>
+	<h2>Syntax</h2>
+	<pre><code class="language-python">cut_image(image, [top_left, bottom_right, center, size, relative_center, relative_size])</code></pre>
+	<h2>Parameters</h2>
+	<table>
+		<tr>
+			<td>image</td>
+			<td><a href="../../autoscript_sdb_microscope_client/structures/AdornedImage/AdornedImage.html">AdornedImage</a> or <code class="language-python">numpy.ndarray</code></td>
+			<td>Image to cut out a part from.</td>
+		</tr>
+		<tr>
+			<td>top_left</td>
+			<td>list of size of 2</td>
+			<td>Top left point of the cut area, in pixels.</td>
+		</tr>
+		<tr>
+			<td>bottom_right</td>
+			<td>list of size of 2</td>
+			<td>Bottom right point of the cut area, in pixels.</td>
+		</tr>
+		<tr>
+			<td>center</td>
+			<td>list of size of 2</td>
+			<td>Center of the cut area, in pixels.</td>
+		</tr>
+		<tr>
+			<td>size</td>
+			<td>list of size of 2</td>
+			<td>Size of the cut area, in pixels.</td>
+		</tr>
+		<tr>
+			<td>relative_center</td>
+			<td>list of size of 2</td>
+			<td>Center of the cut area, in relative coordinates in the range [0, 1].</td>
+		</tr>
+		<tr>
+			<td>relative_size</td>
+			<td>list of size of 2</td>
+			<td>Size of the cut area, in relative coordinates in the range [0, 1].</td>
+		</tr>
+	</table>
+	<h2>Return value</h2>
+	<table>
+		<tr>
+			<td><a href="../../autoscript_sdb_microscope_client/structures/AdornedImage/AdornedImage.html">AdornedImage</a> or <code class="language-python">numpy.ndarray</code></td>
+			<td>Cut taken from the image in the same format as the input image.</td>
+		</tr>
+	</table>
+	<h2>Remarks</h2>
+	<p>
+		Please note that only the following combinations of parameters are valid: top left and bottom right, center and size, or relative center and relative size.
+	</p>
+	<p>
+		The method can accept both <code class="language-python">AdornedImage</code> and <code class="language-python">numpy.ndarray</code> for <code class="language-python">image</code> parameter.
+		The cut is then provided in the same form.
+	</p>
+    <!--<h2>Examples</h2>-->
+    <!--<h2>See also</h2>-->
+</body>
+</html>

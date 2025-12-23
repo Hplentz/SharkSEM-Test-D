@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User guide: Imaging</title>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+
+<h1><a class="header-path" href="UserGuide.html">User guide: </a> <a class="header-path" href="#">Imaging</a></h1>
+
+<p>This chapter shows how to <strong>perform microscope imaging tasks</strong>.</p>
+
+SEM/SDB/WDB microscope platforms, and therefore AutoScript, support two methods of imaging:
+<ol>
+    <li>The <strong>standard</strong> imaging technique occurs when any resolution from the 
+        <a href="../../autoscript_sdb_microscope_client/enumerations/ScanningResolution/ScanningResolution.html">ScanningResolution</a> enumeration  is used.
+        This method supports all settings that can be specified in the
+        <a href="../../autoscript_sdb_microscope_client/structures/GrabFrameSettings/GrabFrameSettings.html">GrabFrameSettings</a> structure.
+        The standard imaging technique is also optimized for speed, and therefore provides the best results for performance critical applications.
+        The available resolutions correspond to the selection in the resolution dropbox in the toolbar of the main user interface application
+        ("Microscope Control"). The highest resolution that can be achieved with this method is 6144x4096.<br><br>
+    </li>
+      
+    <li>Imaging with non-standard resolutions.
+        When a resolution outside of
+        <a href="../../autoscript_sdb_microscope_client/enumerations/ScanningResolution/ScanningResolution.html">ScanningResolution</a>
+        enumeration is specified, the <strong>"Large image acquisition"</strong> imaging technique is used.
+        This technique supports resolutions up to 65536x65536. Imaging in this mode
+        is associated with performance penalty caused by image file creation and transfer between the microscope computer and the computer running the AutoScript client.
+        Besides the performance losses, additional restrictions apply to the scan settings that can be specified in the 
+        <a href="../../autoscript_sdb_microscope_client/structures/GrabFrameSettings/GrabFrameSettings.html">GrabFrameSettings</a> structure.
+    </li>
+</ol>
+
+<p>For examples on large image acquisition go to <a href="LargeImageAcquisition.html">Large image acquisition</a> page.</p>
+
+<p>
+Before proceeding with the code snippets listed below, initialize AutoScript with the following code.
+Do not forget to set the server address or host name (parameters of the <code class="language-python">connect()</code> function) according to your environment.
+</p>
+
+    <pre><code class="language-python">
+    from autoscript_sdb_microscope_client import SdbMicroscopeClient
+    from autoscript_sdb_microscope_client.enumerations import *
+    from autoscript_sdb_microscope_client.structures import *
+    
+    microscope = SdbMicroscopeClient()
+    microscope.connect("localhost")
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Set the active view</strong> to view number 2 (the upper right display in "Microscope Control" application):</p>
+
+    <pre><code class="language-python">
+    microscope.imaging.set_active_view(2)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Set the active imaging device</strong> in the active view:</p>
+
+    <pre><code class="language-python">
+    import time
+    
+    print("Using electron beam as the active imaging device...")
+    microscope.imaging.set_active_device(ImagingDevice.ELECTRON_BEAM)
+    time.sleep(1)
+    print("Using ion beam as the active imaging device...")
+    microscope.imaging.set_active_device(ImagingDevice.ION_BEAM)
+    time.sleep(1)
+    print("Using CCD camera as the active imaging device...")
+    microscope.imaging.set_active_device(ImagingDevice.CCD_CAMERA)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Start live acquisition</strong> in the active view in scanning resolution currently set in the active vew.</p>
+
+    <pre><code class="language-python">
+    microscope.imaging.start_acquisition()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Stop live acquisition</strong> in the active view:</p>
+
+    <pre><code class="language-python">
+    microscope.imaging.stop_acquisition()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Retrieve the microscope image</strong> and <strong>inspect image data</strong> using <code class="language-python">matplotlib</code> package.<br>
+Note that this code does not initiate acquisition of a new image. The get_image() function returns
+an image that was acquired at an earlier time and stored in the image buffer of the active view.</p>
+
+    <pre><code class="language-python">
+    from matplotlib import pyplot as plot
+    
+    image = microscope.imaging.get_image()
+    
+    plot.imshow(image.data, cmap='gray')
+    plot.show()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Retrieve the microscope image</strong> and <strong>inspect image metadata</strong>:</p>
+
+    <pre><code class="language-python">
+    image = microscope.imaging.get_image()
+    print(image.metadata.optics.acceleration_voltage)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Acquire a new image</strong> in the active view with the current scan settings and inspect image data:</p>
+
+    <pre><code class="language-python">
+    from matplotlib import pyplot as plot
+    
+    image = microscope.imaging.grab_frame()
+    
+    plot.imshow(image.data, cmap='gray')
+    plot.show()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p>
+<strong>Acquire a new image</strong> in the active view with the specified scan settings and inspect image data.<br>
+Note that specifying scan settings does not permanently affect the state of the imaging view, but is applied only for one call.</p>
+
+    <pre><code class="language-python">
+    from matplotlib import pyplot as plot
+
+    settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, dwell_time=500e-9)
+    image = microscope.imaging.grab_frame(settings)
+    
+    plot.imshow(image.data, cmap='gray')
+    plot.show()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Acquire a new image in the reduced area</strong> of the active view and inspect image data:</p>
+
+    <pre><code class="language-python">
+    from matplotlib import pyplot as plot
+
+    settings = GrabFrameSettings(reduced_area=Rectangle(0.60, 0.60, 0.30, 0.30))
+    image = microscope.imaging.grab_frame(settings)
+    
+    plot.imshow(image.data, cmap='gray')
+    plot.show()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Acquire a new image</strong> in the active view with <strong>specific bit depth</strong> and inspect image data:</p>
+
+    <pre><code class="language-python">
+    from matplotlib import pyplot as plot
+    
+    settings = GrabFrameSettings(bit_depth=16)
+    image = microscope.imaging.grab_frame(settings)
+    
+    plot.imshow(image.data, cmap='gray')
+    plot.show()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p>Acquire a new image and <strong>save it at a specified path</strong> in TIFF format:</p>
+
+    <pre><code class="language-python">
+    image = microscope.imaging.grab_frame()
+    image.save('C:\\Image.tif')
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Load a TIFF image from a specified path</strong> and display it on a pop-up window:</p>
+
+    <pre><code class="language-python">
+    from matplotlib import pyplot as plot
+    
+    image = AdornedImage.load('C:\\Image.tif')
+    
+    plot.imshow(image.data, cmap='gray')
+    plot.show()
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p>Load a TIFF image file and<strong> inspect its metadata</strong> related to electron beam scanning:</p>
+
+    <pre><code class="language-python">
+    from autoscript_sdb_microscope_client.ini_metadata_reader import IniMetadataReader
+    
+    image = AdornedImage.load("c:\\ProgramData\\Thermo Scientific AutoScript\\UserGuide\\Resources\\Image_8-bit.tif")
+    
+    metadata_reader = IniMetadataReader()
+    metadata_dictionary = metadata_reader.read_from_string(image.metadata.metadata_as_ini)
+    
+    for key in [k for k in metadata_dictionary if k.startswith("EScan")]:
+        value = metadata_dictionary[key]
+        print(key, "=", value)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Locate a template image in a full-frame image</strong> using specialized HOG (histogram of gradients) template matcher and inspect the result:</p>
+
+    <pre><code class="language-python">
+    from matplotlib import pyplot as plot
+    
+    # Take a full frame image and inspect image data
+    image = microscope.imaging.grab_frame()
+    plot.imshow(image.data, cmap='gray')
+    plot.show()
+    
+    # Take a reduced area image and inspect image data
+    settings = GrabFrameSettings(reduced_area=Rectangle(0.05, 0.05, 0.10, 0.10))
+    template = microscope.imaging.grab_frame(settings)
+    plot.imshow(template.data, cmap='gray')
+    plot.show()
+    
+    # Find the template image from the reduced area scan in the full frame image and print the result
+    match_result = microscope.imaging.match_template(image, template)
+    print(match_result)
+    </code></pre>
+    <p style="height:1px"/>
+
+</body>
+</html>

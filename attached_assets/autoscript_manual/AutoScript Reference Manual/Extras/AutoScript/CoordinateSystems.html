@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+	<h1>Coordinate Systems</h1>
+	
+	<p>
+	AutoScript uses numerical values to determine the position of objects in the microscope chamber or of geometric
+	elements in an image. These coordinates are specified in coordinate systems that vary between AutoScript
+	functional areas. This chapter lists the main coordinate systems in a typical SEM.
+	</p>
+    
+	<h2>Stage coordinate system</h2>
+	
+	<p>
+	The picture below shows the orientation of stage axes X, Y, Z, R and T. 
+	The orientation of the Z axis is reversed when the "Link Z to FWD (free working distance)" function is activated.
+	See <a href="../../autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/link.html">specimen.stage.link()</a>
+	and <a href="../../autoscript_sdb_microscope_client/sdb_microscope/specimen/_stage/Stage/unlink.html">specimen.stage.unlink()</a> for details.
+	</p>
+    
+	<img alt="Stage" src="Resources\Stage.png" width="767" height="290">
+	
+    <h2>Scanning reduced area coordinate system</h2>
+    
+    <p>
+    "Reduced area" is one of the <a href="../../autoscript_sdb_microscope_client/enumerations/ScanningMode/ScanningMode.html">supported scanning modes</a>.
+    In this mode, the beam scans in a rectangular sub-region of the entire field of view.
+    The area is specified by the coordinate of its upper left corner, width and height. 
+    The upper left corner of the current field of view has the coordinate [0, 0], the lower right corner has the coordinate [1, 1].
+    </p>
+    
+    <img alt="Reduced Area" src="Resources\ReducedArea.png" width="293" height="235">
+    
+    <h2>Patterning coordinate system</h2>
+    
+    <p>
+    Pattern shapes for patterning jobs are created in a special coordinate system that has its origin in the center
+    of the field of view. The position and size of patterns are specified directly in distance units (meters) bounded
+    by the current scan field width and height.
+    </p>
+    
+    <img alt="Patterns" src="Resources\Patterning.png" width="326" height="230">
+
+    <h2>Imaging views numbering</h2>
+    
+    <p>
+    AutoScript shares the concept of imaging views with the main microscope user interface application "Microscope Control".
+    There are a total of 4 views with index 1 to 4, which divide the entire screen area into 4 quadrants of equal size.
+    Each view can be configured with a specific beam type (called Imaging Device in AutoScript).
+    In the Microscope Control application the views are positioned as follows:</p>
+    
+    <img alt="Views" src="Resources\Views.png" width="279" height="189">
+        
+</body>
+</html>

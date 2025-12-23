@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User guide: Detectors</title>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+
+<h1><a class="header-path" href="UserGuide.html">User guide: </a> <a class="header-path" href="#">Detectors</a></h1>
+
+  <p>This chapter shows how to <strong>switch detectors and change their settings</strong>.</p>
+
+<p>
+Before proceeding with the code snippets listed below, initialize AutoScript with the following code.
+Do not forget to set the server address or host name (parameters of the <code class="language-python">connect()</code> function) according to your environment.
+</p>
+
+    <pre><code class="language-python">
+    from autoscript_sdb_microscope_client import SdbMicroscopeClient
+    from autoscript_sdb_microscope_client.enumerations import *
+    from autoscript_sdb_microscope_client.structures import *
+    
+    microscope = SdbMicroscopeClient()
+    microscope.connect("localhost")
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Get list of available detectors</strong> and inspect it:</p>
+
+    <pre><code class="language-python">
+    av = microscope.detector.type.available_values
+    print(av)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Set active detector in active view to certain type</strong>, e.g. ETD, possibly using enumeration to avoid typo:</p>
+
+    <pre><code class="language-python">
+    microscope.detector.type.value = "ETD"
+    microscope.detector.type.value = DetectorType.ETD
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>For the active detector (now ETD), get the list of available modes</strong> and inspect it:</p>
+
+    <pre><code class="language-python">
+    av = microscope.detector.mode.available_values
+    print(av)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Set active detector to certain mode</strong>, e.g. backscatter electrons, possibly using enumeration to avoid typo:</p>
+
+    <pre><code class="language-python">
+    microscope.detector.mode.value = "BackscatterElectrons"
+    microscope.detector.mode.value = DetectorMode.BACKSCATTER_ELECTRONS
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Set active detector type and mode at once</strong>:</p>
+
+    <pre><code class="language-python">
+    microscope.detector.set_type_mode("ETD", "BackscatterElectrons")
+    microscope.detector.set_type_mode(DetectorType.ETD, DetectorMode.BACKSCATTER_ELECTRONS)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Set contrast and brightness</strong> to 80% and 30% respectively for the active detector type and mode:</p>
+
+    <pre><code class="language-python">
+    microscope.detector.contrast.value = 0.80
+    microscope.detector.brightness.value = 0.30
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Apply custom settings</strong> to ETD detector, e.g. set its grid voltage value to -100 V:</p>
+
+    <pre><code class="language-python">
+    microscope.detector.set_type_mode(DetectorType.ETD, DetectorMode.CUSTOM)
+    microscope.detector.custom_settings.grid_voltage.value = -100
+    </code></pre>
+    
+<p>Custom settings for other scintillation detectors (e.g. ICE, TLD) are managed in a similar way.</p>
+<p style="height:1px"/>
+
+
+<p><strong>Get list of available detector segments</strong> for STEM3 detector and inspect them:</p>
+
+    <pre><code class="language-python">
+    microscope.detector.set_type_mode(DetectorType.STEM3, DetectorMode.CUSTOM)
+    av = microscope.detector.custom_settings.list_all_segments()
+    print(av)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Configure polarity of segments</strong>:</p>
+
+    <pre><code class="language-python">
+    microscope.detector.set_type_mode(DetectorType.STEM3, DetectorMode.CUSTOM)
+    microscope.detector.custom_settings.set_segment_polarity("Angular1", SegmentPolarity.POSITIVE)
+    microscope.detector.custom_settings.set_segment_polarity("Angular4", SegmentPolarity.NEUTRAL)
+    </code></pre>
+    <p style="height:1px"/>
+
+
+<p><strong>Determine current custom mode settings</strong> for STEM3 detector:</p>
+
+    <pre><code class="language-python">
+    microscope.detector.set_type_mode(DetectorType.STEM3, DetectorMode.CUSTOM)
+    segment_names = microscope.detector.custom_settings.list_all_segments()
+    for segment_name in segment_names:
+        segment_polarity = microscope.detector.custom_settings.get_segment_polarity(segment_name)
+        print("%s: %s" % (segment_name, SegmentPolarity.explain(segment_polarity)))
+    </code></pre>
+
+<p>Custom settings for other segmented detectors (e.g., ABS, CBS, STEM4) are managed in a similar way.</p>
+<p style="height:1px"/>
+
+
+<p><strong>Reset all eligible segments in custom mode</strong> for STEM3 detector to default settings (neutral polarity):</p>
+
+    <pre><code class="language-python">
+    microscope.detector.set_type_mode(DetectorType.STEM3, DetectorMode.CUSTOM)
+    microscope.detector.custom_settings.reset_segments()
+    </code></pre>
+
+<p>Resetting all eligible segments for other segmented detectors (e.g. ABS, CBS, STEM3+) are managed in the similar way.</p>
+<p style="height:1px"/>
+
+</body>
+</html>
+

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User guide: Specimen</title>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+</head>
+<body>
+
+<h1><a class="header-path" href="UserGuide.html">User guide: </a> <a class="header-path" href="#">Specimen</a></h1>
+
+<p>This chapter shows how the sample can be manipulated using various mechanisms such as bulk stage, EasyLift or Compustage.
+The code snippets presented here are always related to the bulk stage, but most of them also work also for EasyLift or Compustage
+if the branches <code class="language-python">microscope.specimen.manipulator</code> or <code class="language-python">microscope.specimen.compustage</code> branches are used instead
+of the branch microscope.specimen.stage.
+</p>
+
+<p>
+Before proceeding with the code snippets listed below, initialize AutoScript with the following code.
+Do not forget to set the server address or host name (parameters of the <code class="language-python">connect()</code> function) according to your environment.
+</p>
+
+<pre><code class="language-python">
+    from autoscript_sdb_microscope_client import SdbMicroscopeClient
+    from autoscript_sdb_microscope_client.enumerations import *
+    from autoscript_sdb_microscope_client.structures import *
+    
+    microscope = SdbMicroscopeClient()
+    microscope.connect("localhost")
+</code></pre>
+<p style="height:1px"/>
+
+
+<p><strong>Home the stage.</strong> This procedure calibrates stage absolute position.
+It needs to be performed once after microscope control software (XT) is started up.</p>
+
+<pre><code class="language-python">
+    microscope.specimen.stage.home()
+</code></pre>
+<p style="height:1px"/>
+
+
+<p><strong>Move to absolute position</strong> of 2 mm in X axis and 4 mm in Y axis:</p>
+
+<pre><code class="language-python">
+    p = StagePosition(x=0.002, y=0.004)
+    microscope.specimen.stage.absolute_move(p)
+</code></pre>
+<p style="height:1px"/>
+
+
+<p><strong>Read current stage position</strong> and inspect it:</p>
+
+<pre><code class="language-python">
+    p = microscope.specimen.stage.current_position
+    print(p)
+</code></pre>
+<p style="height:1px"/>
+
+
+<p><strong>Perform relative move</strong> by -2 mm in X axis and -2 mm in Y axis</p>
+
+<pre><code class="language-python">
+    p = StagePosition(x=-0.002, y=-0.002)
+    microscope.specimen.stage.relative_move(p)
+</code></pre>
+<p style="height:1px"/>
+
+
+<p><strong>Perform compucentric rotation</strong> by 45 degrees clockwise:</p>
+
+<pre><code class="language-python">
+    s = MoveSettings(rotate_compucentric=True)
+    p = StagePosition(r=0.785)
+    microscope.specimen.stage.relative_move(p, s)
+</code></pre>
+
+<p>Please note that <code class="language-python">MoveSettings</code> containing the compucentric rotation flag (<code class="language-python">rotate_compucentric</code>) may be used for both absolute and relative movements.</p>
+<p style="height:1px"/>
+
+
+<p><strong>Link Z axis movement to free working distance</strong>:</p>
+
+<pre><code class="language-python">
+    microscope.specimen.stage.link()
+</code></pre>
+<p style="height:1px"/>
+
+
+<p><strong>Unlink Z axis from free working distance</strong>:</p>
+
+<pre><code class="language-python">
+    microscope.specimen.stage.unlink()
+</code></pre>
+<p style="height:1px"/>
+
+
+</body>
+</html>

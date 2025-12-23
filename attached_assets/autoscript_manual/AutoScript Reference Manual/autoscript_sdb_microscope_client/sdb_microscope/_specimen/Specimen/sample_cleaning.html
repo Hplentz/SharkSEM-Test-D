@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>specimen.sample_cleaning</title>
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/page-custom-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/syntax-highlight-style.css">
+    <script src="../../../../Resources/common.js"></script>
+    <script src="../../../../Resources/page.js"></script>
+    <script src="../../../../Resources/prism.js"></script>
+    <script src="../../../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../../../Resources/prism-c.js"></script>
+    <script src="../../../../Resources/prism-cpp.js"></script>
+    <script src="../../../../Resources/prism-csharp.js"></script>
+    <script src="../../../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../../../shell.html');
+        });
+    </script>
+</head>
+<body>
+    <h1><a class="header-path" href="../../../SdbMicroscopeClient/specimen.html">specimen</a>.<a class="header-path" href="../../../sdb_microscope/_specimen/Specimen/sample_cleaning.html">sample_cleaning</a></h1>
+    <p>Enables control and provides the status of the sample cleaning.</p>
+    <h2>Properties</h2>
+    <table>
+        <tr>
+            <td><a href="../../../sdb_microscope/specimen/_sample_cleaning/SampleCleaning/is_installed.html">is_installed</a></td>
+            <td><em>[Read only]</em> Returns True if the plasma cleaning device is present on the microscope.</td>
+        </tr>
+    </table>
+    <h2>Methods</h2>
+    <table>
+        <tr>
+            <td><a href="../../../sdb_microscope/specimen/_sample_cleaning/SampleCleaning/run.html">run()</a></td>
+            <td>Executes the sample cleaning procedure synchronously, i.e. waits for the sample cleaning to end.</td>
+        </tr>
+    </table>
+<!-- Custom part - START -->
+    <h2>Remarks</h2>
+ 
+    <p>
+    Chamber needs to be pumped into the high vacuum before sample cleaning is started.
+    </p>
+    <h2>Examples</h2>
+    
+    <pre><code class="language-python">
+        # Performing sample cleaning with specified duration, if installed.
+        if microscope.specimen.sample_cleaning.is_installed:
+            microscope.specimen.sample_cleaning.run(30)
+    </code></pre>
+    <!--<h2>See also</h2>-->
+<!-- Custom part - END -->
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->

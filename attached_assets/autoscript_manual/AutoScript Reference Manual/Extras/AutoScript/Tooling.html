@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AutoScript Tooling</title>
+    <link rel="stylesheet" type="text/css" href="../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../Resources/syntax-highlight-style.css">
+    <script src="../../Resources/common.js"></script>
+    <script src="../../Resources/page.js"></script>
+    <script src="../../Resources/prism.js"></script>
+    <script src="../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../Resources/prism-c.js"></script>
+    <script src="../../Resources/prism-cpp.js"></script>
+    <script src="../../Resources/prism-csharp.js"></script>
+    <script src="../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../shell.html');
+        });
+    </script>
+    <style type="text/css">
+    hr {
+        padding: 12px;
+        vertical-align: top;
+        border-style: dotted;
+        border-color: lightgray;
+        border-width: 1px 0 0 0;
+    }
+    </style>
+</head>
+<body>
+
+<h1>AutoScript Tooling</h1>
+
+This chapter describes the three utilities that are included in AutoScript to enhance the overall user experience.
+<br>
+
+<ol>
+    <li>AutoScript Runner</li>
+    <li>AutoScript Snippets</li>
+    <li>AutoScript Package Manager</li>
+</ol>
+
+
+<h2>1. AutoScript Runner</h2>
+
+AutoScript Runner is a simple launcher for Python scripts that may or may not call AutoScript API functions.
+One would prefer the Runner to <a href="PyCharm.html">PyCharm</a> (or other) editor for running scripts that are already fully
+tuned and do not require further editing. 
+
+<br><br>
+<img src="Resources/Runner.png" width="859" height="442">
+<br><br>
+
+A typical use case is to open a folder with multiple scripts using the <em>File/Open Folder</em> menu.
+The Runner scans the folder for Python source files and identifies the startup scripts as those that contain AutoScript initialization
+code or the function main(). These scripts are listed in the script selector <strong>(1)</strong>.
+If the script is documented with an introductory comment, this comment is displayed in the upper pane <strong>(2)</strong> for the selected script.
+<br><br>
+When you click the <strong>Run </strong>button, the script is executed using the Python interpreter configured in Settings.<br>
+All output is directed to the Output panel <strong>(3)</strong>, which can be expanded or collapsed by clicking the arrow icon <strong>(4)</strong>. 
+<br><br>
+In the current version of Runner, it is not possible to read user input from the console.
+
+<br><br>
+<hr>
+
+<h2>2. AutoScript Snippets</h2>
+
+AutoScript Snippets is a browser over database of simple Python code samples that demonstrate AutoScript API calls.
+One of its powerful features is the full-text search capability.
+<br><br>
+
+<img height="553" src="Resources/Snippets.png" width="858" alt="">
+<br><br>
+
+In the left pane <strong>(1)</strong>, the code snippets are arranged in a tree structure.
+When you enter text in the search box <strong>(2)</strong>, the set of snippets is filtered to show only those that contain
+the entered text either in the name of the snippet or anywhere in the code of the snippet.
+<br><br>
+
+Use the Copy button <strong>(3)</strong> to copy the snippet to the clipboard.
+<br><br>
+
+Default snippets are stored in a text file at <em>c:\ProgramData\Thermo Scientific AutoScript\CodeSnippets\SdbSnippets.py</em>.
+To add custom snippets, you can either edit the file or create a new one. The tool can display snippets from multiple source files
+if you use the <em>File/Append Snippets</em> menu function.
+
+<br><br>
+<hr>
+
+<h2>3. AutoScript Package Manager</h2>
+
+AutoScript Package Manager is a user interface extension for the <a href="PythonDistribution.html">Enthought Deployment Manager</a> command line tool (Edm).
+It allows you to manage installed packages without having to deal with Edm's command line interface.
+
+<br><br>
+
+<img height="563" src="Resources/PackageManager.png" width="1073" alt="">
+
+<br><br>
+
+On the left side <strong>(1)</strong>, the tool displays the list of packages available on the Enthought Deployment Server in the "free" repository
+thus ready for immediate download. On the right side <strong>(2)</strong>, the list of packages currently installed in the AutoScript Python environment
+is displayed, along with their versions and status indicator.
+The status color is green if the package is most recent. The status is red if a newer version exists on the deployment server.
+<br><br>
+You can easily add a new package by first selecting it in the left pane and then clicking the
+<strong>Install Latest Version</strong> button. Similarly, you can update or remove an installed package by selecting it in the
+right pane and clicking the <strong>Update to Latest Version</strong> or <strong>Uninstall Package</strong> buttons.
+<br><br>
+The two search boxes at the top <strong>(3)</strong> help you quickly navigate to the desired package by removing all packages that
+do not contain the entered text in their name. 
+<br><br>
+Note that installing or updating a Python package resolves the whole chain of dependencies on other packages.
+Therefore, adding or updating a single package may result in adding or updating multiple dependent packages.
+You are prompted to review and approve the list of packages to be added or updated before the change is executed.
+<br><br>
+In the current version of AutoScript, the tool can only operate on the default Python environment called "AutoScript".<br>
+AutoScript Package Manager requires that the computer is connected to the Internet.
+
+</body>
+</html>

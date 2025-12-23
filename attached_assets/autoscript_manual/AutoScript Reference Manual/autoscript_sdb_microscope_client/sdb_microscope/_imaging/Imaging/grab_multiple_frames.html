@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>imaging.grab_multiple_frames</title>
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/common-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/page-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/page-custom-style.css">
+    <link rel="stylesheet" type="text/css" href="../../../../Resources/syntax-highlight-style.css">
+    <script src="../../../../Resources/common.js"></script>
+    <script src="../../../../Resources/page.js"></script>
+    <script src="../../../../Resources/prism.js"></script>
+    <script src="../../../../Resources/prism-normalize-whitespace.js"></script>
+    <script src="../../../../Resources/prism-c.js"></script>
+    <script src="../../../../Resources/prism-cpp.js"></script>
+    <script src="../../../../Resources/prism-csharp.js"></script>
+    <script src="../../../../Resources/prism-python.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            onContentLoaded('../../../../shell.html');
+        });
+    </script>
+</head>
+<body>
+    <h1><a class="header-path" href="../../../SdbMicroscopeClient/imaging.html">imaging</a>.<a class="header-path" href="../../../sdb_microscope/_imaging/Imaging/grab_multiple_frames.html">grab_multiple_frames</a></h1>
+    <p>Scans new frames in all compatible views and provides the corresponding images.</p>
+    <h2>Syntax</h2>
+    <pre><code class="language-python">grab_multiple_frames()
+grab_multiple_frames(settings)</code></pre>
+    <h2>Parameters</h2>
+    <table>
+        <tr>
+            <td>settings</td>
+            <td><a href="../../../structures/GrabFrameSettings/GrabFrameSettings.html">GrabFrameSettings</a></td>
+            <td>The custom scan settings to be used instead of default values.</td>
+        </tr>
+    </table>
+    <h2>Return value</h2>
+    <table>
+        <tr>
+            <td>List[<a href="../../../structures/AdornedImage/AdornedImage.html">AdornedImage</a>]</td>
+            <td>The list of microscope images, each corresponding to a single compatible view.</td>
+        </tr>
+    </table>
+<!-- Custom part - START -->
+    <h2>Remarks</h2>
+    <ul>
+        <li>The function initiates scanning of new images and waits until they are completely scanned.</li>
+        <li>
+            The scan is performed in all views that are compatible with the active view.
+            Compatible views are those which have been assigned a) the same imaging device and b) a compatible detector.
+        </li>
+        
+        <li>
+            Custom scan settings can be provided by the <code>settings</code> parameter.
+            If not specified, the actual scan settings are determined as follows:
+            
+            <ul>
+                <li><code>resolution</code>, <code>dwell_time</code> and <code>reduced_area</code> will default to the current settings in the active view.</li>
+                <li>Other settings will fallback to predefined constant default values:
+                    <ul>
+                        <li><code>bit_depth</code> will be 8.</li>
+                        <li><code>line_integration</code> will be 1.</li>
+                        <li><code>scan_interlacing</code> will be 1.</li>
+                        <li><code>frame_integration</code> will be 1.</li>
+                        <li><code>drift_correction</code> will be False.</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        
+        <li>
+            The grab_multiple_frames() function can perform image acquisition only in standard resolutions,
+            that is resolutions from the <a href="../../../enumerations/ScanningResolution/ScanningResolution.html">ScanningResolution</a>
+            enumeration. Maximum resolution is therefore 6144x4096. An error is returned for other resolutions.
+        </li>
+        
+        <li>
+            Parameter <code>preview_resolution</code> specified in <code>settings</code> is ignored by grab_multiple_frames(). 
+        </li>
+    </ul>
+    <h2>Examples</h2>
+    <pre><code class="language-python">
+    settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, frame_integration=4)
+    images = microscope.imaging.grab_multiple_frames(settings)
+
+    print(f"Acquired {len(images)} images.")
+    </code></pre>
+
+    <pre><code class="language-python">
+        # Acquire multiple images by integrating 8 consecutive frames in all compatible views and correcting them for drift
+        settings = GrabFrameSettings(resolution=ScanningResolution.PRESET_1536X1024, dwell_time=100e-9,
+                                     frame_integration=8, drift_correction=True)
+        images = microscope.imaging.grab_multiple_frames(settings)
+    </code></pre>
+
+    <h2>See also</h2>
+    <a href="grab_frame.html">imaging.grab_frame()</a><br>
+    <a href="grab_frame_to_disk.html">imaging.grab_frame_to_disk()</a>
+<!-- Custom part - END -->
+</body>
+</html>
+<!-- This file was automaticaly generated. Content between custom parts will not be regenerated. Remove this line if you want the generator to completely ignore this file. -->
