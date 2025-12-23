@@ -7,7 +7,30 @@ This C# library provides a unified, vendor-agnostic interface (`ISemController`)
 I prefer simple language and detailed explanations. I want iterative development with frequent check-ins. Ask before making major architectural changes or introducing new external dependencies. Do not make changes to the `SemController.Core/Implementations/Thermo/lib/` folder.
 
 ## System Architecture
-The system is built around a core `ISemController` interface, providing a comprehensive set of operations for SEM control, including connection management, vacuum, stage, beam, optics, and imaging. A `SemControllerFactory` pattern is used to instantiate vendor-specific controllers. The architecture is modular, with `TescanSemController` further broken down into sub-objects (e.g., `sem.Stage`, `sem.Detectors`) for organized access. All operations are asynchronous (`async/await`) and controllers implement `IDisposable` for resource management.
+The system is built around a core `ISemController` interface, providing a comprehensive set of operations for SEM control, including connection management, vacuum, stage, beam, optics, and imaging. A `SemControllerFactory` pattern is used to instantiate vendor-specific controllers. The architecture is modular, with both `TescanSemController` and `ThermoSemController` broken down into sub-objects (e.g., `sem.Stage`, `sem.Vacuum`, `sem.Beam`) for organized access. All operations are asynchronous (`async/await`) and controllers implement `IDisposable` for resource management.
+
+**Project Structure:**
+```
+src/SharkSEM-Test-D/
+├── SemController.sln
+├── SemController.Core/
+│   ├── Interfaces/ISemController.cs
+│   ├── Models/
+│   ├── Implementations/
+│   │   ├── Tescan/
+│   │   │   ├── TescanSemController.cs
+│   │   │   ├── TescanSemStage.cs, TescanSemVacuum.cs, etc.
+│   │   ├── Thermo/
+│   │   │   ├── ThermoSemController.cs
+│   │   │   ├── ThermoSemVacuum.cs, ThermoSemBeam.cs, ThermoSemStage.cs
+│   │   │   ├── ThermoSemOptics.cs, ThermoSemScanning.cs, ThermoSemMisc.cs
+│   │   │   └── lib/ (AutoScript DLLs)
+│   │   └── MockSemController.cs
+│   └── Factory/SemControllerFactory.cs
+├── SemController.Tescan.Example/
+├── SemController.Thermo.Example/
+└── SemController.Tescan.UI/
+```
 
 **Key Features:**
 - **Interface Abstraction**: `ISemController` unifies control across different SEM vendors.
