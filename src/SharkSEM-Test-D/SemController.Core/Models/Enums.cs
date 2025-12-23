@@ -46,6 +46,7 @@ public enum VacuumMode
 public enum SemType
 {
     Tescan,
+    Thermo,
     Mock,
     Custom
 }

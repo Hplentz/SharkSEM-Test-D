@@ -1,9 +1,36 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="AutoScript.Clients.SdbMicroscope">
+      <HintPath>Implementations\Thermo\lib\AutoScript.Clients.SdbMicroscope.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoScript.Libraries.SdbMicroscope">
+      <HintPath>Implementations\Thermo\lib\AutoScript.Libraries.SdbMicroscope.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoScript.Common.CSharp">
+      <HintPath>Implementations\Thermo\lib\AutoScript.Common.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoScript.FramedTransport.CSharp">
+      <HintPath>Implementations\Thermo\lib\AutoScript.FramedTransport.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoScript.Orc.CSharp">
+      <HintPath>Implementations\Thermo\lib\AutoScript.Orc.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoScript.Orc.Interfaces.CSharp">
+      <HintPath>Implementations\Thermo\lib\AutoScript.Orc.Interfaces.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoScript.Presentation.CSharp">
+      <HintPath>Implementations\Thermo\lib\AutoScript.Presentation.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoScript.Serialization.CSharp">
+      <HintPath>Implementations\Thermo\lib\AutoScript.Serialization.CSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 
 </Project>
