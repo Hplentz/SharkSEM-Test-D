@@ -1,7 +1,6 @@
 using SemController.Core.Interfaces;
 using SemController.Core.Models;
 using AutoScript.Clients;
-using AutoScript.Libraries.SdbMicroscope.Structures;
 
 namespace SemController.Core.Implementations.Thermo;
 
@@ -12,12 +11,36 @@ public class ThermoSemController : ISemController
     private SdbMicroscopeClient? _client;
     private bool _disposed;
 
+    public ThermoSemVacuum Vacuum { get; private set; } = null!;
+    public ThermoSemBeam Beam { get; private set; } = null!;
+    public ThermoSemStage Stage { get; private set; } = null!;
+    public ThermoSemOptics Optics { get; private set; } = null!;
+    public ThermoSemScanning Scanning { get; private set; } = null!;
+    public ThermoSemMisc Misc { get; private set; } = null!;
+
     public bool IsConnected => _client != null;
 
     public ThermoSemController(string host = "localhost", int port = 7520)
     {
         _host = host;
         _port = port;
+        InitializeSubModules();
+    }
+
+    private void InitializeSubModules()
+    {
+        Vacuum = new ThermoSemVacuum(GetClient);
+        Beam = new ThermoSemBeam(GetClient);
+        Stage = new ThermoSemStage(GetClient);
+        Optics = new ThermoSemOptics(GetClient);
+        Scanning = new ThermoSemScanning(GetClient);
+        Misc = new ThermoSemMisc(GetClient);
+    }
+
+    private SdbMicroscopeClient GetClient()
+    {
+        EnsureConnected();
+        return _client!;
     }
 
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
@@ -38,363 +61,113 @@ public class ThermoSemController : ISemController
         }, cancellationToken);
     }
 
-    public async Task<MicroscopeInfo> GetMicroscopeInfoAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            var service = _client!.Service;
-            return new MicroscopeInfo
-            {
-                Manufacturer = "Thermo Fisher Scientific",
-                Model = service.System.Name,
-                SerialNumber = service.System.SerialNumber,
-                SoftwareVersion = service.System.Version,
-                ProtocolVersion = "AutoScript"
-            };
-        }, cancellationToken);
-    }
+    public Task<MicroscopeInfo> GetMicroscopeInfoAsync(CancellationToken cancellationToken = default)
+        => Misc.GetMicroscopeInfoAsync(cancellationToken);
 
-    public async Task<VacuumStatus> GetVacuumStatusAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            var state = _client!.Vacuum.ChamberState;
-            return state?.ToLower() switch
-            {
-                "vacuum" => VacuumStatus.Ready,
-                "vented" => VacuumStatus.VacuumOff,
-                "pumping" => VacuumStatus.Pumping,
-                "venting" => VacuumStatus.Venting,
-                _ => VacuumStatus.Error
-            };
-        }, cancellationToken);
-    }
+    public Task<VacuumStatus> GetVacuumStatusAsync(CancellationToken cancellationToken = default)
+        => Vacuum.GetStatusAsync(cancellationToken);
 
-    public async Task<double> GetVacuumPressureAsync(VacuumGauge gauge = VacuumGauge.Chamber, CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            return _client!.Vacuum.ChamberPressure.Value;
-        }, cancellationToken);
-    }
+    public Task<double> GetVacuumPressureAsync(VacuumGauge gauge = VacuumGauge.Chamber, CancellationToken cancellationToken = default)
+        => Vacuum.GetPressureAsync(gauge, cancellationToken);
 
-    public async Task<VacuumMode> GetVacuumModeAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            return VacuumMode.HighVacuum;
-        }, cancellationToken);
-    }
+    public Task<VacuumMode> GetVacuumModeAsync(CancellationToken cancellationToken = default)
+        => Vacuum.GetModeAsync(cancellationToken);
 
-    public async Task PumpAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Vacuum.Pump();
-        }, cancellationToken);
-    }
+    public Task PumpAsync(CancellationToken cancellationToken = default)
+        => Vacuum.PumpAsync(cancellationToken);
 
-    public async Task VentAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Vacuum.Vent();
-        }, cancellationToken);
-    }
+    public Task VentAsync(CancellationToken cancellationToken = default)
+        => Vacuum.VentAsync(cancellationToken);
 
-    public async Task<BeamState> GetBeamStateAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            try
-            {
-                var hv = _client!.Beams.ElectronBeam.HighVoltage.Value;
-                return hv > 0 ? BeamState.On : BeamState.Off;
-            }
-            catch
-            {
-                return BeamState.Unknown;
-            }
-        }, cancellationToken);
-    }
+    public Task<BeamState> GetBeamStateAsync(CancellationToken cancellationToken = default)
+        => Beam.GetStateAsync(cancellationToken);
 
-    public async Task BeamOnAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Beams.ElectronBeam.TurnOn();
-        }, cancellationToken);
-    }
+    public Task BeamOnAsync(CancellationToken cancellationToken = default)
+        => Beam.TurnOnAsync(cancellationToken);
 
-    public async Task<bool> WaitForBeamOnAsync(int timeoutMs = 30000, CancellationToken cancellationToken = default)
-    {
-        var startTime = DateTime.UtcNow;
-        while ((DateTime.UtcNow - startTime).TotalMilliseconds < timeoutMs)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var state = await GetBeamStateAsync(cancellationToken);
-            if (state == BeamState.On)
-                return true;
-            await Task.Delay(500, cancellationToken);
-        }
-        return false;
-    }
+    public Task<bool> WaitForBeamOnAsync(int timeoutMs = 30000, CancellationToken cancellationToken = default)
+        => Beam.WaitForOnAsync(timeoutMs, cancellationToken);
 
-    public async Task BeamOffAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Beams.ElectronBeam.TurnOff();
-        }, cancellationToken);
-    }
+    public Task BeamOffAsync(CancellationToken cancellationToken = default)
+        => Beam.TurnOffAsync(cancellationToken);
 
-    public async Task<double> GetHighVoltageAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            return _client!.Beams.ElectronBeam.HighVoltage.Value;
-        }, cancellationToken);
-    }
+    public Task<double> GetHighVoltageAsync(CancellationToken cancellationToken = default)
+        => Beam.GetHighVoltageAsync(cancellationToken);
 
-    public async Task SetHighVoltageAsync(double voltage, bool waitForCompletion = true, CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Beams.ElectronBeam.HighVoltage.Value = voltage;
-        }, cancellationToken);
-    }
+    public Task SetHighVoltageAsync(double voltage, bool waitForCompletion = true, CancellationToken cancellationToken = default)
+        => Beam.SetHighVoltageAsync(voltage, cancellationToken);
 
-    public async Task<double> GetEmissionCurrentAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            return _client!.Beams.ElectronBeam.EmissionCurrent.Value;
-        }, cancellationToken);
-    }
+    public Task<double> GetEmissionCurrentAsync(CancellationToken cancellationToken = default)
+        => Beam.GetEmissionCurrentAsync(cancellationToken);
 
-    public async Task<Models.StagePosition> GetStagePositionAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            var pos = _client!.Specimen.Stage.CurrentPosition;
-            return new Models.StagePosition
-            {
-                X = (pos.X ?? 0) * 1000.0,
-                Y = (pos.Y ?? 0) * 1000.0,
-                Z = (pos.Z ?? 0) * 1000.0,
-                Rotation = (pos.R ?? 0) * (180.0 / Math.PI),
-                TiltX = (pos.T ?? 0) * (180.0 / Math.PI)
-            };
-        }, cancellationToken);
-    }
+    public Task<BlankerMode> GetBlankerModeAsync(CancellationToken cancellationToken = default)
+        => Beam.GetBlankerModeAsync(cancellationToken);
 
-    public async Task MoveStageAsync(Models.StagePosition position, bool waitForCompletion = true, CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            var targetPos = new AutoScript.Libraries.SdbMicroscope.Structures.StagePosition
-            {
-                X = position.X / 1000.0,
-                Y = position.Y / 1000.0,
-                Z = (position.Z ?? 0) / 1000.0,
-                R = (position.Rotation ?? 0) * (Math.PI / 180.0),
-                T = (position.TiltX ?? 0) * (Math.PI / 180.0)
-            };
-            _client!.Specimen.Stage.AbsoluteMove(targetPos);
-        }, cancellationToken);
-    }
+    public Task SetBlankerModeAsync(BlankerMode mode, CancellationToken cancellationToken = default)
+        => Beam.SetBlankerModeAsync(mode, cancellationToken);
 
-    public async Task MoveStageRelativeAsync(Models.StagePosition delta, bool waitForCompletion = true, CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            var deltaPos = new AutoScript.Libraries.SdbMicroscope.Structures.StagePosition
-            {
-                X = delta.X / 1000.0,
-                Y = delta.Y / 1000.0,
-                Z = (delta.Z ?? 0) / 1000.0,
-                R = (delta.Rotation ?? 0) * (Math.PI / 180.0),
-                T = (delta.TiltX ?? 0) * (Math.PI / 180.0)
-            };
-            _client!.Specimen.Stage.RelativeMove(deltaPos);
-        }, cancellationToken);
-    }
+    public Task<StagePosition> GetStagePositionAsync(CancellationToken cancellationToken = default)
+        => Stage.GetPositionAsync(cancellationToken);
 
-    public async Task<bool> IsStageMovingAsync(CancellationToken cancellationToken = default)
-    {
-        return await Task.FromResult(false);
-    }
+    public Task MoveStageAsync(StagePosition position, bool waitForCompletion = true, CancellationToken cancellationToken = default)
+        => Stage.MoveAbsoluteAsync(position, waitForCompletion, cancellationToken);
 
-    public async Task StopStageAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Specimen.Stage.Stop();
-        }, cancellationToken);
-    }
+    public Task MoveStageRelativeAsync(StagePosition delta, bool waitForCompletion = true, CancellationToken cancellationToken = default)
+        => Stage.MoveRelativeAsync(delta, waitForCompletion, cancellationToken);
 
-    public async Task<StageLimits> GetStageLimitsAsync(CancellationToken cancellationToken = default)
-    {
-        return await Task.FromResult(new StageLimits
-        {
-            MinX = -50, MaxX = 50,
-            MinY = -50, MaxY = 50,
-            MinZ = 0, MaxZ = 50,
-            MinRotation = -180, MaxRotation = 180,
-            MinTiltX = -10, MaxTiltX = 60
-        });
-    }
+    public Task<bool> IsStageMovingAsync(CancellationToken cancellationToken = default)
+        => Stage.IsMovingAsync(cancellationToken);
 
-    public async Task CalibrateStageAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Specimen.Stage.Home();
-        }, cancellationToken);
-    }
+    public Task StopStageAsync(CancellationToken cancellationToken = default)
+        => Stage.StopAsync(cancellationToken);
 
-    public async Task<bool> IsStageCallibratedAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            return _client!.Specimen.Stage.IsHomed;
-        }, cancellationToken);
-    }
+    public Task<StageLimits> GetStageLimitsAsync(CancellationToken cancellationToken = default)
+        => Stage.GetLimitsAsync(cancellationToken);
 
-    public async Task<double> GetViewFieldAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            return _client!.Beams.ElectronBeam.HorizontalFieldWidth.Value * 1e6;
-        }, cancellationToken);
-    }
+    public Task CalibrateStageAsync(CancellationToken cancellationToken = default)
+        => Stage.CalibrateAsync(cancellationToken);
 
-    public async Task SetViewFieldAsync(double viewFieldMicrons, CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Beams.ElectronBeam.HorizontalFieldWidth.Value = viewFieldMicrons / 1e6;
-        }, cancellationToken);
-    }
+    public Task<bool> IsStageCallibratedAsync(CancellationToken cancellationToken = default)
+        => Stage.IsCalibratedAsync(cancellationToken);
 
-    public async Task<double> GetWorkingDistanceAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            return _client!.Beams.ElectronBeam.WorkingDistance.Value * 1000.0;
-        }, cancellationToken);
-    }
+    public Task<double> GetViewFieldAsync(CancellationToken cancellationToken = default)
+        => Optics.GetViewFieldAsync(cancellationToken);
 
-    public async Task SetWorkingDistanceAsync(double workingDistanceMm, CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Beams.ElectronBeam.WorkingDistance.Value = workingDistanceMm / 1000.0;
-        }, cancellationToken);
-    }
+    public Task SetViewFieldAsync(double viewFieldMicrons, CancellationToken cancellationToken = default)
+        => Optics.SetViewFieldAsync(viewFieldMicrons, cancellationToken);
 
-    public async Task<double> GetFocusAsync(CancellationToken cancellationToken = default)
-    {
-        return await GetWorkingDistanceAsync(cancellationToken);
-    }
+    public Task<double> GetWorkingDistanceAsync(CancellationToken cancellationToken = default)
+        => Optics.GetWorkingDistanceAsync(cancellationToken);
 
-    public async Task SetFocusAsync(double focus, CancellationToken cancellationToken = default)
-    {
-        await SetWorkingDistanceAsync(focus, cancellationToken);
-    }
+    public Task SetWorkingDistanceAsync(double workingDistanceMm, CancellationToken cancellationToken = default)
+        => Optics.SetWorkingDistanceAsync(workingDistanceMm, cancellationToken);
 
-    public async Task AutoFocusAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.AutoFunctions.RunAutoFocus();
-        }, cancellationToken);
-    }
+    public Task<double> GetFocusAsync(CancellationToken cancellationToken = default)
+        => Optics.GetFocusAsync(cancellationToken);
 
-    public async Task<int> GetScanSpeedAsync(CancellationToken cancellationToken = default)
-    {
-        return await Task.FromResult(1);
-    }
+    public Task SetFocusAsync(double focus, CancellationToken cancellationToken = default)
+        => Optics.SetFocusAsync(focus, cancellationToken);
 
-    public async Task SetScanSpeedAsync(int speed, CancellationToken cancellationToken = default)
-    {
-        await Task.CompletedTask;
-    }
+    public Task AutoFocusAsync(CancellationToken cancellationToken = default)
+        => Optics.AutoFocusAsync(cancellationToken);
 
-    public async Task<BlankerMode> GetBlankerModeAsync(CancellationToken cancellationToken = default)
-    {
-        return await Task.FromResult(BlankerMode.Auto);
-    }
+    public Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default)
+        => Optics.GetSpotSizeAsync(cancellationToken);
 
-    public async Task SetBlankerModeAsync(BlankerMode mode, CancellationToken cancellationToken = default)
-    {
-        await Task.CompletedTask;
-    }
+    public Task<int> GetScanSpeedAsync(CancellationToken cancellationToken = default)
+        => Scanning.GetSpeedAsync(cancellationToken);
 
-    public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            var image = _client!.Imaging.GrabFrame();
-            var semImage = new SemImage
-            {
-                Width = image.Width,
-                Height = image.Height,
-                BitsPerPixel = 8,
-                Channel = 0,
-                Data = new byte[image.Width * image.Height]
-            };
-            return new[] { semImage };
-        }, cancellationToken);
-    }
+    public Task SetScanSpeedAsync(int speed, CancellationToken cancellationToken = default)
+        => Scanning.SetSpeedAsync(speed, cancellationToken);
 
-    public async Task<SemImage> AcquireSingleImageAsync(int channel, int width, int height, CancellationToken cancellationToken = default)
-    {
-        var images = await AcquireImagesAsync(new ScanSettings { Width = width, Height = height }, cancellationToken);
-        return images.FirstOrDefault() ?? new SemImage { Width = width, Height = height, Data = new byte[width * height] };
-    }
+    public Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
+        => Scanning.AcquireImagesAsync(settings, cancellationToken);
 
-    public async Task StopScanAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        await Task.Run(() =>
-        {
-            _client!.Imaging.StopAcquisition();
-        }, cancellationToken);
-    }
+    public Task<SemImage> AcquireSingleImageAsync(int channel, int width, int height, CancellationToken cancellationToken = default)
+        => Scanning.AcquireSingleImageAsync(channel, width, height, cancellationToken);
 
-    public async Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default)
-    {
-        EnsureConnected();
-        return await Task.Run(() =>
-        {
-            return _client!.Beams.ElectronBeam.Scanning.Spot.Value;
-        }, cancellationToken);
-    }
+    public Task StopScanAsync(CancellationToken cancellationToken = default)
+        => Scanning.StopAsync(cancellationToken);
 
     private void EnsureConnected()
     {
