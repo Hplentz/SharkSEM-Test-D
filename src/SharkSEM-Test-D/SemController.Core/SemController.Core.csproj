@@ -31,6 +31,9 @@
     <Reference Include="AutoScript.Serialization.CSharp">
       <HintPath>Implementations\Thermo\lib\AutoScript.Serialization.CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="AutoScript.Authentication">
+      <HintPath>Implementations\Thermo\lib\AutoScript.Authentication.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
