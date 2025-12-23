@@ -1,5 +1,6 @@
 using SemController.Core.Implementations;
 using SemController.Core.Implementations.Tescan;
+using SemController.Core.Implementations.Thermo;
 using SemController.Core.Interfaces;
 using SemController.Core.Models;
 
@@ -12,6 +13,7 @@ public static class SemControllerFactory
         return settings.Type switch
         {
             SemType.Tescan => new TescanSemController(settings),
+            SemType.Thermo => new ThermoSemController(settings.Host, settings.Port),
             SemType.Mock => new MockSemController(),
             SemType.Custom => throw new NotSupportedException("Custom SEM type requires direct implementation"),
             _ => throw new ArgumentOutOfRangeException(nameof(settings.Type), settings.Type, "Unknown SEM type")
@@ -21,6 +23,11 @@ public static class SemControllerFactory
     public static ISemController CreateTescan(string host, int port = 8300, double timeoutSeconds = 30.0)
     {
         return new TescanSemController(host, port, timeoutSeconds);
+    }
+    
+    public static ISemController CreateThermo(string host = "localhost", int port = 7520)
+    {
+        return new ThermoSemController(host, port);
     }
     
     public static ISemController CreateMock()
@@ -38,6 +45,13 @@ public static class SemControllerFactory
     public static async Task<ISemController> CreateAndConnectTescanAsync(string host, int port = 8300, double timeoutSeconds = 30.0, CancellationToken cancellationToken = default)
     {
         var controller = CreateTescan(host, port, timeoutSeconds);
+        await controller.ConnectAsync(cancellationToken);
+        return controller;
+    }
+    
+    public static async Task<ISemController> CreateAndConnectThermoAsync(string host = "localhost", int port = 7520, CancellationToken cancellationToken = default)
+    {
+        var controller = CreateThermo(host, port);
         await controller.ConnectAsync(cancellationToken);
         return controller;
     }
