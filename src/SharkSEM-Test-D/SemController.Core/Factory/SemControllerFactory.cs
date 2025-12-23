@@ -1,4 +1,5 @@
 using SemController.Core.Implementations;
+using SemController.Core.Implementations.Tescan;
 using SemController.Core.Interfaces;
 using SemController.Core.Models;
 

@@ -1,4 +1,4 @@
-namespace SemController.Core.Implementations;
+namespace SemController.Core.Implementations.Tescan;
 
 public class TescanSemDetectors
 {

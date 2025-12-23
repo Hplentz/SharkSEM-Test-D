@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using SemController.Core.Models;
 
-namespace SemController.Core.Implementations;
+namespace SemController.Core.Implementations.Tescan;
 
 public class TescanSemScanning
 {

@@ -1,6 +1,6 @@
 using SemController.Core.Models;
 
-namespace SemController.Core.Implementations;
+namespace SemController.Core.Implementations.Tescan;
 
 public class TescanSemStage
 {

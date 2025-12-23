@@ -1,4 +1,5 @@
 using SemController.Core.Implementations;
+using SemController.Core.Implementations.Tescan;
 using SemController.Core.Models;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;

@@ -16,16 +16,19 @@ src/SharkSEM-Test-D/
 ├── SemController.Core/            # Main library
 │   ├── Interfaces/                # ISemController, ISemConnection
 │   ├── Models/                    # StagePosition, ScanSettings, SemImage, etc.
-│   ├── Implementations/           # Controller implementations (modular design)
-│   │   ├── TescanSemController.cs     # Main controller (connection, protocol)
-│   │   ├── TescanSemStage.cs          # Stage control (position, movement, limits)
-│   │   ├── TescanSemDetectors.cs      # Detector configuration
-│   │   ├── TescanSemHighVoltage.cs    # Beam & HV control
-│   │   ├── TescanSemElectronOptics.cs # Focus, WD, ViewField, SpotSize, ScanningModes
-│   │   ├── TescanSemImageGeometry.cs  # Image geometry, shift, centerings
-│   │   ├── TescanSemScanning.cs       # Scan control & image acquisition
-│   │   ├── TescanSemVacuum.cs         # Vacuum control
-│   │   ├── TescanSemMisc.cs           # Miscellaneous (GetMicroscopeInfo)
+│   ├── Implementations/           # Controller implementations (vendor-segregated)
+│   │   ├── Tescan/                    # TESCAN SharkSEM implementation
+│   │   │   ├── TescanSemController.cs     # Main controller (connection, protocol)
+│   │   │   ├── TescanSemStage.cs          # Stage control
+│   │   │   ├── TescanSemDetectors.cs      # Detector configuration
+│   │   │   ├── TescanSemHighVoltage.cs    # Beam & HV control
+│   │   │   ├── TescanSemElectronOptics.cs # Focus, WD, ViewField, SpotSize
+│   │   │   ├── TescanSemImageGeometry.cs  # Image geometry, shift, centerings
+│   │   │   ├── TescanSemScanning.cs       # Scan control & image acquisition
+│   │   │   ├── TescanSemVacuum.cs         # Vacuum control
+│   │   │   └── TescanSemMisc.cs           # Miscellaneous (GetMicroscopeInfo)
+│   │   ├── Thermo/                    # Thermo Fisher Scientific (planned)
+│   │   │   └── (ThermoSemController.cs, etc.)
 │   │   └── MockSemController.cs       # Mock controller for testing
 │   └── Factory/                   # SemControllerFactory
 └── SemController.Example/         # Demo console application
@@ -66,6 +69,12 @@ await sem.DisconnectAsync();
 ```
 
 ## Recent Changes
+- 2024-12-23: Reorganized Implementations folder for vendor segregation
+  - Created `Implementations/Tescan/` subfolder for all TESCAN-specific code
+  - Created `Implementations/Thermo/` subfolder (placeholder for Thermo Fisher implementation)
+  - Updated namespaces from `SemController.Core.Implementations` to `SemController.Core.Implementations.Tescan`
+  - MockSemController remains in root Implementations folder (vendor-agnostic)
+
 - 2024-12-19: Added WinForms UI application (SemController.UI)
   - Auto-connects to TESCAN SEM (127.0.0.1) on startup
   - Displays: Microscope Info, Vacuum, Detector, Beam, Scanning Modes, Geometries, Stage, View Field

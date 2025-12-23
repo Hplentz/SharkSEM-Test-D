@@ -2,6 +2,7 @@ using SemController.Core.Factory;
 using SemController.Core.Models;
 using SemController.Core.Interfaces;
 using SemController.Core.Implementations;
+using SemController.Core.Implementations.Tescan;
 using System.Drawing;
 using System.Drawing.Imaging;
 
