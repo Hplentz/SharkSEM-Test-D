@@ -7,6 +7,8 @@ public class ThermoSemScanning
 {
     private readonly Func<SdbMicroscopeClient> _getClient;
     private string? _lastSavedImagePath;
+    
+    internal bool EnablePngStorage { get; set; } = false;
 
     internal ThermoSemScanning(Func<SdbMicroscopeClient> getClient)
     {
@@ -117,6 +119,11 @@ public class ThermoSemScanning
     public async Task<string> AcquireAndSaveImageAsync(string? outputPath = null, CancellationToken cancellationToken = default)
     {
         var image = await AcquireSingleImageAsync(0, 1024, 768, cancellationToken);
+        
+        if (!EnablePngStorage)
+        {
+            return string.Empty;
+        }
         
         string directory = outputPath ?? @"C:\Temp";
         if (!Directory.Exists(directory))
