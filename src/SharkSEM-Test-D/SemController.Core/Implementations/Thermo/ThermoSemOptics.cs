@@ -16,18 +16,20 @@ public class ThermoSemOptics
         return await Task.Run(() =>
         {
             var client = _getClient();
-            var hfwProperty = client.Beams.ElectronBeam.HorizontalFieldWidth;
-            
-            if (hfwProperty == null)
-                return 0.0;
             
             try
             {
+                var hfwProperty = client.Beams.ElectronBeam.HorizontalFieldWidth;
+                
+                if (hfwProperty == null)
+                    return 0.0;
+                
                 var hfwMeters = hfwProperty.Value;
                 return hfwMeters * 1e6;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"GetViewFieldAsync error: {ex.Message}");
                 return 0.0;
             }
         }, cancellationToken);
@@ -68,20 +70,74 @@ public class ThermoSemOptics
         return await Task.Run(() =>
         {
             var client = _getClient();
-            var wdProperty = client.Beams.ElectronBeam.WorkingDistance;
-            
-            if (wdProperty == null)
-                return 0.0;
             
             try
             {
+                var wdProperty = client.Beams.ElectronBeam.WorkingDistance;
+                
+                if (wdProperty == null)
+                    return 0.0;
+                
                 var wdMeters = wdProperty.Value;
                 return wdMeters * 1000.0;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"GetWorkingDistanceAsync error: {ex.Message}");
                 return 0.0;
             }
+        }, cancellationToken);
+    }
+
+    public async Task<(double WdMm, string DebugInfo)> GetWorkingDistanceWithDebugAsync(CancellationToken cancellationToken = default)
+    {
+        return await Task.Run(() =>
+        {
+            var client = _getClient();
+            var debugInfo = new System.Text.StringBuilder();
+            double wdMm = 0.0;
+            
+            try
+            {
+                var beams = client.Beams;
+                debugInfo.AppendLine($"Beams object: {beams?.GetType().FullName ?? "null"}");
+                
+                if (beams != null)
+                {
+                    var electronBeam = beams.ElectronBeam;
+                    debugInfo.AppendLine($"ElectronBeam object: {electronBeam?.GetType().FullName ?? "null"}");
+                    
+                    if (electronBeam != null)
+                    {
+                        var wdProperty = electronBeam.WorkingDistance;
+                        debugInfo.AppendLine($"WorkingDistance type: {wdProperty?.GetType().FullName ?? "null"}");
+                        
+                        if (wdProperty != null)
+                        {
+                            var wdMeters = wdProperty.Value;
+                            wdMm = wdMeters * 1000.0;
+                            debugInfo.AppendLine($"WorkingDistance.Value (meters): {wdMeters}");
+                            debugInfo.AppendLine($"WorkingDistance (mm): {wdMm}");
+                        }
+                        
+                        var hfwProperty = electronBeam.HorizontalFieldWidth;
+                        debugInfo.AppendLine($"HorizontalFieldWidth type: {hfwProperty?.GetType().FullName ?? "null"}");
+                        
+                        if (hfwProperty != null)
+                        {
+                            var hfwMeters = hfwProperty.Value;
+                            debugInfo.AppendLine($"HorizontalFieldWidth.Value (meters): {hfwMeters}");
+                            debugInfo.AppendLine($"HorizontalFieldWidth (µm): {hfwMeters * 1e6}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                debugInfo.AppendLine($"Error: {ex.GetType().Name}: {ex.Message}");
+            }
+            
+            return (wdMm, debugInfo.ToString());
         }, cancellationToken);
     }
 

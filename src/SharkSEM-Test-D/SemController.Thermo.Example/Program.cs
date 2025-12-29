@@ -9,13 +9,20 @@ Console.WriteLine("The library provides the same ISemController interface for al
 
 var host = "localhost";
 var port = 7520;
+var debugMode = false;
 
 if (args.Length >= 1)
     host = args[0];
 if (args.Length >= 2 && int.TryParse(args[1], out var parsedPort))
     port = parsedPort;
+if (args.Contains("--debug") || args.Contains("-d"))
+    debugMode = true;
 
-Console.WriteLine($"--- Connecting to Thermo Fisher SEM at {host}:{port} ---\n");
+Console.WriteLine($"--- Connecting to Thermo Fisher SEM at {host}:{port} ---");
+if (debugMode)
+    Console.WriteLine("(Debug mode enabled)\n");
+else
+    Console.WriteLine("(Use --debug for detailed API diagnostics)\n");
 
 try
 {
@@ -37,8 +44,18 @@ try
     
     try
     {
-        var pressure = await sem.GetVacuumPressureAsync(VacuumGauge.Chamber);
-        Console.WriteLine($"Chamber Pressure: {pressure:E2} Pa");
+        if (debugMode)
+        {
+            var (pressure, rawState, debugInfo) = await sem.Vacuum.GetPressureWithDebugAsync();
+            Console.WriteLine($"Chamber Pressure: {pressure:E2} Pa");
+            Console.WriteLine($"  Raw State: {rawState}");
+            Console.WriteLine($"  Debug Info:\n{debugInfo}");
+        }
+        else
+        {
+            var pressure = await sem.GetVacuumPressureAsync(VacuumGauge.Chamber);
+            Console.WriteLine($"Chamber Pressure: {pressure:E2} Pa");
+        }
     }
     catch (Exception ex)
     {
@@ -61,9 +78,19 @@ try
     
     try
     {
-        var emission = await sem.GetEmissionCurrentAsync();
-        var emissionMicroAmps = emission * 1e6;
-        Console.WriteLine($"Emission Current: {emission:E3} A ({emissionMicroAmps:F1} µA)");
+        if (debugMode)
+        {
+            var (current, debugInfo) = await sem.Beam.GetEmissionCurrentWithDebugAsync();
+            var emissionMicroAmps = current * 1e6;
+            Console.WriteLine($"Emission Current: {current:E3} A ({emissionMicroAmps:F1} µA)");
+            Console.WriteLine($"  Debug Info:\n{debugInfo}");
+        }
+        else
+        {
+            var emission = await sem.GetEmissionCurrentAsync();
+            var emissionMicroAmps = emission * 1e6;
+            Console.WriteLine($"Emission Current: {emission:E3} A ({emissionMicroAmps:F1} µA)");
+        }
     }
     catch (Exception ex)
     {
@@ -73,8 +100,17 @@ try
     Console.WriteLine("\n--- Electron Optics ---");
     try
     {
-        var wd = await sem.GetWorkingDistanceAsync();
-        Console.WriteLine($"Working Distance: {wd:F3} mm");
+        if (debugMode)
+        {
+            var (wdMm, debugInfo) = await sem.Optics.GetWorkingDistanceWithDebugAsync();
+            Console.WriteLine($"Working Distance: {wdMm:F3} mm");
+            Console.WriteLine($"  Debug Info:\n{debugInfo}");
+        }
+        else
+        {
+            var wd = await sem.GetWorkingDistanceAsync();
+            Console.WriteLine($"Working Distance: {wd:F3} mm");
+        }
     }
     catch (Exception ex)
     {
@@ -147,8 +183,9 @@ catch (Exception ex)
     Console.WriteLine($"  1. The Thermo Fisher SEM is running and accessible");
     Console.WriteLine($"  2. AutoScript server is enabled on the SEM");
     Console.WriteLine($"  3. The host ({host}) and port ({port}) are correct");
-    Console.WriteLine($"\nUsage: SemController.Thermo.Example [host] [port]");
+    Console.WriteLine($"\nUsage: SemController.Thermo.Example [host] [port] [--debug]");
     Console.WriteLine($"  Example: SemController.Thermo.Example 192.168.1.100 7520");
+    Console.WriteLine($"  Example: SemController.Thermo.Example 192.168.1.100 7520 --debug");
 }
 
 Console.WriteLine("\n=== Demo Complete ===");

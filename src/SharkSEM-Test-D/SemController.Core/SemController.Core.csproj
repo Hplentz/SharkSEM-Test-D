@@ -46,9 +46,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Implementations\Thermo\lib\*.dll">
+    <Content Include="Implementations\Thermo\lib\*.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+      <Pack>false</Pack>
+    </Content>
   </ItemGroup>
 
 </Project>

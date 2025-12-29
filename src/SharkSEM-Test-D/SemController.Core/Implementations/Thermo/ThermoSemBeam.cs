@@ -87,19 +87,65 @@ public class ThermoSemBeam
         return await Task.Run(() =>
         {
             var client = _getClient();
-            var emissionProperty = client.Beams.ElectronBeam.EmissionCurrent;
-            
-            if (emissionProperty == null)
-                return 0.0;
             
             try
             {
+                var electronBeam = client.Beams.ElectronBeam;
+                if (electronBeam == null)
+                    return 0.0;
+                
+                var emissionProperty = electronBeam.EmissionCurrent;
+                if (emissionProperty == null)
+                    return 0.0;
+                
                 return emissionProperty.Value;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"GetEmissionCurrentAsync error: {ex.Message}");
                 return 0.0;
             }
+        }, cancellationToken);
+    }
+
+    public async Task<(double Current, string DebugInfo)> GetEmissionCurrentWithDebugAsync(CancellationToken cancellationToken = default)
+    {
+        return await Task.Run(() =>
+        {
+            var client = _getClient();
+            var debugInfo = new System.Text.StringBuilder();
+            double current = 0.0;
+            
+            try
+            {
+                var beams = client.Beams;
+                debugInfo.AppendLine($"Beams object: {beams?.GetType().FullName ?? "null"}");
+                
+                if (beams != null)
+                {
+                    var electronBeam = beams.ElectronBeam;
+                    debugInfo.AppendLine($"ElectronBeam object: {electronBeam?.GetType().FullName ?? "null"}");
+                    
+                    if (electronBeam != null)
+                    {
+                        var emissionProperty = electronBeam.EmissionCurrent;
+                        debugInfo.AppendLine($"EmissionCurrent type: {emissionProperty?.GetType().FullName ?? "null"}");
+                        
+                        if (emissionProperty != null)
+                        {
+                            current = emissionProperty.Value;
+                            debugInfo.AppendLine($"EmissionCurrent.Value: {current}");
+                            debugInfo.AppendLine($"EmissionCurrent.Value (µA): {current * 1e6}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                debugInfo.AppendLine($"Error: {ex.GetType().Name}: {ex.Message}");
+            }
+            
+            return (current, debugInfo.ToString());
         }, cancellationToken);
     }
 

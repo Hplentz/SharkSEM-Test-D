@@ -11,4 +11,10 @@
     <ProjectReference Include="..\SemController.Core\SemController.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\SemController.Core\Implementations\Thermo\lib\*.dll" Link="%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
