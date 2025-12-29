@@ -40,62 +40,7 @@ public class ThermoSemVacuum
         return await Task.Run(() =>
         {
             var client = _getClient();
-            
-            try
-            {
-                var vacuum = client.Vacuum;
-                if (vacuum == null)
-                    return 0.0;
-                
-                var pressureProperty = vacuum.ChamberPressure;
-                if (pressureProperty == null)
-                    return 0.0;
-                
-                return pressureProperty.Value;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"GetPressureAsync error: {ex.Message}");
-                return 0.0;
-            }
-        }, cancellationToken);
-    }
-
-    public async Task<(double Pressure, string RawState, string DebugInfo)> GetPressureWithDebugAsync(CancellationToken cancellationToken = default)
-    {
-        return await Task.Run(() =>
-        {
-            var client = _getClient();
-            var debugInfo = new System.Text.StringBuilder();
-            double pressure = 0.0;
-            string rawState = "";
-            
-            try
-            {
-                var vacuum = client.Vacuum;
-                debugInfo.AppendLine($"Vacuum object: {vacuum?.GetType().FullName ?? "null"}");
-                
-                if (vacuum != null)
-                {
-                    rawState = vacuum.ChamberState ?? "null";
-                    debugInfo.AppendLine($"ChamberState: {rawState}");
-                    
-                    var pressureProperty = vacuum.ChamberPressure;
-                    debugInfo.AppendLine($"ChamberPressure type: {pressureProperty?.GetType().FullName ?? "null"}");
-                    
-                    if (pressureProperty != null)
-                    {
-                        pressure = pressureProperty.Value;
-                        debugInfo.AppendLine($"ChamberPressure.Value: {pressure}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                debugInfo.AppendLine($"Error: {ex.GetType().Name}: {ex.Message}");
-            }
-            
-            return (pressure, rawState, debugInfo.ToString());
+            return client.Vacuum.ChamberPressure.Value;
         }, cancellationToken);
     }
 
