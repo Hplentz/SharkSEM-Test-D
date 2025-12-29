@@ -18,7 +18,8 @@ public class ThermoSemBeam
         {
             try
             {
-                var hv = _getClient().Beams.ElectronBeam.HighVoltage.Value;
+                var client = _getClient();
+                var hv = client.Beams.ElectronBeam.HighVoltage.Value;
                 return hv > 0 ? BeamState.On : BeamState.Off;
             }
             catch
@@ -62,23 +63,43 @@ public class ThermoSemBeam
     {
         return await Task.Run(() =>
         {
-            return _getClient().Beams.ElectronBeam.HighVoltage.Value;
+            var client = _getClient();
+            return client.Beams.ElectronBeam.HighVoltage.Value;
         }, cancellationToken);
     }
 
-    public async Task SetHighVoltageAsync(double voltage, CancellationToken cancellationToken = default)
+    public async Task SetHighVoltageAsync(double voltage, bool waitForCompletion = false, CancellationToken cancellationToken = default)
     {
         await Task.Run(() =>
         {
-            _getClient().Beams.ElectronBeam.HighVoltage.Value = voltage;
+            var client = _getClient();
+            client.Beams.ElectronBeam.HighVoltage.Value = voltage;
         }, cancellationToken);
+        
+        if (waitForCompletion)
+        {
+            await Task.Delay(2000, cancellationToken);
+        }
     }
 
     public async Task<double> GetEmissionCurrentAsync(CancellationToken cancellationToken = default)
     {
         return await Task.Run(() =>
         {
-            return _getClient().Beams.ElectronBeam.EmissionCurrent.Value;
+            var client = _getClient();
+            var emissionProperty = client.Beams.ElectronBeam.EmissionCurrent;
+            
+            if (emissionProperty == null)
+                return 0.0;
+            
+            try
+            {
+                return emissionProperty.Value;
+            }
+            catch
+            {
+                return 0.0;
+            }
         }, cancellationToken);
     }
 

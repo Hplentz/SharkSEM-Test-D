@@ -62,7 +62,8 @@ try
     try
     {
         var emission = await sem.GetEmissionCurrentAsync();
-        Console.WriteLine($"Emission Current: {emission:E3} A");
+        var emissionMicroAmps = emission * 1e6;
+        Console.WriteLine($"Emission Current: {emission:E3} A ({emissionMicroAmps:F1} µA)");
     }
     catch (Exception ex)
     {
@@ -83,7 +84,9 @@ try
     try
     {
         var vf = await sem.GetViewFieldAsync();
+        var mag = await sem.Optics.GetMagnificationAsync();
         Console.WriteLine($"View Field: {vf:F1} µm");
+        Console.WriteLine($"Magnification: {mag:F0}X");
     }
     catch (Exception ex)
     {
@@ -123,6 +126,10 @@ try
         var image = await sem.AcquireSingleImageAsync(0, 1024, 768);
         Console.WriteLine($"Image acquired: {image.Width}x{image.Height}, {image.BitsPerPixel} bpp");
         Console.WriteLine($"Data size: {image.Data?.Length ?? 0} bytes");
+        
+        Console.WriteLine("\nSaving image to C:\\Temp...");
+        var savedPath = await sem.AcquireAndSaveImageAsync(@"C:\Temp");
+        Console.WriteLine($"Image saved to: {savedPath}");
     }
     catch (Exception ex)
     {

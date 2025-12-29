@@ -95,7 +95,10 @@ public class ThermoSemController : ISemController
         => Beam.GetHighVoltageAsync(cancellationToken);
 
     public Task SetHighVoltageAsync(double voltage, bool waitForCompletion = true, CancellationToken cancellationToken = default)
-        => Beam.SetHighVoltageAsync(voltage, cancellationToken);
+        => Beam.SetHighVoltageAsync(voltage, waitForCompletion, cancellationToken);
+
+    public Task<string> AcquireAndSaveImageAsync(string? outputPath = null, CancellationToken cancellationToken = default)
+        => Scanning.AcquireAndSaveImageAsync(outputPath, cancellationToken);
 
     public Task<double> GetEmissionCurrentAsync(CancellationToken cancellationToken = default)
         => Beam.GetEmissionCurrentAsync(cancellationToken);

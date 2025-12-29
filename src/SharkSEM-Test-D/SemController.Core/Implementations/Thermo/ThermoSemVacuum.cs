@@ -16,13 +16,20 @@ public class ThermoSemVacuum
     {
         return await Task.Run(() =>
         {
-            var state = _getClient().Vacuum.ChamberState;
+            var client = _getClient();
+            var state = client.Vacuum.ChamberState;
+            
             return state?.ToLower() switch
             {
+                "pumped" => VacuumStatus.Ready,
                 "vacuum" => VacuumStatus.Ready,
+                "ready" => VacuumStatus.Ready,
                 "vented" => VacuumStatus.VacuumOff,
+                "air" => VacuumStatus.VacuumOff,
                 "pumping" => VacuumStatus.Pumping,
                 "venting" => VacuumStatus.Venting,
+                "prevacuum" => VacuumStatus.Pumping,
+                "transition" => VacuumStatus.Pumping,
                 _ => VacuumStatus.Error
             };
         }, cancellationToken);
@@ -32,7 +39,20 @@ public class ThermoSemVacuum
     {
         return await Task.Run(() =>
         {
-            return _getClient().Vacuum.ChamberPressure.Value;
+            var client = _getClient();
+            var pressureProperty = client.Vacuum.ChamberPressure;
+            
+            if (pressureProperty == null)
+                return 0.0;
+            
+            try
+            {
+                return pressureProperty.Value;
+            }
+            catch
+            {
+                return 0.0;
+            }
         }, cancellationToken);
     }
 
