@@ -28,66 +28,42 @@ public class ThermoSemMisc
             try
             {
                 dynamic service = _getClient().Service;
+                dynamic system = service.System;
                 
-                string[] modelPaths = new[]
+                try
                 {
-                    "service.Beams.Electron.MicroscopeName",
-                    "service.Instrument.Name",
-                    "service.Instrument.Type",
-                    "service.Configuration.Name",
-                    "service.Configuration.MicroscopeName",
-                    "service.MicroscopeName",
-                    "service.InstrumentName"
-                };
-                
-                try { info.Model = service.Beams.Electron.MicroscopeName; } catch { }
-                if (info.Model == "SEM")
-                {
-                    try { info.Model = service.Instrument.Name; } catch { }
+                    info.Model = system.Name;
                 }
-                if (info.Model == "SEM")
+                catch (Exception ex) when (ex.Message.Contains("timed out") || ex is TimeoutException)
                 {
-                    try { info.Model = service.Instrument.Type; } catch { }
+                    info.Model = "SEM (timeout)";
                 }
-                if (info.Model == "SEM")
+                catch
                 {
-                    try { info.Model = service.Configuration.Name; } catch { }
-                }
-                if (info.Model == "SEM")
-                {
-                    try { info.Model = service.Configuration.MicroscopeName; } catch { }
-                }
-                if (info.Model == "SEM")
-                {
-                    try { info.Model = service.MicroscopeName; } catch { }
-                }
-                if (info.Model == "SEM")
-                {
-                    try { info.Model = service.InstrumentName; } catch { }
                 }
                 
-                try { info.SerialNumber = service.Instrument.SerialNumber; } catch { }
-                if (info.SerialNumber == "Unknown")
+                try
                 {
-                    try { info.SerialNumber = service.Configuration.SerialNumber; } catch { }
+                    info.SerialNumber = system.SerialNumber;
                 }
-                if (info.SerialNumber == "Unknown")
+                catch (Exception ex) when (ex.Message.Contains("timed out") || ex is TimeoutException)
                 {
-                    try { info.SerialNumber = service.SerialNumber; } catch { }
+                    info.SerialNumber = "Timeout";
+                }
+                catch
+                {
                 }
                 
-                try { info.SoftwareVersion = service.Instrument.SoftwareVersion; } catch { }
-                if (info.SoftwareVersion == "Unknown")
+                try
                 {
-                    try { info.SoftwareVersion = service.Configuration.SoftwareVersion; } catch { }
+                    info.SoftwareVersion = system.Version;
                 }
-                if (info.SoftwareVersion == "Unknown")
+                catch (Exception ex) when (ex.Message.Contains("timed out") || ex is TimeoutException)
                 {
-                    try { info.SoftwareVersion = service.SoftwareVersion; } catch { }
+                    info.SoftwareVersion = "Timeout";
                 }
-                if (info.SoftwareVersion == "Unknown")
+                catch
                 {
-                    try { info.SoftwareVersion = service.Version; } catch { }
                 }
             }
             catch
