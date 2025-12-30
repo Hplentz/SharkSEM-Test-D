@@ -1,9 +1,38 @@
+// =============================================================================
+// ThermoSemController.cs - Thermo Fisher Scientific SEM Controller
+// =============================================================================
+// Implements ISemController for Thermo Fisher Scientific microscopes using
+// the AutoScript C# API (COM-based wrapper around Python AutoScript).
+//
+// Architecture:
+// This controller uses a modular composition pattern where functionality is
+// delegated to specialized sub-modules:
+//   - ThermoSemVacuum: Vacuum system control
+//   - ThermoSemBeam: Electron beam and high voltage control
+//   - ThermoSemStage: Specimen stage control
+//   - ThermoSemOptics: Electron optics (focus, view field, etc.)
+//   - ThermoSemScanning: Image acquisition
+//   - ThermoSemMisc: Microscope information and miscellaneous functions
+//
+// CRITICAL: When accessing AutoScript service properties, you MUST use 'var'
+// instead of explicit 'dynamic' declarations. Using 'dynamic' explicitly causes
+// RuntimeBinderException because it loses type information needed for COM
+// property resolution. See ThermoSemMisc.cs for example.
+//
+// The AutoScript API is synchronous, so all async methods wrap operations
+// in Task.Run() to avoid blocking the calling thread.
+// =============================================================================
+
 using SemController.Core.Interfaces;
 using SemController.Core.Models;
 using AutoScript.Clients;
 
 namespace SemController.Core.Implementations.Thermo;
 
+/// <summary>
+/// ISemController implementation for Thermo Fisher Scientific SEMs.
+/// Uses AutoScript API for microscope communication.
+/// </summary>
 public class ThermoSemController : ISemController
 {
     private readonly string _host;
@@ -11,15 +40,38 @@ public class ThermoSemController : ISemController
     private SdbMicroscopeClient? _client;
     private bool _disposed;
 
+    // -------------------------------------------------------------------------
+    // Sub-Module Properties
+    // -------------------------------------------------------------------------
+    // Each sub-module handles a specific functional domain.
+    // This delegation pattern keeps code organized and testable.
+    
+    /// <summary>Vacuum system control (pump, vent, pressure readings).</summary>
     public ThermoSemVacuum Vacuum { get; private set; } = null!;
+    
+    /// <summary>Electron beam control (on/off, voltage, emission).</summary>
     public ThermoSemBeam Beam { get; private set; } = null!;
+    
+    /// <summary>Specimen stage control (movement, position, limits).</summary>
     public ThermoSemStage Stage { get; private set; } = null!;
+    
+    /// <summary>Electron optics control (focus, view field, working distance).</summary>
     public ThermoSemOptics Optics { get; private set; } = null!;
+    
+    /// <summary>Image acquisition and scanning control.</summary>
     public ThermoSemScanning Scanning { get; private set; } = null!;
+    
+    /// <summary>Miscellaneous functions (microscope info).</summary>
     public ThermoSemMisc Misc { get; private set; } = null!;
 
+    /// <summary>Returns true if connected to the microscope.</summary>
     public bool IsConnected => _client != null;
 
+    /// <summary>
+    /// Creates a new Thermo Fisher SEM controller.
+    /// </summary>
+    /// <param name="host">AutoScript server host (typically "localhost").</param>
+    /// <param name="port">AutoScript server port (typically 7520).</param>
     public ThermoSemController(string host = "localhost", int port = 7520)
     {
         _host = host;
@@ -27,6 +79,11 @@ public class ThermoSemController : ISemController
         InitializeSubModules();
     }
 
+    /// <summary>
+    /// Initializes all sub-modules with a delegate that provides the client.
+    /// Using a delegate (Func) allows sub-modules to access the client lazily,
+    /// ensuring they always get the current connected client instance.
+    /// </summary>
     private void InitializeSubModules()
     {
         Vacuum = new ThermoSemVacuum(GetClient);
@@ -37,12 +94,24 @@ public class ThermoSemController : ISemController
         Misc = new ThermoSemMisc(GetClient);
     }
 
+    /// <summary>
+    /// Gets the connected client, throwing if not connected.
+    /// This is passed as a delegate to sub-modules.
+    /// </summary>
     private SdbMicroscopeClient GetClient()
     {
         EnsureConnected();
         return _client!;
     }
 
+    // -------------------------------------------------------------------------
+    // Connection Management
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Connects to the microscope via AutoScript API.
+    /// Wrapped in Task.Run() because AutoScript Connect is synchronous.
+    /// </summary>
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
         await Task.Run(() =>
@@ -52,6 +121,9 @@ public class ThermoSemController : ISemController
         }, cancellationToken);
     }
 
+    /// <summary>
+    /// Disconnects from the microscope.
+    /// </summary>
     public async Task DisconnectAsync(CancellationToken cancellationToken = default)
     {
         await Task.Run(() =>
@@ -61,9 +133,17 @@ public class ThermoSemController : ISemController
         }, cancellationToken);
     }
 
+    // -------------------------------------------------------------------------
+    // ISemController Implementation - Delegation to Sub-Modules
+    // -------------------------------------------------------------------------
+    // All ISemController methods delegate to the appropriate sub-module.
+    // This pattern keeps the main controller class thin and maintainable.
+    // Each method is a one-liner that routes to the specialized handler.
+
     public Task<MicroscopeInfo> GetMicroscopeInfoAsync(CancellationToken cancellationToken = default)
         => Misc.GetMicroscopeInfoAsync(cancellationToken);
 
+    // Vacuum Operations
     public Task<VacuumStatus> GetVacuumStatusAsync(CancellationToken cancellationToken = default)
         => Vacuum.GetStatusAsync(cancellationToken);
 
@@ -79,6 +159,7 @@ public class ThermoSemController : ISemController
     public Task VentAsync(CancellationToken cancellationToken = default)
         => Vacuum.VentAsync(cancellationToken);
 
+    // Beam Operations
     public Task<BeamState> GetBeamStateAsync(CancellationToken cancellationToken = default)
         => Beam.GetStateAsync(cancellationToken);
 
@@ -97,6 +178,7 @@ public class ThermoSemController : ISemController
     public Task SetHighVoltageAsync(double voltage, bool waitForCompletion = true, CancellationToken cancellationToken = default)
         => Beam.SetHighVoltageAsync(voltage, waitForCompletion, cancellationToken);
 
+    /// <summary>Acquires and saves an image (convenience method).</summary>
     public Task<string> AcquireAndSaveImageAsync(string? outputPath = null, CancellationToken cancellationToken = default)
         => Scanning.AcquireAndSaveImageAsync(outputPath, cancellationToken);
 
@@ -109,6 +191,7 @@ public class ThermoSemController : ISemController
     public Task SetBlankerModeAsync(BlankerMode mode, CancellationToken cancellationToken = default)
         => Beam.SetBlankerModeAsync(mode, cancellationToken);
 
+    // Stage Operations
     public Task<StagePosition> GetStagePositionAsync(CancellationToken cancellationToken = default)
         => Stage.GetPositionAsync(cancellationToken);
 
@@ -133,6 +216,7 @@ public class ThermoSemController : ISemController
     public Task<bool> IsStageCallibratedAsync(CancellationToken cancellationToken = default)
         => Stage.IsCalibratedAsync(cancellationToken);
 
+    // Optics Operations
     public Task<double> GetViewFieldAsync(CancellationToken cancellationToken = default)
         => Optics.GetViewFieldAsync(cancellationToken);
 
@@ -157,6 +241,7 @@ public class ThermoSemController : ISemController
     public Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default)
         => Optics.GetSpotSizeAsync(cancellationToken);
 
+    // Scanning Operations
     public Task<int> GetScanSpeedAsync(CancellationToken cancellationToken = default)
         => Scanning.GetSpeedAsync(cancellationToken);
 
@@ -172,12 +257,24 @@ public class ThermoSemController : ISemController
     public Task StopScanAsync(CancellationToken cancellationToken = default)
         => Scanning.StopAsync(cancellationToken);
 
+    // -------------------------------------------------------------------------
+    // Helper Methods
+    // -------------------------------------------------------------------------
+
+    /// <summary>Throws if not connected to the microscope.</summary>
     private void EnsureConnected()
     {
         if (_client == null)
             throw new InvalidOperationException("Not connected to microscope. Call ConnectAsync first.");
     }
 
+    // -------------------------------------------------------------------------
+    // Resource Cleanup
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Disposes the controller, disconnecting from the microscope.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)
