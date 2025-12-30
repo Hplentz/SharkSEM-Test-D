@@ -1,3 +1,32 @@
+// =============================================================================
+// TescanSemController.cs - Main TESCAN SEM Controller
+// =============================================================================
+// Implements the ISemController interface for TESCAN Scanning Electron Microscopes
+// using the SharkSEM protocol (TCP-based binary message format).
+//
+// Architecture:
+// - Uses composition pattern with sub-modules for organized functionality:
+//   Stage, Vacuum, HighVoltage, Optics, Scanning, Detectors, ImageGeometry, Misc
+// - All sub-modules receive reference to this controller for protocol access
+// - Control channel on port 8300 (configurable), data channel on port+1
+//
+// SharkSEM Protocol:
+// - 32-byte header: command name (16 bytes) + metadata (16 bytes)
+// - Body: binary data with 4-byte alignment
+// - Floats encoded as ASCII strings with length prefix
+// - Supports wait flags for synchronous operation completion
+//
+// Data Channel (Image Acquisition):
+// - Separate TCP connection on port 8301 (control port + 1)
+// - CRITICAL sequence: bind local port → TcpRegDataPort → connect
+// - Image data arrives as ScData messages with progressive pixel chunks
+//
+// Protocol Version Checking:
+// - Queries version on connect via TcpGetVersion
+// - CommandMinVersions dictionary specifies minimum version per command
+// - Unsupported commands log warning and return empty result (no exception)
+// =============================================================================
+
 using System.Globalization;
 using System.Net.Sockets;
 using System.Text;

@@ -1,3 +1,22 @@
+// =============================================================================
+// Thermo Fisher SEM Controller Example
+// =============================================================================
+// Demonstrates the use of ThermoSemController to connect to and control a
+// Thermo Fisher Scientific Scanning Electron Microscope via AutoScript API.
+//
+// Usage: SemController.Thermo.Example [host] [port]
+//   host - AutoScript server hostname/IP (default: localhost)
+//   port - AutoScript server port (default: 7520)
+//
+// This example shows:
+// - Connecting to a Thermo Fisher SEM
+// - Retrieving microscope information
+// - Reading vacuum, beam, optics, and stage status
+// - Acquiring and saving images
+//
+// Note: Requires the Thermo Fisher SEM to be running with AutoScript enabled.
+// =============================================================================
+
 using SemController.Core.Factory;
 using SemController.Core.Models;
 using SemController.Core.Implementations.Thermo;
@@ -7,6 +26,7 @@ Console.WriteLine("=== Thermo Fisher Scientific SEM Controller Demo ===\n");
 Console.WriteLine("This demo tests the Thermo Fisher SEM controller via AutoScript API.");
 Console.WriteLine("The library provides the same ISemController interface for all SEM vendors.\n");
 
+// Parse command-line arguments for connection settings
 string host = "localhost";
 int port = 7520;
 
@@ -19,10 +39,12 @@ Console.WriteLine($"--- Connecting to Thermo Fisher SEM at {host}:{port} ---\n")
 
 try
 {
+    // Create controller and connect
     using ThermoSemController sem = new ThermoSemController(host, port);
     await sem.ConnectAsync();
     Console.WriteLine("Connected to Thermo Fisher SEM");
     
+    // Retrieve and display microscope information
     MicroscopeInfo info = await sem.GetMicroscopeInfoAsync();
     Console.WriteLine($"\nMicroscope Info:");
     Console.WriteLine($"  Manufacturer: {info.Manufacturer}");
@@ -31,6 +53,7 @@ try
     Console.WriteLine($"  Software: {info.SoftwareVersion}");
     Console.WriteLine($"  Protocol: {info.ProtocolVersion}");
     
+    // Query vacuum system status
     Console.WriteLine("\n--- Vacuum Status ---");
     VacuumStatus vacStatus = await sem.GetVacuumStatusAsync();
     Console.WriteLine($"Vacuum Status: {vacStatus}");
@@ -45,6 +68,7 @@ try
         Console.WriteLine($"Chamber Pressure: (unavailable - {ex.Message})");
     }
     
+    // Query beam status
     Console.WriteLine("\n--- Beam Status ---");
     BeamState beamState = await sem.GetBeamStateAsync();
     Console.WriteLine($"Beam State: {beamState}");
@@ -70,6 +94,7 @@ try
         Console.WriteLine($"Emission Current: (unavailable - {ex.Message})");
     }
     
+    // Query electron optics
     Console.WriteLine("\n--- Electron Optics ---");
     try
     {
@@ -93,6 +118,7 @@ try
         Console.WriteLine($"View Field: (unavailable - {ex.Message})");
     }
     
+    // Query stage position
     Console.WriteLine("\n--- Stage Position ---");
     try
     {
@@ -119,6 +145,7 @@ try
         Console.WriteLine($"Stage Homed: (unavailable - {ex.Message})");
     }
     
+    // Test image acquisition
     Console.WriteLine("\n--- Image Acquisition Test ---");
     Console.WriteLine("Acquiring single image...");
     try
@@ -136,6 +163,7 @@ try
         Console.WriteLine($"Image acquisition failed: {ex.Message}");
     }
     
+    // Disconnect
     Console.WriteLine("\n--- Disconnecting ---");
     await sem.DisconnectAsync();
     Console.WriteLine("Disconnected from Thermo Fisher SEM");
