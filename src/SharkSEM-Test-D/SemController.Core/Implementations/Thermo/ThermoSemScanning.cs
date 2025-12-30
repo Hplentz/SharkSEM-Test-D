@@ -23,8 +23,8 @@ public class ThermoSemScanning
         {
             try
             {
-                var client = _getClient();
-                var dwellTime = client.Beams.ElectronBeam.Scanning.DwellTime.Value;
+                SdbMicroscopeClient client = _getClient();
+                double dwellTime = client.Beams.ElectronBeam.Scanning.DwellTime.Value;
                 if (dwellTime <= 100e-9) return 1;
                 if (dwellTime <= 300e-9) return 2;
                 if (dwellTime <= 1e-6) return 3;
@@ -47,7 +47,7 @@ public class ThermoSemScanning
         {
             try
             {
-                var client = _getClient();
+                SdbMicroscopeClient client = _getClient();
                 double dwellTime = speed switch
                 {
                     1 => 100e-9,
@@ -71,11 +71,11 @@ public class ThermoSemScanning
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
-            var frame = client.Imaging.GrabFrame();
-            var width = frame.Width;
-            var height = frame.Height;
-            var pixelData = frame.Data;
+            SdbMicroscopeClient client = _getClient();
+            dynamic frame = client.Imaging.GrabFrame();
+            int width = frame.Width;
+            int height = frame.Height;
+            Array pixelData = frame.Data;
             
             byte[] imageData;
             if (pixelData != null && pixelData.Length > 0)
@@ -98,7 +98,7 @@ public class ThermoSemScanning
                 imageData = new byte[width * height];
             }
             
-            var semImage = new SemImage
+            SemImage semImage = new SemImage
             {
                 Width = width,
                 Height = height,
@@ -112,13 +112,13 @@ public class ThermoSemScanning
 
     public async Task<SemImage> AcquireSingleImageAsync(int channel, int width, int height, CancellationToken cancellationToken = default)
     {
-        var images = await AcquireImagesAsync(new ScanSettings { Width = width, Height = height }, cancellationToken);
+        SemImage[] images = await AcquireImagesAsync(new ScanSettings { Width = width, Height = height }, cancellationToken);
         return images.FirstOrDefault() ?? new SemImage { Width = width, Height = height, Data = new byte[width * height] };
     }
 
     public async Task<string> AcquireAndSaveImageAsync(string? outputPath = null, CancellationToken cancellationToken = default)
     {
-        var image = await AcquireSingleImageAsync(0, 1024, 768, cancellationToken);
+        SemImage image = await AcquireSingleImageAsync(0, 1024, 768, cancellationToken);
         
         if (!EnablePngStorage)
         {
@@ -148,7 +148,7 @@ public class ThermoSemScanning
             if (image.Data == null || image.Width <= 0 || image.Height <= 0)
                 throw new InvalidOperationException("Invalid image data");
 
-            using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            using FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
             
             WritePngFile(fileStream, image.Data, image.Width, image.Height);
         }, cancellationToken);
@@ -156,12 +156,12 @@ public class ThermoSemScanning
 
     private void WritePngFile(Stream stream, byte[] imageData, int width, int height)
     {
-        using var writer = new BinaryWriter(stream);
+        using BinaryWriter writer = new BinaryWriter(stream);
         
         byte[] signature = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
         writer.Write(signature);
         
-        using (var ihdr = new MemoryStream())
+        using (MemoryStream ihdr = new MemoryStream())
         {
             WriteUInt32BE(ihdr, (uint)width);
             WriteUInt32BE(ihdr, (uint)height);
@@ -173,14 +173,14 @@ public class ThermoSemScanning
             WriteChunk(writer, "IHDR", ihdr.ToArray());
         }
         
-        using (var zlibData = new MemoryStream())
+        using (MemoryStream zlibData = new MemoryStream())
         {
             zlibData.WriteByte(0x78);
             zlibData.WriteByte(0x9C);
             
-            using (var deflatedData = new MemoryStream())
+            using (MemoryStream deflatedData = new MemoryStream())
             {
-                using (var deflate = new System.IO.Compression.DeflateStream(deflatedData, System.IO.Compression.CompressionLevel.Fastest, leaveOpen: true))
+                using (System.IO.Compression.DeflateStream deflate = new System.IO.Compression.DeflateStream(deflatedData, System.IO.Compression.CompressionLevel.Fastest, leaveOpen: true))
                 {
                     for (int y = 0; y < height; y++)
                     {
@@ -196,7 +196,7 @@ public class ThermoSemScanning
                     }
                 }
                 
-                var compressed = deflatedData.ToArray();
+                byte[] compressed = deflatedData.ToArray();
                 zlibData.Write(compressed, 0, compressed.Length);
             }
             

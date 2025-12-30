@@ -13,11 +13,11 @@ public class TescanSemElectronOptics
     
     public async Task<double> GetViewFieldAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("GetViewField", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("GetViewField", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
-            var viewFieldMm = TescanSemController.DecodeFloatInternal(response, ref offset);
+            double viewFieldMm = TescanSemController.DecodeFloatInternal(response, ref offset);
             return viewFieldMm * 1000.0;
         }
         return double.NaN;
@@ -25,14 +25,14 @@ public class TescanSemElectronOptics
     
     public async Task SetViewFieldAsync(double viewFieldMicrons, CancellationToken cancellationToken = default)
     {
-        var viewFieldMm = viewFieldMicrons / 1000.0;
-        var body = TescanSemController.EncodeFloatInternal(viewFieldMm);
+        double viewFieldMm = viewFieldMicrons / 1000.0;
+        byte[] body = TescanSemController.EncodeFloatInternal(viewFieldMm);
         await _controller.SendCommandNoResponseInternalAsync("SetViewField", body, cancellationToken);
     }
     
     public async Task<double> GetWorkingDistanceAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("GetWD", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("GetWD", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -43,7 +43,7 @@ public class TescanSemElectronOptics
     
     public async Task SetWorkingDistanceAsync(double workingDistanceMm, CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeFloatInternal(workingDistanceMm);
+        byte[] body = TescanSemController.EncodeFloatInternal(workingDistanceMm);
         await _controller.SendCommandNoResponseInternalAsync("SetWD", body, cancellationToken);
     }
     
@@ -59,13 +59,13 @@ public class TescanSemElectronOptics
     
     public async Task AutoFocusAsync(CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal(0);
+        byte[] body = TescanSemController.EncodeIntInternal(0);
         await _controller.SendCommandWithWaitInternalAsync("AutoWD", body, TescanSemController.WaitFlagOpticsInternal | TescanSemController.WaitFlagAutoInternal, cancellationToken);
     }
     
     public async Task<double> GetSpotSizeAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("GetSpotSize", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("GetSpotSize", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -76,7 +76,7 @@ public class TescanSemElectronOptics
     
     public async Task<double> GetBeamCurrentAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("GetBeamCurrent", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("GetBeamCurrent", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -87,13 +87,13 @@ public class TescanSemElectronOptics
     
     public async Task SetBeamCurrentAsync(double beamCurrentPicoamps, CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeFloatInternal(beamCurrentPicoamps);
+        byte[] body = TescanSemController.EncodeFloatInternal(beamCurrentPicoamps);
         await _controller.SendCommandWithWaitInternalAsync("SetBeamCurrent", body, TescanSemController.WaitFlagOpticsInternal, cancellationToken);
     }
     
     public async Task<string> EnumPCIndexesAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("EnumPCIndexes", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("EnumPCIndexes", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -104,7 +104,7 @@ public class TescanSemElectronOptics
     
     public async Task<int> GetPCIndexAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("GetPCIndex", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("GetPCIndex", null, cancellationToken);
         if (response.Length >= 4)
         {
             return TescanSemController.DecodeIntInternal(response, 0);
@@ -114,14 +114,14 @@ public class TescanSemElectronOptics
     
     public async Task SetPCIndexAsync(int index, CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal(index);
+        byte[] body = TescanSemController.EncodeIntInternal(index);
         await _controller.SendCommandWithWaitInternalAsync("SetPCIndex", body, TescanSemController.WaitFlagOpticsInternal, cancellationToken);
     }
     
     public async Task<double> GetAbsorbedCurrentAsync(CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal(0);
-        var response = await _controller.SendCommandInternalAsync("GetIAbsorbed", body, cancellationToken);
+        byte[] body = TescanSemController.EncodeIntInternal(0);
+        byte[] response = await _controller.SendCommandInternalAsync("GetIAbsorbed", body, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -132,20 +132,20 @@ public class TescanSemElectronOptics
     
     public async Task<List<ScanningMode>> EnumScanningModesAsync(CancellationToken cancellationToken = default)
     {
-        var modes = new List<ScanningMode>();
-        var response = await _controller.SendCommandInternalAsync("SMEnumModes", null, cancellationToken);
+        List<ScanningMode> modes = new List<ScanningMode>();
+        byte[] response = await _controller.SendCommandInternalAsync("SMEnumModes", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
-            var modeMap = TescanSemController.DecodeStringInternal(response, ref offset);
+            string modeMap = TescanSemController.DecodeStringInternal(response, ref offset);
             
-            foreach (var line in modeMap.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            foreach (string line in modeMap.Split('\n', StringSplitOptions.RemoveEmptyEntries))
             {
-                var parts = line.Split('=', 2);
+                string[] parts = line.Split('=', 2);
                 if (parts.Length == 2 && parts[0].StartsWith("mode.") && parts[0].EndsWith(".name"))
                 {
-                    var indexStr = parts[0].Replace("mode.", "").Replace(".name", "");
-                    if (int.TryParse(indexStr, out var index))
+                    string indexStr = parts[0].Replace("mode.", "").Replace(".name", "");
+                    if (int.TryParse(indexStr, out int index))
                     {
                         modes.Add(new ScanningMode(index, parts[1].Trim()));
                     }
@@ -157,7 +157,7 @@ public class TescanSemElectronOptics
     
     public async Task<int> GetScanningModeAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("SMGetMode", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("SMGetMode", null, cancellationToken);
         if (response.Length >= 4)
         {
             return TescanSemController.DecodeIntInternal(response, 0);
@@ -167,18 +167,18 @@ public class TescanSemElectronOptics
     
     public async Task SetScanningModeAsync(int modeIndex, CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal(modeIndex);
+        byte[] body = TescanSemController.EncodeIntInternal(modeIndex);
         await _controller.SendCommandWithWaitInternalAsync("SMSetMode", body, TescanSemController.WaitFlagOpticsInternal, cancellationToken);
     }
     
     public async Task<(int result, double pivotPositionMm)> GetPivotPositionAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("SMGetPivotPos", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("SMGetPivotPos", null, cancellationToken);
         if (response.Length >= 8)
         {
-            var result = TescanSemController.DecodeIntInternal(response, 0);
+            int result = TescanSemController.DecodeIntInternal(response, 0);
             int offset = 4;
-            var pivotPos = TescanSemController.DecodeFloatInternal(response, ref offset);
+            double pivotPos = TescanSemController.DecodeFloatInternal(response, ref offset);
             return (result, pivotPos);
         }
         return (-1, double.NaN);

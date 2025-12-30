@@ -116,7 +116,7 @@ public class TescanSemController : ISemController
             return true;
         }
         
-        if (CommandMinVersions.TryGetValue(commandName, out var minVersion))
+        if (CommandMinVersions.TryGetValue(commandName, out Version? minVersion))
         {
             if (ProtocolVersion < minVersion)
             {
@@ -132,17 +132,17 @@ public class TescanSemController : ISemController
     {
         try
         {
-            var response = await SendCommandInternalAsync("TcpGetVersion", null, cancellationToken, skipVersionCheck: true);
+            byte[] response = await SendCommandInternalAsync("TcpGetVersion", null, cancellationToken, skipVersionCheck: true);
             if (response.Length > 0)
             {
                 int offset = 0;
                 ProtocolVersionString = DecodeStringInternal(response, ref offset);
                 
-                var parts = ProtocolVersionString.Split('.');
+                string[] parts = ProtocolVersionString.Split('.');
                 if (parts.Length >= 3 &&
-                    int.TryParse(parts[0], out var major) &&
-                    int.TryParse(parts[1], out var minor) &&
-                    int.TryParse(parts[2], out var build))
+                    int.TryParse(parts[0], out int major) &&
+                    int.TryParse(parts[1], out int minor) &&
+                    int.TryParse(parts[2], out int build))
                 {
                     ProtocolVersion = new Version(major, minor, build);
                 }
@@ -222,9 +222,9 @@ public class TescanSemController : ISemController
         
         _dataClient.Client.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0));
         
-        var localPort = ((System.Net.IPEndPoint)_dataClient.Client.LocalEndPoint!).Port;
+        int localPort = ((System.Net.IPEndPoint)_dataClient.Client.LocalEndPoint!).Port;
         
-        var regBody = EncodeIntInternal(localPort);
+        byte[] regBody = EncodeIntInternal(localPort);
         await SendCommandInternalAsync("TcpRegDataPort", regBody, cancellationToken);
         
         await _dataClient.ConnectAsync(_host, _port + 1, cancellationToken);
@@ -250,10 +250,10 @@ public class TescanSemController : ISemController
     
     private byte[] BuildHeader(string command, uint bodySize, ushort flags = FlagSendResponse, ushort queue = 0)
     {
-        var header = new byte[HeaderSize];
+        byte[] header = new byte[HeaderSize];
         
-        var cmdBytes = Encoding.ASCII.GetBytes(command);
-        var cmdLen = Math.Min(cmdBytes.Length, CommandNameSizeInternal - 1);
+        byte[] cmdBytes = Encoding.ASCII.GetBytes(command);
+        int cmdLen = Math.Min(cmdBytes.Length, CommandNameSizeInternal - 1);
         Array.Copy(cmdBytes, 0, header, 0, cmdLen);
         
         BitConverter.GetBytes(bodySize).CopyTo(header, 16);
@@ -278,10 +278,10 @@ public class TescanSemController : ISemController
     
     internal static byte[] EncodeFloatInternal(double value)
     {
-        var str = value.ToString("G", InvariantCulture) + '\0';
-        var strBytes = Encoding.ASCII.GetBytes(str);
-        var paddedSize = Pad4(4 + strBytes.Length);
-        var result = new byte[paddedSize];
+        string str = value.ToString("G", InvariantCulture) + '\0';
+        byte[] strBytes = Encoding.ASCII.GetBytes(str);
+        int paddedSize = Pad4(4 + strBytes.Length);
+        byte[] result = new byte[paddedSize];
         BitConverter.GetBytes((uint)strBytes.Length).CopyTo(result, 0);
         Array.Copy(strBytes, 0, result, 4, strBytes.Length);
         return result;
@@ -289,10 +289,10 @@ public class TescanSemController : ISemController
     
     internal static byte[] EncodeStringInternal(string value)
     {
-        var str = value + '\0';
-        var strBytes = Encoding.ASCII.GetBytes(str);
-        var paddedSize = Pad4(4 + strBytes.Length);
-        var result = new byte[paddedSize];
+        string str = value + '\0';
+        byte[] strBytes = Encoding.ASCII.GetBytes(str);
+        int paddedSize = Pad4(4 + strBytes.Length);
+        byte[] result = new byte[paddedSize];
         BitConverter.GetBytes((uint)strBytes.Length).CopyTo(result, 0);
         Array.Copy(strBytes, 0, result, 4, strBytes.Length);
         return result;
@@ -306,8 +306,8 @@ public class TescanSemController : ISemController
         if (_stream == null)
             throw new InvalidOperationException("Not connected to microscope");
         
-        var bodySize = (uint)(body?.Length ?? 0);
-        var header = BuildHeader(command, bodySize);
+        uint bodySize = (uint)(body?.Length ?? 0);
+        byte[] header = BuildHeader(command, bodySize);
         
         await _stream.WriteAsync(header, cancellationToken);
         if (body != null && body.Length > 0)
@@ -315,25 +315,25 @@ public class TescanSemController : ISemController
             await _stream.WriteAsync(body, cancellationToken);
         }
         
-        var responseHeader = new byte[HeaderSize];
-        var bytesRead = 0;
+        byte[] responseHeader = new byte[HeaderSize];
+        int bytesRead = 0;
         while (bytesRead < HeaderSize)
         {
-            var read = await _stream.ReadAsync(responseHeader.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
+            int read = await _stream.ReadAsync(responseHeader.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
             if (read == 0) throw new IOException("Connection closed by server");
             bytesRead += read;
         }
         
-        var responseBodySize = BitConverter.ToUInt32(responseHeader, 16);
+        uint responseBodySize = BitConverter.ToUInt32(responseHeader, 16);
         
         if (responseBodySize == 0)
             return Array.Empty<byte>();
         
-        var responseBody = new byte[responseBodySize];
+        byte[] responseBody = new byte[responseBodySize];
         bytesRead = 0;
         while (bytesRead < responseBodySize)
         {
-            var read = await _stream.ReadAsync(responseBody.AsMemory(bytesRead, (int)responseBodySize - bytesRead), cancellationToken);
+            int read = await _stream.ReadAsync(responseBody.AsMemory(bytesRead, (int)responseBodySize - bytesRead), cancellationToken);
             if (read == 0) throw new IOException("Connection closed by server");
             bytesRead += read;
         }
@@ -349,8 +349,8 @@ public class TescanSemController : ISemController
         if (_stream == null)
             throw new InvalidOperationException("Not connected to microscope");
         
-        var bodySize = (uint)(body?.Length ?? 0);
-        var header = BuildHeader(command, bodySize, flags: 0);
+        uint bodySize = (uint)(body?.Length ?? 0);
+        byte[] header = BuildHeader(command, bodySize, flags: 0);
         
         await _stream.WriteAsync(header, cancellationToken);
         if (body != null && body.Length > 0)
@@ -368,9 +368,9 @@ public class TescanSemController : ISemController
         if (_stream == null)
             throw new InvalidOperationException("Not connected to microscope");
         
-        var bodySize = (uint)(body?.Length ?? 0);
-        var flags = (ushort)(FlagSendResponse | waitFlags);
-        var header = BuildHeader(command, bodySize, flags);
+        uint bodySize = (uint)(body?.Length ?? 0);
+        ushort flags = (ushort)(FlagSendResponse | waitFlags);
+        byte[] header = BuildHeader(command, bodySize, flags);
         
         await _stream.WriteAsync(header, cancellationToken);
         if (body != null && body.Length > 0)
@@ -378,24 +378,24 @@ public class TescanSemController : ISemController
             await _stream.WriteAsync(body, cancellationToken);
         }
         
-        var responseHeader = new byte[HeaderSize];
-        var bytesRead = 0;
+        byte[] responseHeader = new byte[HeaderSize];
+        int bytesRead = 0;
         while (bytesRead < HeaderSize)
         {
-            var read = await _stream.ReadAsync(responseHeader.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
+            int read = await _stream.ReadAsync(responseHeader.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
             if (read == 0) throw new IOException("Connection closed by server");
             bytesRead += read;
         }
         
-        var responseBodySize = BitConverter.ToUInt32(responseHeader, 16);
+        uint responseBodySize = BitConverter.ToUInt32(responseHeader, 16);
         if (responseBodySize == 0)
             return Array.Empty<byte>();
         
-        var responseBody = new byte[responseBodySize];
+        byte[] responseBody = new byte[responseBodySize];
         bytesRead = 0;
         while (bytesRead < (int)responseBodySize)
         {
-            var read = await _stream.ReadAsync(responseBody.AsMemory(bytesRead, (int)responseBodySize - bytesRead), cancellationToken);
+            int read = await _stream.ReadAsync(responseBody.AsMemory(bytesRead, (int)responseBodySize - bytesRead), cancellationToken);
             if (read == 0) throw new IOException("Connection closed by server");
             bytesRead += read;
         }
@@ -410,18 +410,18 @@ public class TescanSemController : ISemController
     
     internal static double DecodeFloatInternal(byte[] body, ref int offset)
     {
-        var strLen = BitConverter.ToUInt32(body, offset);
+        uint strLen = BitConverter.ToUInt32(body, offset);
         offset += 4;
-        var str = Encoding.ASCII.GetString(body, offset, (int)strLen - 1);
+        string str = Encoding.ASCII.GetString(body, offset, (int)strLen - 1);
         offset += Pad4((int)strLen);
         return double.Parse(str, NumberStyles.Float, InvariantCulture);
     }
     
     internal static string DecodeStringInternal(byte[] body, ref int offset)
     {
-        var strLen = BitConverter.ToUInt32(body, offset);
+        uint strLen = BitConverter.ToUInt32(body, offset);
         offset += 4;
-        var str = Encoding.ASCII.GetString(body, offset, (int)strLen - 1);
+        string str = Encoding.ASCII.GetString(body, offset, (int)strLen - 1);
         offset += Pad4((int)strLen);
         return str;
     }
@@ -439,16 +439,16 @@ public class TescanSemController : ISemController
         
         try
         {
-            var header = new byte[HeaderSize];
-            var bytesRead = 0;
+            byte[] header = new byte[HeaderSize];
+            int bytesRead = 0;
             while (bytesRead < HeaderSize)
             {
-                var read = await _dataStream.ReadAsync(header.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
+                int read = await _dataStream.ReadAsync(header.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
                 if (read == 0) return null;
                 bytesRead += read;
             }
             
-            var bodySize = BitConverter.ToUInt32(header, 16);
+            uint bodySize = BitConverter.ToUInt32(header, 16);
             
             byte[] body;
             if (bodySize > 0)
@@ -457,7 +457,7 @@ public class TescanSemController : ISemController
                 bytesRead = 0;
                 while (bytesRead < bodySize)
                 {
-                    var read = await _dataStream.ReadAsync(body.AsMemory(bytesRead, (int)bodySize - bytesRead), cancellationToken);
+                    int read = await _dataStream.ReadAsync(body.AsMemory(bytesRead, (int)bodySize - bytesRead), cancellationToken);
                     if (read == 0) return null;
                     bytesRead += read;
                 }

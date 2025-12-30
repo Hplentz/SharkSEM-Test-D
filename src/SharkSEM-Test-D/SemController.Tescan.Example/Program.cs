@@ -17,12 +17,12 @@ Console.WriteLine("  - Mock/Simulator (for testing without hardware)\n");
 
 Console.WriteLine("--- Connecting to TESCAN SEM at 127.0.0.1 ---\n");
 
-using (var sem = new TescanSemController("127.0.0.1"))
+using (TescanSemController sem = new TescanSemController("127.0.0.1"))
 {
     await sem.ConnectAsync();
     Console.WriteLine("Connected to TESCAN SEM");
     
-    var info = await sem.GetMicroscopeInfoAsync();
+    MicroscopeInfo info = await sem.GetMicroscopeInfoAsync();
     Console.WriteLine($"\nMicroscope Info:");
     Console.WriteLine($"  Manufacturer: {info.Manufacturer}");
     Console.WriteLine($"  Model: {info.Model}");
@@ -30,27 +30,27 @@ using (var sem = new TescanSemController("127.0.0.1"))
     Console.WriteLine($"  Software: {info.SoftwareVersion}");
     Console.WriteLine($"  Protocol: {info.ProtocolVersion}");
     
-    var vacStatus = await sem.GetVacuumStatusAsync();
+    VacuumStatus vacStatus = await sem.GetVacuumStatusAsync();
     Console.WriteLine($"\nVacuum Status: {vacStatus}");
     
-    var pressure = await sem.GetVacuumPressureAsync(VacuumGauge.Chamber);
+    double pressure = await sem.GetVacuumPressureAsync(VacuumGauge.Chamber);
     Console.WriteLine($"Chamber Pressure: {pressure:E2} Pa");
     
     Console.WriteLine("\n--- Detector Configuration ---");
-    var detectorsStr = await sem.EnumDetectorsAsync();
+    string detectorsStr = await sem.EnumDetectorsAsync();
     Console.WriteLine($"Available Detectors: {detectorsStr}");
     
-    var channelCount = await sem.GetChannelCountAsync();
+    int channelCount = await sem.GetChannelCountAsync();
     Console.WriteLine($"Number of Channels: {channelCount}");
     
     for (int ch = 0; ch < Math.Min(channelCount, 4); ch++)
     {
-        var selectedDet = await sem.GetSelectedDetectorAsync(ch);
-        var (enabled, bpp) = await sem.GetChannelEnabledAsync(ch);
+        int selectedDet = await sem.GetSelectedDetectorAsync(ch);
+        (int enabled, int bpp) = await sem.GetChannelEnabledAsync(ch);
         Console.WriteLine($"  Channel {ch}: Detector={selectedDet}, Enabled={enabled}, BPP={bpp}");
     }
     
-    var detectorNames = detectorsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
+    string[] detectorNames = detectorsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
     int bseDetectorIndex = -1;
     for (int i = 0; i < detectorNames.Length; i++)
     {
@@ -73,10 +73,10 @@ using (var sem = new TescanSemController("127.0.0.1"))
     Console.WriteLine($"Enabling channel {imageChannel} with 8-bit depth...");
     await sem.EnableChannelAsync(imageChannel, true, 8);
     
-    var (en, bp) = await sem.GetChannelEnabledAsync(imageChannel);
+    (int en, int bp) = await sem.GetChannelEnabledAsync(imageChannel);
     Console.WriteLine($"Channel {imageChannel} status: Enabled={en}, BPP={bp}");
     
-    var beamState = await sem.GetBeamStateAsync();
+    BeamState beamState = await sem.GetBeamStateAsync();
     Console.WriteLine($"\nBeam State: {beamState}");
     
     Console.WriteLine("\nTurning beam ON...");
@@ -87,12 +87,12 @@ using (var sem = new TescanSemController("127.0.0.1"))
     if (beamState == BeamState.Transitioning)
     {
         Console.WriteLine("Waiting for beam to stabilize...");
-        var beamReady = await sem.WaitForBeamOnAsync(30000);
+        bool beamReady = await sem.WaitForBeamOnAsync(30000);
         beamState = await sem.GetBeamStateAsync();
         Console.WriteLine($"Beam State: {beamState} (ready: {beamReady})");
     }
     
-    var hv = await sem.GetHighVoltageAsync();
+    double hv = await sem.GetHighVoltageAsync();
     Console.WriteLine($"\nHigh Voltage: {hv / 1000:F1} kV");
     
     Console.WriteLine("Setting HV to 20 kV...");
@@ -100,16 +100,16 @@ using (var sem = new TescanSemController("127.0.0.1"))
     hv = await sem.GetHighVoltageAsync();
     Console.WriteLine($"High Voltage: {hv / 1000:F1} kV");
     
-    var emission = await sem.GetEmissionCurrentAsync();
+    double emission = await sem.GetEmissionCurrentAsync();
     Console.WriteLine($"Emission Current: {emission * 1e6:F1} uA");
     
     Console.WriteLine("\n--- Probe Current (PC) Indexes ---");
-    var pcIndexes = await sem.Optics.EnumPCIndexesAsync();
+    string pcIndexes = await sem.Optics.EnumPCIndexesAsync();
     if (!string.IsNullOrEmpty(pcIndexes))
     {
         Console.WriteLine("EnumPCIndexes response:");
-        var lines = pcIndexes.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        foreach (var line in lines.Take(10))
+        string[] lines = pcIndexes.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        foreach (string line in lines.Take(10))
         {
             Console.WriteLine($"  {line.Trim()}");
         }
@@ -124,7 +124,7 @@ using (var sem = new TescanSemController("127.0.0.1"))
     }
     
     Console.WriteLine("\n--- Beam Current ---");
-    var beamCurrentPa = await sem.Optics.GetBeamCurrentAsync();
+    double beamCurrentPa = await sem.Optics.GetBeamCurrentAsync();
     if (!double.IsNaN(beamCurrentPa))
     {
         if (beamCurrentPa >= 1000)
@@ -157,7 +157,7 @@ using (var sem = new TescanSemController("127.0.0.1"))
     }
     
     Console.WriteLine("\n--- Absorbed Current ---");
-    var absorbedCurrentPa = await sem.Optics.GetAbsorbedCurrentAsync();
+    double absorbedCurrentPa = await sem.Optics.GetAbsorbedCurrentAsync();
     if (!double.IsNaN(absorbedCurrentPa))
     {
         if (absorbedCurrentPa >= 1000)
@@ -175,11 +175,11 @@ using (var sem = new TescanSemController("127.0.0.1"))
     }
     
     Console.WriteLine("\n--- Scanning Modes ---");
-    var scanningModes = await sem.Optics.EnumScanningModesAsync();
+    List<ScanningMode> scanningModes = await sem.Optics.EnumScanningModesAsync();
     if (scanningModes.Count > 0)
     {
         Console.WriteLine($"Available scanning modes ({scanningModes.Count} total):");
-        foreach (var mode in scanningModes)
+        foreach (ScanningMode mode in scanningModes)
         {
             Console.WriteLine($"  {mode}");
         }
@@ -189,10 +189,11 @@ using (var sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine("SMEnumModes not available");
     }
     
-    var currentModeIndex = await sem.Optics.GetScanningModeAsync();
+    int currentModeIndex = await sem.Optics.GetScanningModeAsync();
     if (currentModeIndex >= 0)
     {
-        var currentModeName = scanningModes.FirstOrDefault(m => m.Index == currentModeIndex)?.Name ?? "Unknown";
+        ScanningMode? currentMode = scanningModes.FirstOrDefault(m => m.Index == currentModeIndex);
+        string currentModeName = currentMode?.Name ?? "Unknown";
         Console.WriteLine($"\nCurrent Scanning Mode: [{currentModeIndex}] {currentModeName}");
     }
     else
@@ -200,7 +201,7 @@ using (var sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine("\nSMGetMode not available");
     }
     
-    var (pivotResult, pivotPos) = await sem.Optics.GetPivotPositionAsync();
+    (int pivotResult, double pivotPos) = await sem.Optics.GetPivotPositionAsync();
     if (pivotResult == 0)
     {
         Console.WriteLine($"Pivot Position: {pivotPos:F3} mm");
@@ -215,14 +216,14 @@ using (var sem = new TescanSemController("127.0.0.1"))
     }
     
     Console.WriteLine("\n--- Image Geometry ---");
-    var geometries = await sem.ImageGeometry.EnumGeometriesAsync();
+    List<ImageGeometry> geometries = await sem.ImageGeometry.EnumGeometriesAsync();
     if (geometries.Count > 0)
     {
         Console.WriteLine($"Available geometries ({geometries.Count} total):");
-        foreach (var geo in geometries)
+        foreach (ImageGeometry geo in geometries)
         {
-            var (gx, gy) = await sem.ImageGeometry.GetGeometryAsync(geo.Index);
-            var (minX, maxX, minY, maxY) = await sem.ImageGeometry.GetGeomLimitsAsync(geo.Index);
+            (double gx, double gy) = await sem.ImageGeometry.GetGeometryAsync(geo.Index);
+            (double minX, double maxX, double minY, double maxY) = await sem.ImageGeometry.GetGeomLimitsAsync(geo.Index);
             Console.WriteLine($"  [{geo.Index}] {geo.Name}:");
             Console.WriteLine($"       X={gx:F6} (range: {minX:F6} to {maxX:F6})");
             if (!double.IsNaN(minY))
@@ -236,7 +237,7 @@ using (var sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine("EnumGeometries not available");
     }
     
-    var (imgShiftX, imgShiftY) = await sem.ImageGeometry.GetImageShiftAsync();
+    (double imgShiftX, double imgShiftY) = await sem.ImageGeometry.GetImageShiftAsync();
     if (!double.IsNaN(imgShiftX))
     {
         Console.WriteLine($"\nImage Shift: X={imgShiftX:F6}, Y={imgShiftY:F6}");
@@ -247,13 +248,13 @@ using (var sem = new TescanSemController("127.0.0.1"))
     }
     
     Console.WriteLine("\n--- Centerings ---");
-    var centerings = await sem.ImageGeometry.EnumCenteringsAsync();
+    List<Centering> centerings = await sem.ImageGeometry.EnumCenteringsAsync();
     if (centerings.Count > 0)
     {
         Console.WriteLine($"Available centerings ({centerings.Count} total):");
-        foreach (var centering in centerings)
+        foreach (Centering centering in centerings)
         {
-            var (cx, cy) = await sem.ImageGeometry.GetCenteringAsync(centering.Index);
+            (double cx, double cy) = await sem.ImageGeometry.GetCenteringAsync(centering.Index);
             Console.WriteLine($"  [{centering.Index}] {centering.Name}: X={cx:F6}, Y={cy:F6}");
         }
     }
@@ -262,16 +263,16 @@ using (var sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine("EnumCenterings not available");
     }
     
-    var stagePos = await sem.GetStagePositionAsync();
+    StagePosition stagePos = await sem.GetStagePositionAsync();
     Console.WriteLine($"\nStage Position: {stagePos}");
     
-    var limits = await sem.GetStageLimitsAsync();
+    StageLimits limits = await sem.GetStageLimitsAsync();
     Console.WriteLine($"Stage X Range: {limits.MinX:F1} to {limits.MaxX:F1} mm");
     Console.WriteLine($"Stage Y Range: {limits.MinY:F1} to {limits.MaxY:F1} mm");
     Console.WriteLine($"Stage Z Range: {limits.MinZ:F1} to {limits.MaxZ:F1} mm");
     
-    var isCalibrated = await sem.Stage.IsCallibratedAsync();
-    var isBusy = await sem.Stage.IsMovingAsync();
+    bool isCalibrated = await sem.Stage.IsCallibratedAsync();
+    bool isBusy = await sem.Stage.IsMovingAsync();
     Console.WriteLine($"\nStage Calibrated: {isCalibrated}, Stage Busy: {isBusy}");
     
     if (!isCalibrated)
@@ -285,7 +286,7 @@ using (var sem = new TescanSemController("127.0.0.1"))
     stagePos = await sem.GetStagePositionAsync();
     Console.WriteLine($"New Position: {stagePos}");
     
-    var viewField = await sem.GetViewFieldAsync();
+    double viewField = await sem.GetViewFieldAsync();
     Console.WriteLine($"\nView Field: {viewField:F1} um");
     
     Console.WriteLine("Setting view field to 1000 um...");
@@ -293,7 +294,7 @@ using (var sem = new TescanSemController("127.0.0.1"))
     viewField = await sem.GetViewFieldAsync();
     Console.WriteLine($"View Field: {viewField:F1} um");
     
-    var wd = await sem.GetWorkingDistanceAsync();
+    double wd = await sem.GetWorkingDistanceAsync();
     Console.WriteLine($"\nWorking Distance: {wd:F2} mm");
     
     Console.WriteLine("\nRunning AutoFocus...");
@@ -305,11 +306,11 @@ using (var sem = new TescanSemController("127.0.0.1"))
     await sem.AutoSignalAsync(imageChannel);
     
     Console.WriteLine("\n--- Scan Speed Configuration ---");
-    var speeds = await sem.Scanning.EnumSpeedsAsync();
+    List<ScanSpeed> speeds = await sem.Scanning.EnumSpeedsAsync();
     if (speeds.Count > 0)
     {
         Console.WriteLine($"Available scan speeds ({speeds.Count} total):");
-        foreach (var speed in speeds.Take(10))
+        foreach (ScanSpeed speed in speeds.Take(10))
         {
             Console.WriteLine($"  {speed}");
         }
@@ -318,8 +319,8 @@ using (var sem = new TescanSemController("127.0.0.1"))
             Console.WriteLine($"  ... and {speeds.Count - 10} more");
         }
         
-        var currentSpeedIndex = await sem.Scanning.GetSpeedAsync();
-        var currentSpeedInfo = speeds.FirstOrDefault(s => s.Index == currentSpeedIndex);
+        int currentSpeedIndex = await sem.Scanning.GetSpeedAsync();
+        ScanSpeed? currentSpeedInfo = speeds.FirstOrDefault(s => s.Index == currentSpeedIndex);
         if (currentSpeedInfo != null)
         {
             Console.WriteLine($"\nCurrent scan speed: index {currentSpeedIndex} ({currentSpeedInfo.DwellTimeMicroseconds:F1} µs/pixel)");
@@ -331,11 +332,11 @@ using (var sem = new TescanSemController("127.0.0.1"))
         
         double targetDwellTime = 3.2;
         Console.WriteLine($"Setting scan speed to {targetDwellTime} µs/pixel...");
-        var success = await sem.Scanning.SetSpeedByDwellTimeAsync(targetDwellTime);
+        bool success = await sem.Scanning.SetSpeedByDwellTimeAsync(targetDwellTime);
         if (success)
         {
-            var newSpeedIndex = await sem.Scanning.GetSpeedAsync();
-            var newSpeedInfo = speeds.FirstOrDefault(s => s.Index == newSpeedIndex);
+            int newSpeedIndex = await sem.Scanning.GetSpeedAsync();
+            ScanSpeed? newSpeedInfo = speeds.FirstOrDefault(s => s.Index == newSpeedIndex);
             Console.WriteLine($"Scan speed set to index {newSpeedIndex}: {newSpeedInfo?.DwellTimeMicroseconds:F1} µs/pixel");
         }
         else
@@ -346,35 +347,35 @@ using (var sem = new TescanSemController("127.0.0.1"))
     else
     {
         Console.WriteLine("ScEnumSpeeds not available (requires protocol 3.1.14+)");
-        var currentSpeedIndex = await sem.Scanning.GetSpeedAsync();
+        int currentSpeedIndex = await sem.Scanning.GetSpeedAsync();
         Console.WriteLine($"Current scan speed index: {currentSpeedIndex}");
     }
     
     Console.WriteLine($"\nAcquiring image (256x256) on channel {imageChannel}...");
-    var image = await sem.AcquireSingleImageAsync(imageChannel, 256, 256);
+    SemImage image = await sem.AcquireSingleImageAsync(imageChannel, 256, 256);
     Console.WriteLine($"Image acquired: {image.Width}x{image.Height}, {image.Data.Length} bytes, Channel {image.Channel}");
     
     if (image.Data.Length > 0)
     {
-        var minVal = image.Data.Min();
-        var maxVal = image.Data.Max();
-        var avgVal = image.Data.Average(b => (double)b);
+        byte minVal = image.Data.Min();
+        byte maxVal = image.Data.Max();
+        double avgVal = image.Data.Average(b => (double)b);
         Console.WriteLine($"Image statistics: Min={minVal}, Max={maxVal}, Avg={avgVal:F1}");
     }
     
-    var outputPath = Path.Combine(@"C:\Temp", $"SEM_Image_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+    string outputPath = Path.Combine(@"C:\Temp", $"SEM_Image_{DateTime.Now:yyyyMMdd_HHmmss}.png");
     try
     {
         Directory.CreateDirectory(@"C:\Temp");
-        using var bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format8bppIndexed);
-        var palette = bitmap.Palette;
+        using Bitmap bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format8bppIndexed);
+        ColorPalette palette = bitmap.Palette;
         for (int i = 0; i < 256; i++)
         {
             palette.Entries[i] = Color.FromArgb(i, i, i);
         }
         bitmap.Palette = palette;
         
-        var bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), 
+        BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), 
             ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
         for (int y = 0; y < image.Height; y++)
         {

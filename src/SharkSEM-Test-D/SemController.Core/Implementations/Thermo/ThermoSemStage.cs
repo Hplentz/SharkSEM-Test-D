@@ -17,7 +17,7 @@ public class ThermoSemStage
     {
         return await Task.Run(() =>
         {
-            var pos = _getClient().Specimen.Stage.CurrentPosition;
+            AutoScript.Libraries.SdbMicroscope.Structures.StagePosition pos = _getClient().Specimen.Stage.CurrentPosition;
             return new Models.StagePosition
             {
                 X = (pos.X ?? 0) * 1000.0,
@@ -33,7 +33,7 @@ public class ThermoSemStage
     {
         await Task.Run(() =>
         {
-            var targetPos = new AutoScript.Libraries.SdbMicroscope.Structures.StagePosition
+            AutoScript.Libraries.SdbMicroscope.Structures.StagePosition targetPos = new AutoScript.Libraries.SdbMicroscope.Structures.StagePosition
             {
                 X = position.X / 1000.0,
                 Y = position.Y / 1000.0,
@@ -49,7 +49,7 @@ public class ThermoSemStage
     {
         await Task.Run(() =>
         {
-            var deltaPos = new AutoScript.Libraries.SdbMicroscope.Structures.StagePosition
+            AutoScript.Libraries.SdbMicroscope.Structures.StagePosition deltaPos = new AutoScript.Libraries.SdbMicroscope.Structures.StagePosition
             {
                 X = delta.X / 1000.0,
                 Y = delta.Y / 1000.0,

@@ -49,7 +49,7 @@ public class MockSemController : ISemController
     
     public Task<double> GetVacuumPressureAsync(VacuumGauge gauge = VacuumGauge.Chamber, CancellationToken cancellationToken = default)
     {
-        var basePressure = gauge switch
+        double basePressure = gauge switch
         {
             VacuumGauge.Chamber => 1e-3,
             VacuumGauge.SemGun => 1e-7,
@@ -127,7 +127,7 @@ public class MockSemController : ISemController
     
     public async Task MoveStageRelativeAsync(StagePosition delta, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
-        var newPosition = new StagePosition(
+        StagePosition newPosition = new StagePosition(
             _currentPosition.X + delta.X,
             _currentPosition.Y + delta.Y,
             _currentPosition.Z + delta.Z,
@@ -219,11 +219,11 @@ public class MockSemController : ISemController
     
     public Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
     {
-        var images = new List<SemImage>();
+        List<SemImage> images = new List<SemImage>();
         
-        foreach (var channel in settings.Channels)
+        foreach (int channel in settings.Channels)
         {
-            var data = new byte[settings.Width * settings.Height];
+            byte[] data = new byte[settings.Width * settings.Height];
             _random.NextBytes(data);
             
             for (int i = 0; i < data.Length; i++)
@@ -239,7 +239,7 @@ public class MockSemController : ISemController
     
     public async Task<SemImage> AcquireSingleImageAsync(int channel, int width, int height, CancellationToken cancellationToken = default)
     {
-        var images = await AcquireImagesAsync(new ScanSettings
+        SemImage[] images = await AcquireImagesAsync(new ScanSettings
         {
             Width = width,
             Height = height,

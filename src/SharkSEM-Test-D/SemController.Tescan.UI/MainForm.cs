@@ -125,7 +125,7 @@ public partial class MainForm : Form
 
         try
         {
-            var info = await _sem.GetMicroscopeInfoAsync();
+            MicroscopeInfo info = await _sem.GetMicroscopeInfoAsync();
             lblManufacturer.Text = $"Manufacturer: {info.Manufacturer}";
             lblModel.Text = $"Model: {info.Model}";
             lblSerial.Text = $"Serial: {info.SerialNumber}";
@@ -144,8 +144,8 @@ public partial class MainForm : Form
 
         try
         {
-            var status = await _sem.GetVacuumStatusAsync();
-            var pressure = await _sem.GetVacuumPressureAsync();
+            VacuumStatus status = await _sem.GetVacuumStatusAsync();
+            double pressure = await _sem.GetVacuumPressureAsync();
             lblVacuumStatus.Text = $"Status: {status}";
             lblChamberPressure.Text = $"Pressure: {pressure:E2} Pa";
         }
@@ -163,16 +163,16 @@ public partial class MainForm : Form
         try
         {
             cboDetectors.Items.Clear();
-            var detectorsStr = await _sem.Detectors.EnumDetectorsAsync();
+            string detectorsStr = await _sem.Detectors.EnumDetectorsAsync();
             if (!string.IsNullOrEmpty(detectorsStr))
             {
-                var detectorNames = ParseDetectorNames(detectorsStr);
+                List<string> detectorNames = ParseDetectorNames(detectorsStr);
                 for (int i = 0; i < detectorNames.Count; i++)
                 {
                     cboDetectors.Items.Add($"{i}: {detectorNames[i]}");
                 }
 
-                var selected = await _sem.Detectors.GetSelectedDetectorAsync(0);
+                int selected = await _sem.Detectors.GetSelectedDetectorAsync(0);
                 if (selected >= 0 && selected < cboDetectors.Items.Count)
                 {
                     cboDetectors.SelectedIndex = selected;
@@ -184,13 +184,13 @@ public partial class MainForm : Form
 
     private List<string> ParseDetectorNames(string detectorsStr)
     {
-        var names = new List<string>();
-        var dict = new Dictionary<int, string>();
+        List<string> names = new List<string>();
+        Dictionary<int, string> dict = new Dictionary<int, string>();
 
-        var lines = detectorsStr.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        foreach (var line in lines)
+        string[] lines = detectorsStr.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (string line in lines)
         {
-            var match = System.Text.RegularExpressions.Regex.Match(line, @"det\.(\d+)\.name=(.+)");
+            Match match = System.Text.RegularExpressions.Regex.Match(line, @"det\.(\d+)\.name=(.+)");
             if (match.Success && int.TryParse(match.Groups[1].Value, out int idx))
             {
                 dict[idx] = match.Groups[2].Value.Trim();
@@ -207,7 +207,7 @@ public partial class MainForm : Form
 
         if (names.Count == 0)
         {
-            var parts = detectorsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = detectorsStr.Split(';', StringSplitOptions.RemoveEmptyEntries);
             names.AddRange(parts.Select(p => p.Trim()));
         }
 
@@ -220,20 +220,20 @@ public partial class MainForm : Form
 
         try
         {
-            var beamState = await _sem.HighVoltage.GetBeamStateAsync();
+            BeamState beamState = await _sem.HighVoltage.GetBeamStateAsync();
             lblBeamState.Text = $"Beam State: {beamState}";
 
-            var hv = await _sem.GetHighVoltageAsync();
+            double hv = await _sem.GetHighVoltageAsync();
             numHighVoltage.Value = (decimal)hv;
 
             await RefreshPCIndexesAsync();
 
-            var beamCurrent = await _sem.Optics.GetBeamCurrentAsync();
+            double beamCurrent = await _sem.Optics.GetBeamCurrentAsync();
             numBeamCurrent.Value = (decimal)beamCurrent;
 
             try
             {
-                var absorbedCurrent = await _sem.Optics.GetAbsorbedCurrentAsync();
+                double absorbedCurrent = await _sem.Optics.GetAbsorbedCurrentAsync();
                 lblAbsorbedCurrent.Text = absorbedCurrent >= 1000
                     ? $"Absorbed Current: {absorbedCurrent / 1000:F2} nA"
                     : $"Absorbed Current: {absorbedCurrent:F2} pA";
@@ -243,7 +243,7 @@ public partial class MainForm : Form
                 lblAbsorbedCurrent.Text = "Absorbed Current: -- pA";
             }
 
-            var wd = await _sem.GetWorkingDistanceAsync();
+            double wd = await _sem.GetWorkingDistanceAsync();
             numWorkingDistance.Value = (decimal)wd;
         }
         catch { }
@@ -257,24 +257,24 @@ public partial class MainForm : Form
         {
             cboPCIndexes.Items.Clear();
             _pcIndexes.Clear();
-            var pcStr = await _sem.Optics.EnumPCIndexesAsync();
+            string pcStr = await _sem.Optics.EnumPCIndexesAsync();
             if (!string.IsNullOrEmpty(pcStr))
             {
-                var regex = new Regex(@"pc\.(\d+)\.current=([0-9.eE+-]+)", RegexOptions.IgnoreCase);
-                var matches = regex.Matches(pcStr);
+                Regex regex = new Regex(@"pc\.(\d+)\.current=([0-9.eE+-]+)", RegexOptions.IgnoreCase);
+                MatchCollection matches = regex.Matches(pcStr);
                 foreach (Match match in matches)
                 {
                     if (match.Success && match.Groups.Count >= 3)
                     {
-                        var index = int.Parse(match.Groups[1].Value);
-                        var current = double.Parse(match.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture);
-                        var display = current >= 1000 ? $"{current / 1000:F2} nA" : $"{current:F2} pA";
+                        int index = int.Parse(match.Groups[1].Value);
+                        double current = double.Parse(match.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture);
+                        string display = current >= 1000 ? $"{current / 1000:F2} nA" : $"{current:F2} pA";
                         _pcIndexes.Add(index);
                         cboPCIndexes.Items.Add($"{index}: {display}");
                     }
                 }
                 
-                var currentPCIndex = await _sem.Optics.GetPCIndexAsync();
+                int currentPCIndex = await _sem.Optics.GetPCIndexAsync();
                 for (int i = 0; i < _pcIndexes.Count; i++)
                 {
                     if (_pcIndexes[i] == currentPCIndex)
@@ -296,12 +296,12 @@ public partial class MainForm : Form
         {
             cboScanningModes.Items.Clear();
             _scanningModes = await _sem.Optics.EnumScanningModesAsync();
-            foreach (var mode in _scanningModes)
+            foreach (ScanningMode mode in _scanningModes)
             {
                 cboScanningModes.Items.Add($"{mode.Index}: {mode.Name}");
             }
 
-            var currentMode = await _sem.Optics.GetScanningModeAsync();
+            int currentMode = await _sem.Optics.GetScanningModeAsync();
             for (int i = 0; i < _scanningModes.Count; i++)
             {
                 if (_scanningModes[i].Index == currentMode)
@@ -311,7 +311,7 @@ public partial class MainForm : Form
                 }
             }
 
-            var (result, pivot) = await _sem.Optics.GetPivotPositionAsync();
+            (int result, double pivot) = await _sem.Optics.GetPivotPositionAsync();
             if (result == 0)
             {
                 lblPivotPosition.Text = $"Pivot Position: {pivot:F3} mm";
@@ -337,21 +337,21 @@ public partial class MainForm : Form
 
             if (_imageShiftIndex >= 0)
             {
-                var (x, y) = await _sem.ImageGeometry.GetGeometryAsync(_imageShiftIndex);
+                (double x, double y) = await _sem.ImageGeometry.GetGeometryAsync(_imageShiftIndex);
                 numImageShiftX.Value = (decimal)x;
                 numImageShiftY.Value = (decimal)y;
 
-                var (minX, maxX, minY, maxY) = await _sem.ImageGeometry.GetGeomLimitsAsync(_imageShiftIndex);
+                (double minX, double maxX, double minY, double maxY) = await _sem.ImageGeometry.GetGeomLimitsAsync(_imageShiftIndex);
                 lblImageShiftRangeX.Text = $"X: {minX:F4} to {maxX:F4}";
                 lblImageShiftRangeY.Text = $"Y: {minY:F4} to {maxY:F4}";
             }
 
             if (_imageRotationIndex >= 0)
             {
-                var (x, _) = await _sem.ImageGeometry.GetGeometryAsync(_imageRotationIndex);
+                (double x, double _) = await _sem.ImageGeometry.GetGeometryAsync(_imageRotationIndex);
                 numImageRotation.Value = (decimal)x;
 
-                var (minX, maxX, _, _) = await _sem.ImageGeometry.GetGeomLimitsAsync(_imageRotationIndex);
+                (double minX, double maxX, double _, double _) = await _sem.ImageGeometry.GetGeomLimitsAsync(_imageRotationIndex);
                 lblImageRotRange.Text = $"Range: {minX:F0} to {maxX:F0} deg";
             }
         }
@@ -364,12 +364,12 @@ public partial class MainForm : Form
 
         try
         {
-            var calibrated = await _sem.Stage.IsCallibratedAsync();
-            var busy = await _sem.Stage.IsMovingAsync();
+            bool calibrated = await _sem.Stage.IsCallibratedAsync();
+            bool busy = await _sem.Stage.IsMovingAsync();
             lblStageCalibrated.Text = $"Calibrated: {calibrated}";
             lblStageBusy.Text = $"Busy: {busy}";
 
-            var pos = await _sem.GetStagePositionAsync();
+            StagePosition pos = await _sem.GetStagePositionAsync();
             numStageX.Value = (decimal)pos.X;
             numStageY.Value = (decimal)pos.Y;
             numStageZ.Value = (decimal)pos.Z;
@@ -385,7 +385,7 @@ public partial class MainForm : Form
 
         try
         {
-            var vf = await _sem.GetViewFieldAsync();
+            double vf = await _sem.GetViewFieldAsync();
             numViewField.Value = (decimal)vf;
         }
         catch { }
@@ -399,12 +399,12 @@ public partial class MainForm : Form
         {
             cboScanSpeeds.Items.Clear();
             _scanSpeeds = await _sem.Scanning.EnumSpeedsAsync();
-            foreach (var speed in _scanSpeeds)
+            foreach (ScanSpeed speed in _scanSpeeds)
             {
                 cboScanSpeeds.Items.Add($"Speed {speed.Index}");
             }
 
-            var currentSpeed = await _sem.GetScanSpeedAsync();
+            int currentSpeed = await _sem.GetScanSpeedAsync();
             for (int i = 0; i < _scanSpeeds.Count; i++)
             {
                 if (_scanSpeeds[i].Index == currentSpeed)
@@ -444,10 +444,10 @@ public partial class MainForm : Form
             btnAcquireImage.Enabled = false;
             btnAcquireImage.Text = "Acquiring...";
 
-            var image = await _sem.AcquireSingleImageAsync(0, 400, 400);
+            SemImage image = await _sem.AcquireSingleImageAsync(0, 400, 400);
             if (image != null && image.Data != null && image.Data.Length > 0)
             {
-                var bitmap = CreateBitmapFromImageData(image);
+                Bitmap bitmap = CreateBitmapFromImageData(image);
                 picImage.Image?.Dispose();
                 picImage.Image = bitmap;
             }
@@ -465,16 +465,16 @@ public partial class MainForm : Form
 
     private static Bitmap CreateBitmapFromImageData(SemImage image)
     {
-        var bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format8bppIndexed);
+        Bitmap bitmap = new Bitmap(image.Width, image.Height, PixelFormat.Format8bppIndexed);
 
-        var palette = bitmap.Palette;
+        ColorPalette palette = bitmap.Palette;
         for (int i = 0; i < 256; i++)
         {
             palette.Entries[i] = Color.FromArgb(i, i, i);
         }
         bitmap.Palette = palette;
 
-        var bmpData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
+        BitmapData bmpData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
         try
         {
             for (int y = 0; y < image.Height; y++)
@@ -563,35 +563,35 @@ public partial class MainForm : Form
     private async void NumStageX_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value };
+        StagePosition pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value };
         await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumStageY_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value };
+        StagePosition pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value };
         await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumStageZ_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value };
+        StagePosition pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value };
         await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumStageR_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value, Rotation = (double)numStageR.Value };
+        StagePosition pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value, Rotation = (double)numStageR.Value };
         await _sem.Stage.MoveToAsync(pos);
     }
 
     private async void NumStageTx_Leave(object? sender, EventArgs e)
     {
         if (_isUpdating || _sem == null) return;
-        var pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value, Rotation = (double)numStageR.Value, TiltX = (double)numStageTx.Value };
+        StagePosition pos = new StagePosition { X = (double)numStageX.Value, Y = (double)numStageY.Value, Z = (double)numStageZ.Value, Rotation = (double)numStageR.Value, TiltX = (double)numStageTx.Value };
         await _sem.Stage.MoveToAsync(pos);
     }
 

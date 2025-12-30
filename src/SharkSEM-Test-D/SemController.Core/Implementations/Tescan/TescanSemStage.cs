@@ -14,8 +14,8 @@ public class TescanSemStage
     
     public async Task<StagePosition> GetPositionAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("StgGetPosition", null, cancellationToken);
-        var position = new StagePosition();
+        byte[] response = await _controller.SendCommandInternalAsync("StgGetPosition", null, cancellationToken);
+        StagePosition position = new StagePosition();
         
         if (response.Length > 0)
         {
@@ -33,7 +33,7 @@ public class TescanSemStage
     
     public async Task MoveToAsync(StagePosition position, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
-        var body = new List<byte>();
+        List<byte> body = new List<byte>();
         body.AddRange(TescanSemController.EncodeFloatInternal(position.X));
         body.AddRange(TescanSemController.EncodeFloatInternal(position.Y));
         
@@ -67,7 +67,7 @@ public class TescanSemStage
     
     public async Task MoveRelativeAsync(StagePosition delta, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
-        var body = new List<byte>();
+        List<byte> body = new List<byte>();
         body.AddRange(TescanSemController.EncodeFloatInternal(delta.X));
         body.AddRange(TescanSemController.EncodeFloatInternal(delta.Y));
         
@@ -101,7 +101,7 @@ public class TescanSemStage
     
     private async Task WaitForMovementAsync(CancellationToken cancellationToken)
     {
-        var startTime = DateTime.UtcNow;
+        DateTime startTime = DateTime.UtcNow;
         while (await IsMovingAsync(cancellationToken))
         {
             if (DateTime.UtcNow - startTime > _stageMovementTimeout)
@@ -114,7 +114,7 @@ public class TescanSemStage
     
     public async Task<bool> IsMovingAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("StgIsBusy", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("StgIsBusy", null, cancellationToken);
         if (response.Length >= 4)
         {
             return TescanSemController.DecodeIntInternal(response, 0) != 0;
@@ -129,10 +129,10 @@ public class TescanSemStage
     
     public async Task<StageLimits> GetLimitsAsync(CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal(0);
-        var response = await _controller.SendCommandInternalAsync("StgGetLimits", body, cancellationToken);
+        byte[] body = TescanSemController.EncodeIntInternal(0);
+        byte[] response = await _controller.SendCommandInternalAsync("StgGetLimits", body, cancellationToken);
         
-        var limits = new StageLimits();
+        StageLimits limits = new StageLimits();
         if (response.Length > 0)
         {
             int offset = 0;
@@ -160,7 +160,7 @@ public class TescanSemStage
     
     public async Task<bool> IsCallibratedAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("StgIsCalibrated", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("StgIsCalibrated", null, cancellationToken);
         if (response.Length >= 4)
         {
             return TescanSemController.DecodeIntInternal(response, 0) != 0;

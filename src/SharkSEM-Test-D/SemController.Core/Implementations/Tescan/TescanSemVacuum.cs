@@ -13,10 +13,10 @@ public class TescanSemVacuum
     
     public async Task<VacuumStatus> GetStatusAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("VacGetStatus", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("VacGetStatus", null, cancellationToken);
         if (response.Length >= 4)
         {
-            var status = TescanSemController.DecodeIntInternal(response, 0);
+            int status = TescanSemController.DecodeIntInternal(response, 0);
             return (VacuumStatus)status;
         }
         return VacuumStatus.Error;
@@ -24,8 +24,8 @@ public class TescanSemVacuum
     
     public async Task<double> GetPressureAsync(VacuumGauge gauge = VacuumGauge.Chamber, CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal((int)gauge);
-        var response = await _controller.SendCommandInternalAsync("VacGetPressure", body, cancellationToken);
+        byte[] body = TescanSemController.EncodeIntInternal((int)gauge);
+        byte[] response = await _controller.SendCommandInternalAsync("VacGetPressure", body, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
@@ -36,10 +36,10 @@ public class TescanSemVacuum
     
     public async Task<VacuumMode> GetModeAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("VacGetVPMode", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("VacGetVPMode", null, cancellationToken);
         if (response.Length >= 4)
         {
-            var mode = TescanSemController.DecodeIntInternal(response, 0);
+            int mode = TescanSemController.DecodeIntInternal(response, 0);
             return (VacuumMode)mode;
         }
         return VacuumMode.Unknown;

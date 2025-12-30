@@ -16,8 +16,8 @@ public class ThermoSemVacuum
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
-            var state = client.Vacuum.ChamberState;
+            SdbMicroscopeClient client = _getClient();
+            string? state = client.Vacuum.ChamberState;
             
             return state?.ToLower() switch
             {
@@ -39,7 +39,7 @@ public class ThermoSemVacuum
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
+            SdbMicroscopeClient client = _getClient();
             return client.Vacuum.ChamberPressure.Value;
         }, cancellationToken);
     }

@@ -18,8 +18,8 @@ public class ThermoSemBeam
         {
             try
             {
-                var client = _getClient();
-                var hv = client.Beams.ElectronBeam.HighVoltage.Value;
+                SdbMicroscopeClient client = _getClient();
+                double hv = client.Beams.ElectronBeam.HighVoltage.Value;
                 return hv > 0 ? BeamState.On : BeamState.Off;
             }
             catch
@@ -39,11 +39,11 @@ public class ThermoSemBeam
 
     public async Task<bool> WaitForOnAsync(int timeoutMs = 30000, CancellationToken cancellationToken = default)
     {
-        var startTime = DateTime.UtcNow;
+        DateTime startTime = DateTime.UtcNow;
         while ((DateTime.UtcNow - startTime).TotalMilliseconds < timeoutMs)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var state = await GetStateAsync(cancellationToken);
+            BeamState state = await GetStateAsync(cancellationToken);
             if (state == BeamState.On)
                 return true;
             await Task.Delay(500, cancellationToken);
@@ -63,7 +63,7 @@ public class ThermoSemBeam
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
+            SdbMicroscopeClient client = _getClient();
             return client.Beams.ElectronBeam.HighVoltage.Value;
         }, cancellationToken);
     }
@@ -72,7 +72,7 @@ public class ThermoSemBeam
     {
         await Task.Run(() =>
         {
-            var client = _getClient();
+            SdbMicroscopeClient client = _getClient();
             client.Beams.ElectronBeam.HighVoltage.Value = voltage;
         }, cancellationToken);
         
@@ -86,7 +86,7 @@ public class ThermoSemBeam
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
+            SdbMicroscopeClient client = _getClient();
             return client.Beams.ElectronBeam.EmissionCurrent.Value;
         }, cancellationToken);
     }

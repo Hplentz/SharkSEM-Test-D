@@ -22,16 +22,16 @@ public class TescanSemScanning
             return _cachedSpeeds;
         }
         
-        var speeds = new List<ScanSpeed>();
+        List<ScanSpeed> speeds = new List<ScanSpeed>();
         
-        var response = await _controller.SendCommandInternalAsync("ScEnumSpeeds", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("ScEnumSpeeds", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
-            var speedMap = TescanSemController.DecodeStringInternal(response, ref offset);
+            string speedMap = TescanSemController.DecodeStringInternal(response, ref offset);
             
-            var regex = new Regex(@"speed\.(\d+)\.dwell=([0-9.]+)", RegexOptions.IgnoreCase);
-            var matches = regex.Matches(speedMap);
+            Regex regex = new Regex(@"speed\.(\d+)\.dwell=([0-9.]+)", RegexOptions.IgnoreCase);
+            MatchCollection matches = regex.Matches(speedMap);
             
             foreach (Match match in matches)
             {
@@ -59,14 +59,14 @@ public class TescanSemScanning
     
     public async Task<int?> FindSpeedIndexByDwellTimeAsync(double targetDwellTimeMicroseconds, CancellationToken cancellationToken = default)
     {
-        var speeds = await EnumSpeedsAsync(false, cancellationToken);
+        List<ScanSpeed> speeds = await EnumSpeedsAsync(false, cancellationToken);
         
         ScanSpeed? bestMatch = null;
         double smallestDiff = double.MaxValue;
         
-        foreach (var speed in speeds)
+        foreach (ScanSpeed speed in speeds)
         {
-            var diff = Math.Abs(speed.DwellTimeMicroseconds - targetDwellTimeMicroseconds);
+            double diff = Math.Abs(speed.DwellTimeMicroseconds - targetDwellTimeMicroseconds);
             if (diff < smallestDiff)
             {
                 smallestDiff = diff;
@@ -79,7 +79,7 @@ public class TescanSemScanning
     
     public async Task<bool> SetSpeedByDwellTimeAsync(double targetDwellTimeMicroseconds, CancellationToken cancellationToken = default)
     {
-        var speedIndex = await FindSpeedIndexByDwellTimeAsync(targetDwellTimeMicroseconds, cancellationToken);
+        int? speedIndex = await FindSpeedIndexByDwellTimeAsync(targetDwellTimeMicroseconds, cancellationToken);
         if (speedIndex.HasValue)
         {
             await SetSpeedAsync(speedIndex.Value, cancellationToken);
@@ -90,7 +90,7 @@ public class TescanSemScanning
     
     public async Task<int> GetSpeedAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("ScGetSpeed", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("ScGetSpeed", null, cancellationToken);
         if (response.Length >= 4)
         {
             return TescanSemController.DecodeIntInternal(response, 0);
@@ -100,13 +100,13 @@ public class TescanSemScanning
     
     public async Task SetSpeedAsync(int speed, CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal(speed);
+        byte[] body = TescanSemController.EncodeIntInternal(speed);
         await _controller.SendCommandNoResponseInternalAsync("ScSetSpeed", body, cancellationToken);
     }
     
     public async Task<BlankerMode> GetBlankerModeAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _controller.SendCommandInternalAsync("ScGetBlanker", null, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("ScGetBlanker", null, cancellationToken);
         if (response.Length >= 4)
         {
             return (BlankerMode)TescanSemController.DecodeIntInternal(response, 0);
@@ -116,7 +116,7 @@ public class TescanSemScanning
     
     public async Task SetBlankerModeAsync(BlankerMode mode, CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal((int)mode);
+        byte[] body = TescanSemController.EncodeIntInternal((int)mode);
         await _controller.SendCommandNoResponseInternalAsync("ScSetBlanker", body, cancellationToken);
     }
     
@@ -127,7 +127,7 @@ public class TescanSemScanning
     
     public async Task SetGuiScanningAsync(bool enable, CancellationToken cancellationToken = default)
     {
-        var body = TescanSemController.EncodeIntInternal(enable ? 1 : 0);
+        byte[] body = TescanSemController.EncodeIntInternal(enable ? 1 : 0);
         await _controller.SendCommandNoResponseInternalAsync("GUISetScanning", body, cancellationToken);
     }
     
@@ -135,9 +135,9 @@ public class TescanSemScanning
     {
         await _controller.EnsureDataChannelInternalAsync(cancellationToken);
         
-        foreach (var channel in settings.Channels)
+        foreach (int channel in settings.Channels)
         {
-            var enableBody = new List<byte>();
+            List<byte> enableBody = new List<byte>();
             enableBody.AddRange(TescanSemController.EncodeIntInternal(channel));
             enableBody.AddRange(TescanSemController.EncodeIntInternal(1));
             enableBody.AddRange(TescanSemController.EncodeIntInternal(8));
@@ -149,10 +149,10 @@ public class TescanSemScanning
         
         try
         {
-            var right = settings.Right > 0 ? settings.Right : (settings.Width - 1);
-            var bottom = settings.Bottom > 0 ? settings.Bottom : (settings.Height - 1);
+            int right = settings.Right > 0 ? settings.Right : (settings.Width - 1);
+            int bottom = settings.Bottom > 0 ? settings.Bottom : (settings.Height - 1);
             
-            var scanBody = new List<byte>();
+            List<byte> scanBody = new List<byte>();
             scanBody.AddRange(TescanSemController.EncodeIntInternal(0));
             scanBody.AddRange(TescanSemController.EncodeIntInternal(settings.Width));
             scanBody.AddRange(TescanSemController.EncodeIntInternal(settings.Height));
@@ -162,20 +162,20 @@ public class TescanSemScanning
             scanBody.AddRange(TescanSemController.EncodeIntInternal(bottom));
             scanBody.AddRange(TescanSemController.EncodeIntInternal(1));
             
-            var scanResult = await _controller.SendCommandInternalAsync("ScScanXY", scanBody.ToArray(), cancellationToken);
+            byte[] scanResult = await _controller.SendCommandInternalAsync("ScScanXY", scanBody.ToArray(), cancellationToken);
             if (scanResult.Length >= 4)
             {
-                var scannedFrameId = TescanSemController.DecodeIntInternal(scanResult, 0);
+                int scannedFrameId = TescanSemController.DecodeIntInternal(scanResult, 0);
                 if (scannedFrameId < 0)
                 {
                     throw new InvalidOperationException($"ScScanXY failed with error code: {scannedFrameId}");
                 }
             }
             
-            var imageSize = settings.Width * settings.Height;
-            var imageDataList = await ReadAllImagesFromDataChannelAsync(settings.Channels, imageSize, cancellationToken);
+            int imageSize = settings.Width * settings.Height;
+            List<byte[]> imageDataList = await ReadAllImagesFromDataChannelAsync(settings.Channels, imageSize, cancellationToken);
             
-            var images = new List<SemImage>();
+            List<SemImage> images = new List<SemImage>();
             for (int i = 0; i < settings.Channels.Length && i < imageDataList.Count; i++)
             {
                 if (imageDataList[i].Length > 0)
@@ -194,45 +194,45 @@ public class TescanSemScanning
     
     public async Task<SemImage> AcquireSingleImageAsync(int channel, int width, int height, CancellationToken cancellationToken = default)
     {
-        var settings = new ScanSettings
+        ScanSettings settings = new ScanSettings
         {
             Width = width,
             Height = height,
             Channels = new[] { channel }
         };
         
-        var images = await AcquireImagesAsync(settings, cancellationToken);
+        SemImage[] images = await AcquireImagesAsync(settings, cancellationToken);
         return images.Length > 0 ? images[0] : new SemImage(width, height, Array.Empty<byte>(), channel);
     }
     
     private async Task<List<byte[]>> ReadAllImagesFromDataChannelAsync(int[] channels, int imageSizePerChannel, CancellationToken cancellationToken)
     {
-        var imageByChannel = new Dictionary<int, byte[]>();
-        var bytesReceivedByChannel = new Dictionary<int, int>();
+        Dictionary<int, byte[]> imageByChannel = new Dictionary<int, byte[]>();
+        Dictionary<int, int> bytesReceivedByChannel = new Dictionary<int, int>();
         
-        foreach (var ch in channels)
+        foreach (int ch in channels)
         {
             imageByChannel[ch] = new byte[imageSizePerChannel];
             bytesReceivedByChannel[ch] = 0;
         }
         
-        var timeout = TimeSpan.FromSeconds(_controller.TimeoutSeconds * 3);
-        var startTime = DateTime.UtcNow;
+        TimeSpan timeout = TimeSpan.FromSeconds(_controller.TimeoutSeconds * 3);
+        DateTime startTime = DateTime.UtcNow;
         
         while (DateTime.UtcNow - startTime < timeout)
         {
-            var message = await _controller.ReadDataChannelMessageInternalAsync(cancellationToken);
+            TescanSemController.DataChannelMessage? message = await _controller.ReadDataChannelMessageInternalAsync(cancellationToken);
             if (message == null)
                 break;
             
-            var commandName = Encoding.ASCII.GetString(message.Header, 0, TescanSemController.CommandNameSizeInternal).TrimEnd('\0');
+            string commandName = Encoding.ASCII.GetString(message.Header, 0, TescanSemController.CommandNameSizeInternal).TrimEnd('\0');
             
             if (commandName == "ScData" && message.Body.Length >= 20)
             {
-                var msgChannel = BitConverter.ToInt32(message.Body, 4);
-                var argIndex = BitConverter.ToUInt32(message.Body, 8);
-                var argBpp = BitConverter.ToInt32(message.Body, 12);
-                var argDataSize = BitConverter.ToUInt32(message.Body, 16);
+                int msgChannel = BitConverter.ToInt32(message.Body, 4);
+                uint argIndex = BitConverter.ToUInt32(message.Body, 8);
+                int argBpp = BitConverter.ToInt32(message.Body, 12);
+                uint argDataSize = BitConverter.ToUInt32(message.Body, 16);
                 
                 if (!imageByChannel.ContainsKey(msgChannel))
                     continue;
@@ -240,8 +240,8 @@ public class TescanSemScanning
                 if (argBpp != 8)
                     continue;
                 
-                var buffer = imageByChannel[msgChannel];
-                var currentSize = bytesReceivedByChannel[msgChannel];
+                byte[] buffer = imageByChannel[msgChannel];
+                int currentSize = bytesReceivedByChannel[msgChannel];
                 
                 if (argIndex < currentSize)
                 {
@@ -252,7 +252,7 @@ public class TescanSemScanning
                     continue;
                 
                 int dataOffset = 20;
-                var copyLen = Math.Min((int)argDataSize, buffer.Length - (int)argIndex);
+                int copyLen = Math.Min((int)argDataSize, buffer.Length - (int)argIndex);
                 
                 if (copyLen > 0 && dataOffset + argDataSize <= message.Body.Length)
                 {
@@ -262,7 +262,7 @@ public class TescanSemScanning
             }
             
             bool allComplete = true;
-            foreach (var ch in channels)
+            foreach (int ch in channels)
             {
                 if (bytesReceivedByChannel[ch] < imageSizePerChannel)
                 {
@@ -274,8 +274,8 @@ public class TescanSemScanning
                 break;
         }
         
-        var results = new List<byte[]>();
-        foreach (var ch in channels)
+        List<byte[]> results = new List<byte[]>();
+        foreach (int ch in channels)
         {
             results.Add(imageByChannel[ch]);
         }

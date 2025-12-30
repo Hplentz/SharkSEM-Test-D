@@ -15,8 +15,8 @@ public class ThermoSemOptics
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
-            var hfwMeters = client.Beams.ElectronBeam.HorizontalFieldWidth.Value;
+            SdbMicroscopeClient client = _getClient();
+            double hfwMeters = client.Beams.ElectronBeam.HorizontalFieldWidth.Value;
             return hfwMeters * 1e6;
         }, cancellationToken);
     }
@@ -25,8 +25,8 @@ public class ThermoSemOptics
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
-            var viewField = client.Beams.ElectronBeam.HorizontalFieldWidth.Value;
+            SdbMicroscopeClient client = _getClient();
+            double viewField = client.Beams.ElectronBeam.HorizontalFieldWidth.Value;
             if (viewField > 0)
             {
                 return 0.128 / viewField;
@@ -39,7 +39,7 @@ public class ThermoSemOptics
     {
         await Task.Run(() =>
         {
-            var client = _getClient();
+            SdbMicroscopeClient client = _getClient();
             client.Beams.ElectronBeam.HorizontalFieldWidth.Value = viewFieldMicrons / 1e6;
         }, cancellationToken);
     }
@@ -48,8 +48,8 @@ public class ThermoSemOptics
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
-            var wdMeters = client.Beams.ElectronBeam.WorkingDistance.Value;
+            SdbMicroscopeClient client = _getClient();
+            double wdMeters = client.Beams.ElectronBeam.WorkingDistance.Value;
             return wdMeters * 1000.0;
         }, cancellationToken);
     }
@@ -58,7 +58,7 @@ public class ThermoSemOptics
     {
         await Task.Run(() =>
         {
-            var client = _getClient();
+            SdbMicroscopeClient client = _getClient();
             client.Beams.ElectronBeam.WorkingDistance.Value = workingDistanceMm / 1000.0;
         }, cancellationToken);
     }
@@ -85,7 +85,7 @@ public class ThermoSemOptics
     {
         return await Task.Run(() =>
         {
-            var client = _getClient();
+            SdbMicroscopeClient client = _getClient();
             return client.Beams.ElectronBeam.Scanning.Spot.Value;
         }, cancellationToken);
     }

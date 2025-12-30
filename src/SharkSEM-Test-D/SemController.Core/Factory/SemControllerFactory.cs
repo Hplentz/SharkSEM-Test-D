@@ -37,21 +37,21 @@ public static class SemControllerFactory
     
     public static async Task<ISemController> CreateAndConnectAsync(SemConnectionSettings settings, CancellationToken cancellationToken = default)
     {
-        var controller = Create(settings);
+        ISemController controller = Create(settings);
         await controller.ConnectAsync(cancellationToken);
         return controller;
     }
     
     public static async Task<ISemController> CreateAndConnectTescanAsync(string host, int port = 8300, double timeoutSeconds = 30.0, CancellationToken cancellationToken = default)
     {
-        var controller = CreateTescan(host, port, timeoutSeconds);
+        ISemController controller = CreateTescan(host, port, timeoutSeconds);
         await controller.ConnectAsync(cancellationToken);
         return controller;
     }
     
     public static async Task<ISemController> CreateAndConnectThermoAsync(string host = "localhost", int port = 7520, CancellationToken cancellationToken = default)
     {
-        var controller = CreateThermo(host, port);
+        ISemController controller = CreateThermo(host, port);
         await controller.ConnectAsync(cancellationToken);
         return controller;
     }

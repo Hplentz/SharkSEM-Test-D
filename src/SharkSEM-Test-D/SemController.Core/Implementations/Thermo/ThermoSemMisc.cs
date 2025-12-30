@@ -16,7 +16,7 @@ public class ThermoSemMisc
     {
         return await Task.Run(() =>
         {
-            var service = _getClient().Service;
+            dynamic service = _getClient().Service;
             return new MicroscopeInfo
             {
                 Manufacturer = "Thermo Fisher Scientific",

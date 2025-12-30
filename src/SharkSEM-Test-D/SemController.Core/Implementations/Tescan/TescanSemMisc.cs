@@ -13,11 +13,11 @@ public class TescanSemMisc
     
     public async Task<MicroscopeInfo> GetMicroscopeInfoAsync(CancellationToken cancellationToken = default)
     {
-        var info = new MicroscopeInfo { Manufacturer = "TESCAN" };
+        MicroscopeInfo info = new MicroscopeInfo { Manufacturer = "TESCAN" };
         
         try
         {
-            var response = await _controller.SendCommandInternalAsync("TcpGetModel", null, cancellationToken);
+            byte[] response = await _controller.SendCommandInternalAsync("TcpGetModel", null, cancellationToken);
             if (response.Length > 0)
             {
                 int offset = 0;
@@ -28,7 +28,7 @@ public class TescanSemMisc
         
         try
         {
-            var response = await _controller.SendCommandInternalAsync("TcpGetDevice", null, cancellationToken);
+            byte[] response = await _controller.SendCommandInternalAsync("TcpGetDevice", null, cancellationToken);
             if (response.Length > 0)
             {
                 int offset = 0;
@@ -39,7 +39,7 @@ public class TescanSemMisc
         
         try
         {
-            var response = await _controller.SendCommandInternalAsync("TcpGetSWVersion", null, cancellationToken);
+            byte[] response = await _controller.SendCommandInternalAsync("TcpGetSWVersion", null, cancellationToken);
             if (response.Length > 0)
             {
                 int offset = 0;
@@ -50,7 +50,7 @@ public class TescanSemMisc
         
         try
         {
-            var response = await _controller.SendCommandInternalAsync("TcpGetVersion", null, cancellationToken);
+            byte[] response = await _controller.SendCommandInternalAsync("TcpGetVersion", null, cancellationToken);
             if (response.Length > 0)
             {
                 int offset = 0;
