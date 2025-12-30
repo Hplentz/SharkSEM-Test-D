@@ -27,8 +27,8 @@ public class ThermoSemMisc
 
             try
             {
-                dynamic service = _getClient().Service;
-                dynamic system = service.System;
+                var service = _getClient().Service;
+                var system = service.System;
                 
                 try
                 {

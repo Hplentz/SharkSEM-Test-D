@@ -43,6 +43,10 @@ src/SharkSEM-Test-D/
 - **Unit Conventions**: Standardized units for stage positions (mm), working distance (mm), view field (µm), high voltage (Volts), emission current (Amperes), and tilt/rotation (Degrees).
 - **Image Acquisition Workflow**: Detailed steps for detector configuration, channel selection, enabling, signal optimization, and image capture via a dedicated data channel.
 
+## Important Implementation Notes
+
+**Thermo AutoScript API - Use `var` for COM objects**: When accessing AutoScript service properties (e.g., `_getClient().Service`, `service.System`), you MUST use `var` instead of explicit `dynamic` declarations. Using `dynamic` explicitly causes RuntimeBinderException because it loses type information needed for COM property resolution. This is critical for ThermoSemMisc.cs and any code accessing the AutoScript API.
+
 ## External Dependencies
 - **TESCAN SharkSEM Protocol**: Custom TCP-based binary protocol (default port 8300 for control, 8301 for data).
 - **Thermo Fisher Scientific AutoScript API**: COM-based C# API, requiring specific DLLs (`SemController.Core/Implementations/Thermo/lib/`).
