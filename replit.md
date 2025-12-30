@@ -47,6 +47,18 @@ src/SharkSEM-Test-D/
 
 **Thermo AutoScript API - Use `var` for COM objects**: When accessing AutoScript service properties (e.g., `_getClient().Service`, `service.System`), you MUST use `var` instead of explicit `dynamic` declarations. Using `dynamic` explicitly causes RuntimeBinderException because it loses type information needed for COM property resolution. This is critical for ThermoSemMisc.cs and any code accessing the AutoScript API.
 
+## Recent Changes (December 2025)
+
+**Source Code Documentation Complete**
+All 35+ source files now include comprehensive documentation:
+- File headers with protocol/architecture overviews
+- Class-level summaries describing purpose and responsibilities  
+- Method documentation explaining functionality and parameters
+- Unit conversion notes where applicable
+- Critical implementation details for protocol handling
+
+Documentation standard follows: No line-by-line commenting. Focus on what and why, making code maintainable when modified outside Replit.
+
 ## External Dependencies
 - **TESCAN SharkSEM Protocol**: Custom TCP-based binary protocol (default port 8300 for control, 8301 for data).
 - **Thermo Fisher Scientific AutoScript API**: COM-based C# API, requiring specific DLLs (`SemController.Core/Implementations/Thermo/lib/`).
