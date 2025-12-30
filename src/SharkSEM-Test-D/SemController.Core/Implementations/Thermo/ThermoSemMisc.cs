@@ -16,15 +16,63 @@ public class ThermoSemMisc
     {
         return await Task.Run(() =>
         {
-            dynamic service = _getClient().Service;
-            return new MicroscopeInfo
+            MicroscopeInfo info = new MicroscopeInfo
             {
                 Manufacturer = "Thermo Fisher Scientific",
-                Model = service.System.Name,
-                SerialNumber = service.System.SerialNumber,
-                SoftwareVersion = service.System.Version,
+                Model = "SEM",
+                SerialNumber = "Unknown",
+                SoftwareVersion = "Unknown",
                 ProtocolVersion = "AutoScript"
             };
+
+            try
+            {
+                dynamic service = _getClient().Service;
+                
+                try
+                {
+                    info.Model = service.Microscope.Name;
+                }
+                catch
+                {
+                    try
+                    {
+                        info.Model = service.Name;
+                    }
+                    catch { }
+                }
+                
+                try
+                {
+                    info.SerialNumber = service.Microscope.SerialNumber;
+                }
+                catch
+                {
+                    try
+                    {
+                        info.SerialNumber = service.SerialNumber;
+                    }
+                    catch { }
+                }
+                
+                try
+                {
+                    info.SoftwareVersion = service.Microscope.Version;
+                }
+                catch
+                {
+                    try
+                    {
+                        info.SoftwareVersion = service.Version;
+                    }
+                    catch { }
+                }
+            }
+            catch
+            {
+            }
+
+            return info;
         }, cancellationToken);
     }
 }
