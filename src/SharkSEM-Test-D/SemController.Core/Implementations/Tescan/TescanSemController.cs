@@ -297,16 +297,16 @@ public class TescanSemController : ISemController
         ["DtStateGet"] = new Version(3, 1, 1),
         ["DtStateSet"] = new Version(3, 1, 1),
         
-        // Image Geometry commands (may not exist in older protocols)
-        ["EnumGeometries"] = new Version(1, 0, 0),
-        ["GetGeometry"] = new Version(2, 1, 0),      // Requires newer protocol
-        ["SetGeometry"] = new Version(2, 1, 0),
-        ["GetGeomLimits"] = new Version(2, 1, 0),
+        // Image Geometry commands - per SharkSEM API v2.0.22 manual
+        ["EnumGeometries"] = new Version(1, 0, 5),
+        ["GetGeometry"] = new Version(1, 0, 5),
+        ["SetGeometry"] = new Version(1, 0, 5),
+        ["GetGeomLimits"] = new Version(2, 0, 22),   // Added in 2.0.22, not in 2.0.21!
         ["GetImageShift"] = new Version(1, 0, 0),
         ["SetImageShift"] = new Version(1, 0, 0),
-        ["EnumCenterings"] = new Version(1, 0, 0),
-        ["GetCentering"] = new Version(1, 0, 0),
-        ["SetCentering"] = new Version(1, 0, 0),
+        ["EnumCenterings"] = new Version(1, 0, 5),
+        ["GetCentering"] = new Version(1, 0, 5),
+        ["SetCentering"] = new Version(1, 0, 5),
     };
     
     /// <summary>
