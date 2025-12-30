@@ -296,6 +296,17 @@ public class TescanSemController : ISemController
         ["DtStateEnum"] = new Version(3, 1, 1),
         ["DtStateGet"] = new Version(3, 1, 1),
         ["DtStateSet"] = new Version(3, 1, 1),
+        
+        // Image Geometry commands (may not exist in older protocols)
+        ["EnumGeometries"] = new Version(1, 0, 0),
+        ["GetGeometry"] = new Version(2, 1, 0),      // Requires newer protocol
+        ["SetGeometry"] = new Version(2, 1, 0),
+        ["GetGeomLimits"] = new Version(2, 1, 0),
+        ["GetImageShift"] = new Version(1, 0, 0),
+        ["SetImageShift"] = new Version(1, 0, 0),
+        ["EnumCenterings"] = new Version(1, 0, 0),
+        ["GetCentering"] = new Version(1, 0, 0),
+        ["SetCentering"] = new Version(1, 0, 0),
     };
     
     /// <summary>
@@ -326,6 +337,10 @@ public class TescanSemController : ISemController
     /// <summary>
     /// Queries and parses the protocol version from the SEM.
     /// Called during ConnectAsync to enable version checking for subsequent commands.
+    /// 
+    /// Note: Older protocol versions may return additional data (like device info)
+    /// concatenated in the response. We extract only the version portion which
+    /// matches the pattern "X.Y.Z" (digits and dots only).
     /// </summary>
     private async Task FetchProtocolVersionAsync(CancellationToken cancellationToken)
     {
@@ -336,7 +351,26 @@ public class TescanSemController : ISemController
             if (response.Length > 0)
             {
                 int offset = 0;
-                ProtocolVersionString = DecodeStringInternal(response, ref offset);
+                string rawVersionString = DecodeStringInternal(response, ref offset);
+                
+                // Extract only the version portion (digits and dots)
+                // Older protocols may append device info like "2.0.210300USB\VID_..."
+                // We want just "2.0.21"
+                int endIndex = 0;
+                for (int i = 0; i < rawVersionString.Length; i++)
+                {
+                    char c = rawVersionString[i];
+                    if (char.IsDigit(c) || c == '.')
+                    {
+                        endIndex = i + 1;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                ProtocolVersionString = endIndex > 0 ? rawVersionString.Substring(0, endIndex) : rawVersionString;
                 
                 // Parse version string like "3.2.20" into Version object
                 string[] parts = ProtocolVersionString.Split('.');
