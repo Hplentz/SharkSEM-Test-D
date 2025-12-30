@@ -196,11 +196,12 @@ public class TescanSemElectronOptics
     
     /// <summary>
     /// Gets absorbed current measurement from Faraday cup in picoamps.
+    /// SharkSEM Command: GetIAbsorbed (no body)
+    /// Response: Float (ASCII-encoded absorbed current value)
     /// </summary>
     public async Task<double> GetAbsorbedCurrentAsync(CancellationToken cancellationToken = default)
     {
-        byte[] body = TescanSemController.EncodeIntInternal(0);
-        byte[] response = await _controller.SendCommandInternalAsync("GetIAbsorbed", body, cancellationToken);
+        byte[] response = await _controller.SendCommandInternalAsync("GetIAbsorbed", null, cancellationToken);
         if (response.Length > 0)
         {
             int offset = 0;
