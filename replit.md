@@ -49,6 +49,17 @@ src/SharkSEM-Test-D/
 
 ## Recent Changes (December 2025)
 
+**Enhanced Protocol Documentation in TescanSemController.cs and TescanSemScanning.cs**
+
+Key files now include detailed ASCII diagrams and protocol specifications:
+
+- **SharkSEM Message Header Format**: 32-byte layout with offset/size/field tables
+- **Body Data Encoding**: Integer, float (ASCII-encoded!), string formats with examples
+- **Data Channel Setup**: Critical bind→register→connect sequence explained
+- **ScScanXY Command**: Request/response body format for image acquisition
+- **ScData Message Format**: Data channel pixel data structure
+- **Wait Flags**: WaitFlagOptics, WaitFlagAuto usage and importance
+
 **Source Code Documentation Complete**
 All 35+ source files now include comprehensive documentation:
 - File headers with protocol/architecture overviews
