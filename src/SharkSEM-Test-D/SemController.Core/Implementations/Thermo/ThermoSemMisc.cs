@@ -29,43 +29,65 @@ public class ThermoSemMisc
             {
                 dynamic service = _getClient().Service;
                 
-                try
+                string[] modelPaths = new[]
                 {
-                    info.Model = service.Microscope.Name;
+                    "service.Beams.Electron.MicroscopeName",
+                    "service.Instrument.Name",
+                    "service.Instrument.Type",
+                    "service.Configuration.Name",
+                    "service.Configuration.MicroscopeName",
+                    "service.MicroscopeName",
+                    "service.InstrumentName"
+                };
+                
+                try { info.Model = service.Beams.Electron.MicroscopeName; } catch { }
+                if (info.Model == "SEM")
+                {
+                    try { info.Model = service.Instrument.Name; } catch { }
                 }
-                catch
+                if (info.Model == "SEM")
                 {
-                    try
-                    {
-                        info.Model = service.Name;
-                    }
-                    catch { }
+                    try { info.Model = service.Instrument.Type; } catch { }
+                }
+                if (info.Model == "SEM")
+                {
+                    try { info.Model = service.Configuration.Name; } catch { }
+                }
+                if (info.Model == "SEM")
+                {
+                    try { info.Model = service.Configuration.MicroscopeName; } catch { }
+                }
+                if (info.Model == "SEM")
+                {
+                    try { info.Model = service.MicroscopeName; } catch { }
+                }
+                if (info.Model == "SEM")
+                {
+                    try { info.Model = service.InstrumentName; } catch { }
                 }
                 
-                try
+                try { info.SerialNumber = service.Instrument.SerialNumber; } catch { }
+                if (info.SerialNumber == "Unknown")
                 {
-                    info.SerialNumber = service.Microscope.SerialNumber;
+                    try { info.SerialNumber = service.Configuration.SerialNumber; } catch { }
                 }
-                catch
+                if (info.SerialNumber == "Unknown")
                 {
-                    try
-                    {
-                        info.SerialNumber = service.SerialNumber;
-                    }
-                    catch { }
+                    try { info.SerialNumber = service.SerialNumber; } catch { }
                 }
                 
-                try
+                try { info.SoftwareVersion = service.Instrument.SoftwareVersion; } catch { }
+                if (info.SoftwareVersion == "Unknown")
                 {
-                    info.SoftwareVersion = service.Microscope.Version;
+                    try { info.SoftwareVersion = service.Configuration.SoftwareVersion; } catch { }
                 }
-                catch
+                if (info.SoftwareVersion == "Unknown")
                 {
-                    try
-                    {
-                        info.SoftwareVersion = service.Version;
-                    }
-                    catch { }
+                    try { info.SoftwareVersion = service.SoftwareVersion; } catch { }
+                }
+                if (info.SoftwareVersion == "Unknown")
+                {
+                    try { info.SoftwareVersion = service.Version; } catch { }
                 }
             }
             catch
