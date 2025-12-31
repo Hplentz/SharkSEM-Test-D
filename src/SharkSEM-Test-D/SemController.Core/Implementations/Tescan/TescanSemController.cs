@@ -249,7 +249,8 @@ public class TescanSemController : ISemController
         ["StgMove"] = new Version(1, 0, 0),
         ["StgIsBusy"] = new Version(1, 0, 0),
         ["StgStop"] = new Version(1, 0, 0),
-        ["StgGetLimits"] = new Version(1, 0, 0),
+        ["StgGetLimits"] = new Version(2, 0, 22),    // Added in 2.0.22, not in 2.0.21!
+        ["StgGetMotorized"] = new Version(2, 0, 22), // Added in 2.0.22
         ["StgCalibrate"] = new Version(1, 0, 0),
         ["StgIsCalibrated"] = new Version(1, 0, 0),
         
