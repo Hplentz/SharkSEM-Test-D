@@ -49,6 +49,23 @@ src/SharkSEM-Test-D/
 
 ## Recent Changes (December 2025)
 
+**Live Hardware Testing & Bug Fixes - Verified on Gen3 (V2.x.x) and Gen4 (V3.x.x) SEMs**
+
+Critical bugs fixed during live SEM testing:
+
+1. **GetIAbsorbed hang**: Fixed by sending `null` body instead of integer 0. Protocol expects no body for this command.
+
+2. **Protocol version parsing**: Older protocols (V2.x.x) may return device info concatenated with version string (e.g., "2.0.210300USB\VID_..."). Fixed to extract only version digits.
+
+3. **Command version checking**: Added `CommandMinVersions` dictionary to skip unsupported commands gracefully instead of hanging. Key commands added in V2.0.22 (not available in V2.0.21):
+   - `StgGetLimits` - Get stage travel limits
+   - `StgGetMotorized` - Check motorized axes
+   - `GetGeomLimits` - Get geometry parameter limits
+
+4. **Version requirements verified from API manuals**:
+   - V2.0.22 manual for Gen3 SEMs
+   - V3.x.x manual for Gen4 SEMs
+
 **Enhanced Protocol Documentation in TescanSemController.cs and TescanSemScanning.cs**
 
 Key files now include detailed ASCII diagrams and protocol specifications:
