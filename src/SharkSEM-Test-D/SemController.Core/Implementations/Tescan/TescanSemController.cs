@@ -470,9 +470,17 @@ public class TescanSemController : ISemController
         _client = new TcpClient();
         _client.ReceiveTimeout = (int)(_timeoutSeconds * 1000);
         _client.SendTimeout = (int)(_timeoutSeconds * 1000);
-        
+
         // Connect to control channel
-        await _client.ConnectAsync(_host, _port, cancellationToken);
+        try
+        {
+            await _client.ConnectAsync(_host, _port, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR - COULDN'T CONNECT TO TESCAN\r\n\r\n" + ex.ToString());
+            System.Environment.Exit(1);
+        }
         _stream = _client.GetStream();
         
         // Reset data channel state
