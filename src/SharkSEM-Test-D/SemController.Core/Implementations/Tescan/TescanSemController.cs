@@ -463,6 +463,8 @@ public class TescanSemController : ISemController
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
         if (IsConnected) return;
+
+        // Test change
         
         // Create TCP client with configured timeouts
         _client = new TcpClient();
