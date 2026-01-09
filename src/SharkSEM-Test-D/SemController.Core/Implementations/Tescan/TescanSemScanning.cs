@@ -353,11 +353,29 @@ public class TescanSemScanning
     /// <param name="settings">Scan parameters (resolution, channels, ROI).</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Array of acquired images, one per channel.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if data channel setup fails or scan command returns an error.</exception>
+    /// <exception cref="TimeoutException">Thrown if image data is not received within the timeout period.</exception>
     public async Task<SemImage[]> AcquireImagesAsync(ScanSettings settings, CancellationToken cancellationToken = default)
     {
-        // Step 1: Ensure data channel is established
-        // This performs the critical bind → register → connect sequence
-        await _controller.EnsureDataChannelInternalAsync(cancellationToken);
+        // Validate settings
+        if (settings.Channels == null || settings.Channels.Length == 0)
+            throw new ArgumentException("At least one detector channel must be specified.", nameof(settings));
+        if (settings.Width <= 0 || settings.Height <= 0)
+            throw new ArgumentException("Width and Height must be positive values.", nameof(settings));
+        
+        try
+        {
+            // Step 1: Ensure data channel is established
+            // This performs the critical bind → register → connect sequence
+            await _controller.EnsureDataChannelInternalAsync(cancellationToken);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Data channel setup failed - provide helpful error message
+            throw new InvalidOperationException(
+                "Failed to establish data channel for image acquisition. " +
+                "Ensure the SEM connection is stable and try again.", ex);
+        }
         
         // Step 2: Enable each requested detector channel
         // DtEnable parameters: [channel][enabled][bpp]
@@ -400,7 +418,17 @@ public class TescanSemScanning
                 int scannedFrameId = TescanSemController.DecodeIntInternal(scanResult, 0);
                 if (scannedFrameId < 0)
                 {
-                    throw new InvalidOperationException($"ScScanXY failed with error code: {scannedFrameId}");
+                    // ScScanXY returned an error code - decode the error
+                    string errorDesc = scannedFrameId switch
+                    {
+                        -1 => "Invalid parameters or detector not selected",
+                        -2 => "Data channel not registered",
+                        -3 => "Scan already in progress",
+                        _ => $"Unknown error code"
+                    };
+                    throw new InvalidOperationException(
+                        $"Image acquisition failed: ScScanXY returned error {scannedFrameId} ({errorDesc}). " +
+                        "Ensure a detector is selected and the data channel is properly registered.");
                 }
             }
             
@@ -408,6 +436,14 @@ public class TescanSemScanning
             // ScData messages arrive progressively with pixel chunks
             int imageSize = settings.Width * settings.Height;
             List<byte[]> imageDataList = await ReadAllImagesFromDataChannelAsync(settings.Channels, imageSize, cancellationToken);
+            
+            // Verify we received complete images
+            if (imageDataList.Count == 0)
+            {
+                throw new TimeoutException(
+                    "No image data received from SEM. The data channel may have been interrupted " +
+                    "or the scan may have failed silently.");
+            }
             
             // Build SemImage array from received data
             List<SemImage> images = new List<SemImage>();
@@ -421,11 +457,26 @@ public class TescanSemScanning
             
             return images.ToArray();
         }
+        catch (IOException ex)
+        {
+            // Communication error during scan - connection may be lost
+            throw new InvalidOperationException(
+                "Communication error during image acquisition. " +
+                "The connection to the SEM may have been lost.", ex);
+        }
         finally
         {
             // Step 7: ALWAYS restore GUI scanning control
             // This is critical - leaving GUI scanning disabled would lock the operator out
-            await SetGuiScanningAsync(true, cancellationToken);
+            try
+            {
+                await SetGuiScanningAsync(true, cancellationToken);
+            }
+            catch
+            {
+                // Ignore errors restoring GUI - we don't want to mask the original exception
+                // The operator can manually re-enable scanning on the SEM if needed
+            }
         }
     }
     

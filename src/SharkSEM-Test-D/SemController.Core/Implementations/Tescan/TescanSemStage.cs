@@ -151,17 +151,44 @@ public class TescanSemStage
     
     /// <summary>
     /// Polls IsMoving until stage stops or timeout occurs.
+    /// Provides detailed error reporting including position information when possible.
     /// </summary>
     private async Task WaitForMovementAsync(CancellationToken cancellationToken)
     {
         DateTime startTime = DateTime.UtcNow;
-        while (await IsMovingAsync(cancellationToken))
+        StagePosition? lastKnownPosition = null;
+        
+        try
         {
-            if (DateTime.UtcNow - startTime > _stageMovementTimeout)
+            while (await IsMovingAsync(cancellationToken))
             {
-                throw new TimeoutException($"Stage movement timed out after {_stageMovementTimeout.TotalMinutes} minutes");
+                if (DateTime.UtcNow - startTime > _stageMovementTimeout)
+                {
+                    // Get current position to include in error message
+                    try { lastKnownPosition = await GetPositionAsync(cancellationToken); } catch { }
+                    
+                    string positionInfo = lastKnownPosition != null 
+                        ? $" Current position: {lastKnownPosition}" 
+                        : "";
+                    throw new TimeoutException(
+                        $"Stage movement timed out after {_stageMovementTimeout.TotalMinutes} minutes.{positionInfo} " +
+                        "The stage may be stuck or an obstacle is preventing movement. " +
+                        "Use StopAsync() to halt the stage.");
+                }
+                await Task.Delay(100, cancellationToken);
             }
-            await Task.Delay(100, cancellationToken);
+        }
+        catch (IOException ex)
+        {
+            // Communication error while waiting for movement
+            // Try to get position info for error context
+            try { lastKnownPosition = await GetPositionAsync(cancellationToken); } catch { }
+            
+            string positionInfo = lastKnownPosition != null 
+                ? $" Last known position: {lastKnownPosition}" 
+                : "";
+            throw new InvalidOperationException(
+                $"Communication lost while waiting for stage movement to complete.{positionInfo}", ex);
         }
     }
     
@@ -220,10 +247,23 @@ public class TescanSemStage
     /// <summary>
     /// Initiates stage calibration/homing sequence.
     /// Stage must be calibrated after power-on before accurate movements.
+    /// Note: Calibration can take up to one minute. Use IsCallibratedAsync() to check completion.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if not connected or if stage/detector noses are busy.</exception>
     public async Task CalibrateAsync(CancellationToken cancellationToken = default)
     {
-        await _controller.SendCommandNoResponseInternalAsync("StgCalibrate", null, cancellationToken);
+        // Per SharkSEM API manual: StgCalibrate requires all stages and detector noses to be idle
+        // (Wait B flag must not be set). Calibration takes up to one minute.
+        try
+        {
+            await _controller.SendCommandNoResponseInternalAsync("StgCalibrate", null, cancellationToken);
+        }
+        catch (IOException ex)
+        {
+            throw new InvalidOperationException(
+                "Failed to initiate stage calibration. Ensure all stages and detector noses are idle " +
+                "before attempting calibration.", ex);
+        }
     }
     
     /// <summary>

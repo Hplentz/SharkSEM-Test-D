@@ -87,6 +87,36 @@ All 35+ source files now include comprehensive documentation:
 
 Documentation standard follows: No line-by-line commenting. Focus on what and why, making code maintainable when modified outside Replit.
 
+## Recent Changes (January 2026)
+
+**Comprehensive Exception Handling Implementation**
+
+Added robust exception handling across all TESCAN modules with detailed source comments explaining error scenarios and recovery strategies:
+
+1. **ConnectAsync**: Catches SocketException with proper cleanup, re-throws descriptive InvalidOperationException with troubleshooting guidance (check power, SharkSEM server, firewall).
+
+2. **EnsureDataChannelInternalAsync**: Data channel setup errors trigger CloseDataChannel() cleanup to allow retry. Reports specific failure stage (bind, register, or connect).
+
+3. **SendCommandInternalAsync/NoResponse**: Detects connection loss during read/write, marks controller disconnected via MarkDisconnected() helper, throws IOException with command name and context.
+
+4. **TescanSemStage.WaitForMovementAsync**: Timeout errors include current stage position when available. Communication errors during wait are caught and reported with position context.
+
+5. **TescanSemVacuum**: PumpAsync/VentAsync include safety warnings (venting while beam on = potential gun damage) and wrap errors with helpful messages.
+
+6. **TescanSemHighVoltage.BeamOnAsync**: Documents vacuum prerequisites per API manual. SetVoltageAsync includes voltage limits guidance.
+
+7. **TescanSemScanning.AcquireImagesAsync**: Validates parameters upfront, decodes ScScanXY error codes (-1/-2/-3), ensures GUI scanning is re-enabled in finally block even on errors.
+
+**Design Decisions**:
+- Library re-throws descriptive exceptions instead of calling Environment.Exit
+- IOException for network/communication failures
+- InvalidOperationException for state/prerequisite errors  
+- TimeoutException for operations that exceed time limits
+- MarkDisconnected() centralizes connection cleanup
+- Error messages include actionable troubleshooting guidance
+
+**Startup Project**: SemController.Tescan.Example set as default startup project in solution file.
+
 ## External Dependencies
 - **TESCAN SharkSEM Protocol**: Custom TCP-based binary protocol (default port 8300 for control, 8301 for data).
 - **Thermo Fisher Scientific AutoScript API**: COM-based C# API, requiring specific DLLs (`SemController.Core/Implementations/Thermo/lib/`).

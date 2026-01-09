@@ -83,18 +83,49 @@ public class TescanSemVacuum
     /// <summary>
     /// Initiates chamber pump-down sequence.
     /// Fire-and-forget command (no response expected).
+    /// 
+    /// Note: This is a long-running operation. Monitor GetStatusAsync() for
+    /// vacuum state changes. Pump-down time varies from seconds to minutes
+    /// depending on chamber volume and current pressure.
     /// </summary>
+    /// <exception cref="IOException">Thrown if communication with SEM fails.</exception>
     public async Task PumpAsync(CancellationToken cancellationToken = default)
     {
-        await _controller.SendCommandNoResponseInternalAsync("VacPump", null, cancellationToken);
+        try
+        {
+            await _controller.SendCommandNoResponseInternalAsync("VacPump", null, cancellationToken);
+        }
+        catch (IOException ex)
+        {
+            throw new IOException(
+                "Failed to initiate vacuum pump-down. " +
+                "Check SEM connection and vacuum system status.", ex);
+        }
     }
     
     /// <summary>
     /// Initiates chamber venting to atmosphere.
     /// Fire-and-forget command (no response expected).
+    /// 
+    /// CAUTION: Venting while beam is on can damage the electron gun!
+    /// The SEM should automatically protect against this, but verify
+    /// beam is off before venting if possible.
+    /// 
+    /// Note: This is a long-running operation. Monitor GetStatusAsync() for
+    /// vacuum state changes.
     /// </summary>
+    /// <exception cref="IOException">Thrown if communication with SEM fails.</exception>
     public async Task VentAsync(CancellationToken cancellationToken = default)
     {
-        await _controller.SendCommandNoResponseInternalAsync("VacVent", null, cancellationToken);
+        try
+        {
+            await _controller.SendCommandNoResponseInternalAsync("VacVent", null, cancellationToken);
+        }
+        catch (IOException ex)
+        {
+            throw new IOException(
+                "Failed to initiate chamber venting. " +
+                "Check SEM connection and vacuum system status.", ex);
+        }
     }
 }

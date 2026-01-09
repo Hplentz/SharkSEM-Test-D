@@ -463,24 +463,46 @@ public class TescanSemController : ISemController
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
         if (IsConnected) return;
-
-        // Test change
         
         // Create TCP client with configured timeouts
         _client = new TcpClient();
         _client.ReceiveTimeout = (int)(_timeoutSeconds * 1000);
         _client.SendTimeout = (int)(_timeoutSeconds * 1000);
 
-        // Connect to control channel
+        // Connect to control channel with comprehensive exception handling
+        // Network failures are common: wrong IP, firewall blocking, SEM not running SharkSEM server
         try
         {
             await _client.ConnectAsync(_host, _port, cancellationToken);
         }
+        catch (System.Net.Sockets.SocketException ex)
+        {
+            // Network-level failure (connection refused, host unreachable, etc.)
+            // Clean up the TcpClient before re-throwing
+            _client?.Dispose();
+            _client = null;
+            throw new InvalidOperationException(
+                $"Network error connecting to TESCAN SEM at {_host}:{_port}. " +
+                $"Ensure the microscope is powered on, SharkSEM server is running, " +
+                $"and no firewall is blocking the connection. Socket error: {ex.SocketErrorCode}", ex);
+        }
+        catch (OperationCanceledException)
+        {
+            // Connection was cancelled (e.g., timeout or user cancellation)
+            // Clean up and let cancellation propagate normally
+            _client?.Dispose();
+            _client = null;
+            throw;
+        }
         catch (Exception ex)
         {
-            Console.WriteLine("ERROR - COULDN'T CONNECT TO TESCAN\r\n\r\n" + ex.ToString());
-            System.Environment.Exit(1);
+            // Unexpected error - clean up and re-throw with context
+            _client?.Dispose();
+            _client = null;
+            throw new InvalidOperationException(
+                $"Failed to connect to TESCAN SEM at {_host}:{_port}: {ex.Message}", ex);
         }
+        
         _stream = _client.GetStream();
         
         // Reset data channel state
@@ -525,26 +547,66 @@ public class TescanSemController : ISemController
         if (_dataClient?.Connected == true && _dataChannelRegistered)
             return;
         
-        // Step 1: Create TCP client and bind to local port
-        _dataClient = new TcpClient();
-        _dataClient.ReceiveTimeout = (int)(_timeoutSeconds * 1000);
-        _dataClient.SendTimeout = (int)(_timeoutSeconds * 1000);
-        
-        // Bind to any available local port (OS assigns one)
-        _dataClient.Client.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0));
-        
-        // Get the port number that was assigned
-        int localPort = ((System.Net.IPEndPoint)_dataClient.Client.LocalEndPoint!).Port;
-        
-        // Step 2: Register our port with the SEM via control channel
-        byte[] regBody = EncodeIntInternal(localPort);
-        await SendCommandInternalAsync("TcpRegDataPort", regBody, cancellationToken);
-        
-        // Step 3: Connect to SEM's data port (control port + 1)
-        await _dataClient.ConnectAsync(_host, _port + 1, cancellationToken);
-        _dataStream = _dataClient.GetStream();
-        
-        _dataChannelRegistered = true;
+        // Data channel setup requires precise sequence: bind → register → connect
+        // Any failure requires cleanup to allow retry
+        try
+        {
+            // Step 1: Create TCP client and bind to local port
+            _dataClient = new TcpClient();
+            _dataClient.ReceiveTimeout = (int)(_timeoutSeconds * 1000);
+            _dataClient.SendTimeout = (int)(_timeoutSeconds * 1000);
+            
+            // Bind to any available local port (OS assigns one)
+            _dataClient.Client.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0));
+            
+            // Get the port number that was assigned
+            int localPort = ((System.Net.IPEndPoint)_dataClient.Client.LocalEndPoint!).Port;
+            
+            // Step 2: Register our port with the SEM via control channel
+            // This tells the SEM where to send image data
+            byte[] regBody = EncodeIntInternal(localPort);
+            await SendCommandInternalAsync("TcpRegDataPort", regBody, cancellationToken);
+            
+            // Step 3: Connect to SEM's data port (control port + 1)
+            await _dataClient.ConnectAsync(_host, _port + 1, cancellationToken);
+            _dataStream = _dataClient.GetStream();
+            
+            _dataChannelRegistered = true;
+        }
+        catch (System.Net.Sockets.SocketException ex)
+        {
+            // Network error during data channel setup - clean up and report
+            CloseDataChannel();
+            throw new InvalidOperationException(
+                $"Failed to establish data channel to TESCAN SEM at {_host}:{_port + 1}. " +
+                $"Socket error: {ex.SocketErrorCode}. Image acquisition will not be available.", ex);
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancellation requested - clean up and propagate
+            CloseDataChannel();
+            throw;
+        }
+        catch (IOException ex)
+        {
+            // I/O error during TcpRegDataPort command
+            CloseDataChannel();
+            throw new InvalidOperationException(
+                $"Communication error while registering data port with SEM: {ex.Message}", ex);
+        }
+    }
+    
+    /// <summary>
+    /// Closes and cleans up the data channel resources.
+    /// Called on data channel errors to allow retry.
+    /// </summary>
+    private void CloseDataChannel()
+    {
+        _dataStream?.Close();
+        _dataClient?.Close();
+        _dataStream = null;
+        _dataClient = null;
+        _dataChannelRegistered = false;
     }
     
     /// <summary>
@@ -740,46 +802,87 @@ public class TescanSemController : ISemController
         if (!skipVersionCheck && !CheckVersionSupport(command))
             return Array.Empty<byte>();
         
+        // Verify connection is still valid before attempting command
         if (_stream == null)
-            throw new InvalidOperationException("Not connected to microscope");
+            throw new InvalidOperationException("Not connected to microscope. Call ConnectAsync first.");
         
-        // Build and send request
-        uint bodySize = (uint)(body?.Length ?? 0);
-        byte[] header = BuildHeader(command, bodySize);
-        
-        await _stream.WriteAsync(header, cancellationToken);
-        if (body != null && body.Length > 0)
+        try
         {
-            await _stream.WriteAsync(body, cancellationToken);
+            // Build and send request
+            uint bodySize = (uint)(body?.Length ?? 0);
+            byte[] header = BuildHeader(command, bodySize);
+            
+            await _stream.WriteAsync(header, cancellationToken);
+            if (body != null && body.Length > 0)
+            {
+                await _stream.WriteAsync(body, cancellationToken);
+            }
+            
+            // Read response header (loop to handle partial reads)
+            byte[] responseHeader = new byte[HeaderSize];
+            int bytesRead = 0;
+            while (bytesRead < HeaderSize)
+            {
+                int read = await _stream.ReadAsync(responseHeader.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
+                if (read == 0)
+                {
+                    // Connection was closed unexpectedly - mark as disconnected
+                    MarkDisconnected();
+                    throw new IOException($"Connection to SEM closed unexpectedly while executing '{command}'. " +
+                        "The microscope may have been restarted or the network connection was lost.");
+                }
+                bytesRead += read;
+            }
+            
+            // Extract body size from response header (bytes 16-19)
+            uint responseBodySize = BitConverter.ToUInt32(responseHeader, 16);
+            
+            if (responseBodySize == 0)
+                return Array.Empty<byte>();
+            
+            // Read response body (loop to handle partial reads)
+            byte[] responseBody = new byte[responseBodySize];
+            bytesRead = 0;
+            while (bytesRead < responseBodySize)
+            {
+                int read = await _stream.ReadAsync(responseBody.AsMemory(bytesRead, (int)responseBodySize - bytesRead), cancellationToken);
+                if (read == 0)
+                {
+                    // Connection was closed unexpectedly during body read
+                    MarkDisconnected();
+                    throw new IOException($"Connection to SEM closed unexpectedly while reading response for '{command}'. " +
+                        "Received {bytesRead} of {responseBodySize} bytes.");
+                }
+                bytesRead += read;
+            }
+            
+            return responseBody;
         }
-        
-        // Read response header (loop to handle partial reads)
-        byte[] responseHeader = new byte[HeaderSize];
-        int bytesRead = 0;
-        while (bytesRead < HeaderSize)
+        catch (System.Net.Sockets.SocketException ex)
         {
-            int read = await _stream.ReadAsync(responseHeader.AsMemory(bytesRead, HeaderSize - bytesRead), cancellationToken);
-            if (read == 0) throw new IOException("Connection closed by server");
-            bytesRead += read;
+            // Network-level error during command execution
+            MarkDisconnected();
+            throw new IOException($"Network error during command '{command}': {ex.SocketErrorCode}. " +
+                "The connection has been lost.", ex);
         }
-        
-        // Extract body size from response header (bytes 16-19)
-        uint responseBodySize = BitConverter.ToUInt32(responseHeader, 16);
-        
-        if (responseBodySize == 0)
-            return Array.Empty<byte>();
-        
-        // Read response body (loop to handle partial reads)
-        byte[] responseBody = new byte[responseBodySize];
-        bytesRead = 0;
-        while (bytesRead < responseBodySize)
+        catch (ObjectDisposedException)
         {
-            int read = await _stream.ReadAsync(responseBody.AsMemory(bytesRead, (int)responseBodySize - bytesRead), cancellationToken);
-            if (read == 0) throw new IOException("Connection closed by server");
-            bytesRead += read;
+            // Stream was disposed (connection already closed)
+            MarkDisconnected();
+            throw new InvalidOperationException($"Cannot execute command '{command}': connection has been closed.");
         }
-        
-        return responseBody;
+    }
+    
+    /// <summary>
+    /// Marks the controller as disconnected and cleans up resources.
+    /// Called when communication errors indicate the connection is no longer valid.
+    /// </summary>
+    private void MarkDisconnected()
+    {
+        _stream = null;
+        _client?.Close();
+        _client = null;
+        CloseDataChannel();
     }
     
     /// <summary>
@@ -797,19 +900,36 @@ public class TescanSemController : ISemController
         if (!CheckVersionSupport(command))
             return false;
         
+        // Verify connection is still valid before attempting command
         if (_stream == null)
-            throw new InvalidOperationException("Not connected to microscope");
+            throw new InvalidOperationException("Not connected to microscope. Call ConnectAsync first.");
         
-        uint bodySize = (uint)(body?.Length ?? 0);
-        // Note: flags=0 means no response requested
-        byte[] header = BuildHeader(command, bodySize, flags: 0);
-        
-        await _stream.WriteAsync(header, cancellationToken);
-        if (body != null && body.Length > 0)
+        try
         {
-            await _stream.WriteAsync(body, cancellationToken);
+            uint bodySize = (uint)(body?.Length ?? 0);
+            // Note: flags=0 means no response requested
+            byte[] header = BuildHeader(command, bodySize, flags: 0);
+            
+            await _stream.WriteAsync(header, cancellationToken);
+            if (body != null && body.Length > 0)
+            {
+                await _stream.WriteAsync(body, cancellationToken);
+            }
+            return true;
         }
-        return true;
+        catch (System.Net.Sockets.SocketException ex)
+        {
+            // Network-level error during command send
+            MarkDisconnected();
+            throw new IOException($"Network error sending command '{command}': {ex.SocketErrorCode}. " +
+                "The connection has been lost.", ex);
+        }
+        catch (ObjectDisposedException)
+        {
+            // Stream was disposed (connection already closed)
+            MarkDisconnected();
+            throw new InvalidOperationException($"Cannot execute command '{command}': connection has been closed.");
+        }
     }
     
     /// <summary>

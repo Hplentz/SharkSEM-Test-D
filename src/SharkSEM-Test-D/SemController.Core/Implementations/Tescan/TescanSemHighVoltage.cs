@@ -54,11 +54,30 @@ public class TescanSemHighVoltage
     /// <summary>
     /// Turns on the electron beam.
     /// Uses WaitFlagOptics and WaitFlagAuto to wait for beam stabilization.
+    /// 
+    /// Prerequisites per SharkSEM API manual:
+    /// - Vacuum must be ready (high vacuum or variable pressure mode active)
+    /// - Gun filament must be heated (for tungsten guns)
+    /// 
+    /// This command may take several seconds as it waits for beam stabilization.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown if vacuum is not ready or beam cannot be activated.</exception>
     public async Task BeamOnAsync(CancellationToken cancellationToken = default)
     {
-        // Wait flags ensure command doesn't return until beam is stable
-        await _controller.SendCommandWithWaitInternalAsync("HVBeamOn", null, TescanSemController.WaitFlagOpticsInternal | TescanSemController.WaitFlagAutoInternal, cancellationToken);
+        try
+        {
+            // Wait flags ensure command doesn't return until beam is stable
+            await _controller.SendCommandWithWaitInternalAsync("HVBeamOn", null, 
+                TescanSemController.WaitFlagOpticsInternal | TescanSemController.WaitFlagAutoInternal, 
+                cancellationToken);
+        }
+        catch (IOException ex)
+        {
+            throw new InvalidOperationException(
+                "Failed to turn on electron beam. " +
+                "Ensure vacuum system is ready (pumped down to operating pressure) " +
+                "and the SEM is in a valid state for beam activation.", ex);
+        }
     }
     
     /// <summary>
@@ -106,20 +125,34 @@ public class TescanSemHighVoltage
     
     /// <summary>
     /// Sets accelerating voltage in Volts.
+    /// 
+    /// Note: Voltage is subject to limits determined by the SEM model and configuration.
+    /// Values outside the valid range will be automatically adjusted by the SEM.
+    /// Typical ranges: 200V to 30kV depending on the microscope model.
     /// </summary>
     /// <param name="voltage">Target voltage in Volts.</param>
     /// <param name="waitForCompletion">
     /// If true (asyncFlag=0), command blocks until voltage stabilizes.
     /// If false (asyncFlag=1), command returns immediately.
     /// </param>
+    /// <exception cref="IOException">Thrown if communication with SEM fails.</exception>
     public async Task SetVoltageAsync(double voltage, bool waitForCompletion = true, CancellationToken cancellationToken = default)
     {
-        // asyncFlag: 0 = wait for completion, 1 = return immediately
-        int asyncFlag = waitForCompletion ? 0 : 1;
-        List<byte> body = new List<byte>();
-        body.AddRange(TescanSemController.EncodeFloatInternal(voltage));
-        body.AddRange(TescanSemController.EncodeIntInternal(asyncFlag));
-        await _controller.SendCommandNoResponseInternalAsync("HVSetVoltage", body.ToArray(), cancellationToken);
+        try
+        {
+            // asyncFlag: 0 = wait for completion, 1 = return immediately
+            int asyncFlag = waitForCompletion ? 0 : 1;
+            List<byte> body = new List<byte>();
+            body.AddRange(TescanSemController.EncodeFloatInternal(voltage));
+            body.AddRange(TescanSemController.EncodeIntInternal(asyncFlag));
+            await _controller.SendCommandNoResponseInternalAsync("HVSetVoltage", body.ToArray(), cancellationToken);
+        }
+        catch (IOException ex)
+        {
+            throw new IOException(
+                $"Failed to set accelerating voltage to {voltage}V. " +
+                "Check SEM connection and high voltage system status.", ex);
+        }
     }
     
     /// <summary>
