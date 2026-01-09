@@ -42,10 +42,12 @@ Console.WriteLine("  - Mock/Simulator (for testing without hardware)\n");
 
 Console.WriteLine("--- Connecting to TESCAN SEM at 127.0.0.1 ---\n");
 
-using (TescanSemController sem = new TescanSemController("127.0.0.1"))
+try
 {
-    await sem.ConnectAsync();
-    Console.WriteLine("Connected to TESCAN SEM");
+    using (TescanSemController sem = new TescanSemController("127.0.0.1"))
+    {
+        await sem.ConnectAsync();
+        Console.WriteLine("Connected to TESCAN SEM");
     
     // Retrieve and display microscope information
     MicroscopeInfo info = await sem.GetMicroscopeInfoAsync();
@@ -444,10 +446,25 @@ using (TescanSemController sem = new TescanSemController("127.0.0.1"))
         Console.WriteLine($"Could not save image: {ex.Message}");
     }
     
-    Console.WriteLine("\nBeam left ON for inspection");
+        Console.WriteLine("\nBeam left ON for inspection");
     
-    await sem.DisconnectAsync();
-    Console.WriteLine("Disconnected\n");
+        await sem.DisconnectAsync();
+        Console.WriteLine("Disconnected\n");
+    }
+}
+catch (InvalidOperationException ex)
+{
+    Console.WriteLine($"\nConnection Failed: {ex.Message}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Details: {ex.InnerException.Message}");
+    }
+    Console.WriteLine("\nTo test without hardware, consider using the MockSemController instead.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"\nUnexpected Error: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
 }
 
 // Additional connection examples
